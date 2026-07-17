@@ -1,0 +1,24 @@
+# General
+.DS_Store
+*.log
+.env
+.env.local
+
+# Flutter / Dart
+lanna/.dart_tool/
+lanna/.flutter-plugins
+lanna/.flutter-plugins-dependencies
+lanna/.packages
+lanna/build/
+lanna/android/local.properties
+lanna/android/.gradle/
+lanna/ios/Flutter/Generated.xcconfig
+lanna/ios/Flutter/flutter_export_environment.sh
+
+# Node.js (Lanna_Admin)
+Lanna_Admin/node_modules/
+Lanna_Admin/dist/
+Lanna_Admin/.env
+
+# Local logs
+*.bak

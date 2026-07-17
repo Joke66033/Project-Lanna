@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Font Test</title>
+  <style>
+    @font-face {
+      font-family: "LannaAkkhara";
+      src: url("../src/fonts/AKKHARA-KM.TTF") format("truetype");
+    }
+    .lanna {
+      font-family: "LannaAkkhara", serif;
+      font-size: 48px;
+      margin: 20px;
+    }
+    .system {
+      font-size: 48px;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Font: LannaAkkhara</h2>
+  
+  <div>
+    <h3>1. Thai Script: "สวัสดี" (expecting Lanna glyphs if legacy)</h3>
+    <div class="lanna">สวัสดี</div>
+  </div>
+
+  <div>
+    <h3>2. Tai Tham Script: "ᨠᨡᨢ" (expecting Lanna glyphs)</h3>
+    <div class="lanna">ᨠᨡᨢ</div>
+  </div>
+
+  <hr/>
+
+  <h2>Font: Default System Font</h2>
+  
+  <div>
+    <h3>3. Thai Script: "สวัสดี"</h3>
+    <div class="system">สวัสดี</div>
+  </div>
+
+  <div>
+    <h3>4. Tai Tham Script: "ᨠᨡᨢ"</h3>
+    <div class="system">ᨠᨡᨢ</div>
+  </div>
+</body>
+</html>

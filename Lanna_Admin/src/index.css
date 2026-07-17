@@ -1,0 +1,591 @@
+/* ฟอนต์นี้เป็นฟอนต์บังคับสำหรับตัวอักษรล้านนาทั้งโปรเจกต์ ห้ามเปลี่ยนหรือใช้ font อื่นแทนโดยไม่ปรึกษาก่อน */
+@font-face {
+  font-family: "LannaAkkhara";
+  src: url("./fonts/AKKHARA-KM.TTF") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ฟอนต์นี้เป็นฟอนต์บังคับสำหรับตัวอักษรล้านนาทั้งโปรเจกต์ ห้ามเปลี่ยนหรือใช้ font อื่นแทนโดยไม่ปรึกษาก่อน */
+.lanna-text {
+  font-family: "Noto Sans Tai Tham", "LannaAkkhara", serif;
+  font-size: 1.35em;
+  line-height: 1.8;
+}
+
+.lanna-char {
+  font-family: "Noto Sans Tai Tham", "LannaAkkhara", sans-serif;
+  font-size: 1.35em;
+  line-height: 1.8;
+}
+
+/* ป้องกันข้อความอักษรล้านนาล้นนอกกรอบในช่องกรอกข้อมูล */
+input.lanna-text,
+textarea.lanna-text,
+input.lanna-char,
+textarea.lanna-char {
+  line-height: 2.2 !important;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+  min-height: 62px !important;
+  overflow: visible !important;
+}
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Sarabun', 'Lexend', system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8f7f5;
+}
+
+html {
+  overflow-y: scroll;
+}
+
+body {
+  overflow-y: scroll;
+}
+
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ================= SWEETALERT2 FIX ================= */
+.swal2-container {
+  z-index: 9999 !important;
+}
+
+.swal2-actions {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  gap: 12px;
+}
+
+.swal2-confirm,
+.swal2-cancel {
+  display: inline-flex !important;
+}
+
+/* Chrome / Edge / Safari */
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+}
+
+input[type="password"]::-webkit-textfield-decoration-container {
+  visibility: hidden;
+}
+
+/* Edge */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+
+/* 1. Global backgrounds & body */
+body {
+  background-color: #fafafa !important;
+  font-size: 16px !important;
+}
+
+.bg-\[\#f9f7f4\] {
+  background-color: #fafafa !important;
+}
+
+.bg-\[\#f5f5f0\] {
+  background-color: #fafafa !important;
+}
+
+/* 2. Content wrapper */
+main {
+  background-color: #fafafa !important;
+}
+
+/* 3. Minimal Cards */
+.shadow-sm,
+.shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02) !important;
+  border: 1px solid #f1f5f9 !important;
+}
+
+.rounded-xl {
+  border-radius: 12px !important;
+}
+
+.rounded-2xl {
+  border-radius: 12px !important;
+}
+
+.rounded-3xl {
+  border-radius: 12px !important;
+}
+
+.rounded-lg {
+  border-radius: 8px !important;
+}
+
+.rounded-md {
+  border-radius: 8px !important;
+}
+
+.rounded-sm {
+  border-radius: 6px !important;
+}
+
+.rounded-2xl.bg-white {
+  border-radius: 12px !important;
+}
+
+/* Modals */
+
+/* 4. Global Table fallback */
+table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+
+/* 5. Forms */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+select,
+textarea {
+  border: 1px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  font-size: 1rem !important;
+  color: #1e293b !important;
+  outline: none !important;
+  transition: all 0.15s ease-in-out !important;
+  box-shadow: none !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  border-color: #64748b !important;
+  box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.06) !important;
+}
+
+/* Ensure validation error border colors are respected */
+input.border-red-400,
+textarea.border-red-400 {
+  border-color: #f87171 !important;
+}
+input.border-red-500,
+textarea.border-red-500,
+select.border-red-500 {
+  border-color: #ef4444 !important;
+}
+
+/* Custom Input Group for fields with icons (e.g., password toggle) */
+.input-group {
+  display: flex !important;
+  align-items: center !important;
+  border: 1px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  transition: all 0.15s ease-in-out !important;
+  width: 100% !important;
+}
+
+.input-group:focus-within {
+  border-color: #64748b !important;
+  box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.06) !important;
+}
+
+.input-group.border-red-400 {
+  border-color: #f87171 !important;
+}
+
+.input-group.border-red-500 {
+  border-color: #ef4444 !important;
+}
+
+.input-group input {
+  border: none !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  flex: 1 !important;
+  color: #1e293b !important;
+  font-size: 1rem !important;
+  height: auto !important;
+}
+
+.input-group input:focus {
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+select {
+  padding-right: 32px !important;
+}
+
+label {
+  color: #475569 !important;
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+}
+
+/* 6. Badges */
+.bg-orange-100 {
+  background-color: #ffedd5 !important;
+  color: #c2410c !important;
+}
+
+.bg-green-100 {
+  background-color: #f0fdf4 !important;
+  color: #16a34a !important;
+}
+
+.bg-purple-100 {
+  background-color: #faf5ff !important;
+  color: #9333ea !important;
+}
+
+.bg-yellow-100 {
+  background-color: #fef9c3 !important;
+  color: #854d0e !important;
+}
+
+.bg-violet-100 {
+  background-color: #f5f3ff !important;
+  color: #7c3aed !important;
+}
+
+.bg-sky-100 {
+  background-color: #f0f9ff !important;
+  color: #0284c7 !important;
+}
+
+.bg-rose-100 {
+  background-color: #fff1f2 !important;
+  color: #e11d48 !important;
+}
+
+.bg-emerald-100 {
+  background-color: #ecfdf5 !important;
+  color: #059669 !important;
+}
+
+/* 7. Buttons */
+.bg-orange-500 {
+  background-color: #ea580c !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.bg-orange-500:hover {
+  background-color: #c2410c !important;
+}
+
+.text-red-600 {
+  color: #dc2626 !important;
+}
+
+.text-red-600:hover {
+  color: #b91c1c !important;
+}
+
+.hover\:bg-red-50:hover {
+  background-color: #fef2f2 !important;
+}
+
+.hover\:bg-orange-50:hover {
+  background-color: #fff7ed !important;
+}
+
+/* 8. Topbar accent */
+
+
+/* ============================================================
+   SHARED TABLE SYSTEM — .lanna-table
+   ครอบ <table> ด้วย class นี้เพื่อใช้สไตล์มาตรฐาน
+   ============================================================ */
+
+/* Wrapper card */
+.lanna-table-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02) !important;
+}
+
+/* ตาราง */
+.lanna-table {
+  width: 100%;
+  border-collapse: collapse !important;
+  font-size: 1rem !important;
+}
+
+.lanna-table thead tr {
+  background: linear-gradient(to right, #fff7ed, #fffbeb);
+}
+
+.lanna-table thead th {
+  padding: 12px 16px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-bottom: none !important;
+  border-right: none !important;
+  text-align: left;
+}
+
+.lanna-table thead th.th-left {
+  text-align: left;
+}
+
+.lanna-table thead th.th-num {
+  width: 60px !important;
+  max-width: 60px !important;
+  border-right: 1px solid #fed7aa !important;
+}
+
+/* จำกัดขนาดคอลัมน์ จัดการ หรือแอ็กชันการจัดการขวาสุด */
+.lanna-table th:last-child,
+.lanna-table td:last-child {
+  width: 110px !important;
+  max-width: 120px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+/* จำกัดขนาดคอลัมน์ ลำดับ ซ้ายสุด */
+.lanna-table th.th-num,
+.lanna-table td.td-num {
+  width: 60px !important;
+  max-width: 60px !important;
+  text-align: center !important;
+}
+
+/* Body rows */
+.lanna-table tbody tr {
+  background-color: #ffffff !important;
+  transition: background-color 0.1s ease !important;
+}
+
+.lanna-table tbody tr:hover {
+  background-color: rgba(255, 247, 237, 0.5) !important;
+}
+
+.lanna-table tbody td {
+  padding: 13px 16px !important;
+  color: #334155 !important;
+  border-bottom: 1px solid #f8fafc !important;
+  border-right: none !important;
+  font-size: 1rem !important;
+}
+
+.lanna-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* เลขลำดับวงกลม */
+.lanna-seq {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background-color: #ffedd5;
+  color: #b45309;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: background-color 0.12s, color 0.12s;
+}
+
+.lanna-table tbody tr:hover .lanna-seq {
+  background-color: #fed7aa;
+  color: #92400e;
+}
+
+/* คอลัมน์ลำดับ */
+.lanna-table td.td-num {
+  border-right: 1px solid #f1f5f9 !important;
+  text-align: center;
+}
+
+/* Badge หมวดหมู่ */
+.lanna-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 4px 10px !important;
+  border-radius: 8px !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.lanna-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+/* Shared Buttons */
+.lanna-btn-primary {
+  background-color: #ea580c !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  padding: 10px 18px !important;
+  font-size: 0.875rem !important;
+  transition: all 0.15s ease !important;
+  border: 1px solid #ea580c !important;
+}
+
+.lanna-btn-primary:hover {
+  background-color: #c2410c !important;
+  border-color: #c2410c !important;
+}
+
+.lanna-btn-primary:disabled {
+  background-color: #cbd5e1 !important;
+  border-color: #cbd5e1 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
+}
+
+.lanna-btn-secondary {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  padding: 10px 18px !important;
+  font-size: 0.875rem !important;
+  transition: all 0.15s ease !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.lanna-btn-secondary:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* ปุ่มจัดการ */
+.lanna-btn-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.lanna-btn-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  color: #60a5fa;
+  transition: background-color 0.1s, color 0.1s;
+}
+
+.lanna-btn-edit:hover {
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.lanna-btn-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  color: #f87171;
+  transition: background-color 0.1s, color 0.1s;
+}
+
+.lanna-btn-delete:hover {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+/* Text helpers */
+.lanna-cell-main {
+  font-weight: 400;
+  color: #1e293b !important;
+}
+
+.lanna-cell-sub {
+  color: #64748b !important;
+}
+
+/* Empty state */
+.lanna-empty {
+  padding: 64px 16px;
+  text-align: center;
+}
+
+.lanna-empty svg {
+  color: #e2e8f0;
+  margin: 0 auto 8px;
+  display: block;
+}
+
+.lanna-empty-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.lanna-empty-sub {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+  margin-top: 2px;
+}
+
+/* Hide spin-button controls inside number input fields globally */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}

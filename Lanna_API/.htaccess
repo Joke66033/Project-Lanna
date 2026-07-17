@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Enable AcceptPathInfo to support /file.php/path/info syntax
+AcceptPathInfo On
+
+# Fallback rewrite rule for supabase proxy path routing
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^endpoints/supabase_proxy.php/(.*)$ endpoints/supabase_proxy.php [L,QSA]

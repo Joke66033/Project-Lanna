@@ -1,0 +1,8 @@
+{
+    "name": "lanna/api",
+    "description": "Lanna API",
+    "minimum-stability": "stable",
+    "require": {
+        "phpmailer/phpmailer": "^7.1"
+    }
+}

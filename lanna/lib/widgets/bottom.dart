@@ -23,7 +23,7 @@ class BottomNav extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        height: 48,
+        height: 60,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -95,7 +95,7 @@ class BottomNav extends StatelessWidget {
                       Text(
                         'แปลภาษา',
                         style: TextStyle(
-                          fontSize: 8,
+                          fontSize: 9,
                           fontWeight: index == 0 ? FontWeight.bold : FontWeight.w400,
                           color: index == 0 ? const Color(0xFF924E19) : const Color(0xFF7A5C3A),
                         ),
@@ -138,7 +138,7 @@ class BottomNav extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                size: 22,
+                size: 24,
                 color: active ? primaryOrange : const Color(0xFF7A5C3A).withValues(alpha: 0.6),
               ),
               const SizedBox(height: 2),
@@ -147,7 +147,7 @@ class BottomNav extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 8,
+                  fontSize: 9,
                   fontWeight: active ? FontWeight.bold : FontWeight.w400,
                   color: active ? primaryOrange : const Color(0xFF7A5C3A).withValues(alpha: 0.6),
                 ),

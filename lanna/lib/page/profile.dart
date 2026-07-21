@@ -539,7 +539,7 @@ class _ProfileContentState extends State<ProfileContent>
                                   border: Border.all(color: Colors.white, width: 4),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.08),
+                                      color: Colors.black.withValues(alpha: 0.08),
                                       blurRadius: 16,
                                       offset: const Offset(0, 8),
                                     ),
@@ -567,7 +567,7 @@ class _ProfileContentState extends State<ProfileContent>
                                     border: Border.all(color: Colors.white, width: 2),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withValues(alpha: 0.2),
                                         blurRadius: 6,
                                         offset: const Offset(0, 3),
                                       ),
@@ -604,7 +604,7 @@ class _ProfileContentState extends State<ProfileContent>
                     _user?.email ?? '',
                     style: TextStyle(
                       fontSize: 8,
-                      color: const Color(0xFF7A5C3A).withOpacity(0.8),
+                      color: const Color(0xFF7A5C3A).withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -750,7 +750,7 @@ class _ProfileContentState extends State<ProfileContent>
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               elevation: 2,
-                              shadowColor: kPrimaryOrange.withOpacity(0.4),
+                              shadowColor: kPrimaryOrange.withValues(alpha: 0.4),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -805,7 +805,7 @@ class _ProfileContentState extends State<ProfileContent>
                                     foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(vertical: 16),
                                     elevation: 2,
-                                    shadowColor: kPrimaryOrange.withOpacity(0.4),
+                                    shadowColor: kPrimaryOrange.withValues(alpha: 0.4),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16),
                                     ),
@@ -1116,7 +1116,7 @@ class _ProfileContentState extends State<ProfileContent>
             boxShadow: isEditing
                 ? [
                     BoxShadow(
-                      color: kPrimaryOrange.withOpacity(0.08),
+                      color: kPrimaryOrange.withValues(alpha: 0.08),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -1127,7 +1127,7 @@ class _ProfileContentState extends State<ProfileContent>
             children: [
               Icon(
                 prefixIcon,
-                color: isEditing ? kPrimaryOrange : const Color(0xFF7A5C3A).withOpacity(0.7),
+                color: isEditing ? kPrimaryOrange : const Color(0xFF7A5C3A).withValues(alpha: 0.7),
                 size: 22,
               ),
               const SizedBox(width: 12),

@@ -58,7 +58,7 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
   List<ConsonantGroup> _groups = [];
   String _currentCategoryId = 'CL0001';
   final Map<String, ArticleModel?> _articlesMap = {};
-  final Map<String, List<LannaConsonant>> _consonantsMap = {};
+
   bool _isLoading = true;
   String? _errorMsg;
 
@@ -121,65 +121,12 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
 
       // 2. ดึงอักขระพยัญชนะทั้งหมดตามกลุ่ม
       final apiConsonants = await _charService.getAllCharacters(categoryCharId: 'CL0001,CL0002,CL0003');
+      final allCategories = await _charService.getAllCategories();
+      final Map<String, String> catNames = {
+        for (var c in allCategories) c.categoryCharId: c.name
+      };
 
-      // ข้อมูลจำลองและคำอธิบายลำดับเส้นเดิมที่มีความถูกต้องสูง
-      final List<LannaConsonant> fallbackConsonants = [
-        LannaConsonant(char: 'ᨠ', reading: 'ก๋ะ', thai: 'ก', description: 'เริ่มม้วนหัวกลมจากขวาล่าง ลากขึ้นขยักด้านบนแล้วลากลงคล้าย ก.ไก่'),
-        LannaConsonant(char: 'ᨡ', reading: 'ข๋ะ', thai: 'ข', description: 'ม้วนหัวหยักจากบนซ้าย ลากมนโค้งทางขวา แล้วหยักลงล่างสุด'),
-        LannaConsonant(char: 'ᨢ', reading: 'ขะหางยาว/ฃ๋ะ', thai: 'ฃ', description: 'ลักษณะเขียนคล้าย ตั๋ว ข๋ะ แต่ลากส่วนท้ายยาวตวัดขึ้นสูงขวา'),
-        LannaConsonant(char: 'ᨣ', reading: 'ก๊ะ/คะ', thai: 'ค', description: 'ม้วนหัวกลมบน ลากลงขวาแล้วโค้งขยักขึ้นด้านขวาคล้าย ค.ควาย'),
-        LannaConsonant(char: 'ᨤ', reading: 'คะหางยาว/ฅ๊ะ', thai: 'ฅ', description: 'เขียนคล้าย ตั๋ว ก๊ะ แต่ลากปลายตวัดหางขึ้นขมวดด้านขวาบน'),
-        LannaConsonant(char: 'ᨥ', reading: 'ฆะ/ข๊ะ', thai: 'ฆ', description: 'ม้วนหัวกลมบน หยักโค้งด้านซ้าย แล้วตวัดโค้งมนขึ้นขวา'),
-        LannaConsonant(char: 'ᨦ', reading: 'งะ', thai: 'ง', description: 'ม้วนหัวกลมบน ลากลาดลงล่างแล้วตวัดหางเฉียงขึ้นซ้าย'),
-        LannaConsonant(char: 'ᨧ', reading: 'จ๋ะ', thai: 'จ', description: 'ม้วนหัวกลมบน ลากโค้งมนลงด้านล่าง ตวัดโค้งขมวดขวาขึ้นบน'),
-        LannaConsonant(char: 'ᨨ', reading: 'ฉ๋ะ', thai: 'ฉ', description: 'เริ่มหัวม้วนบน โค้งหยักลอนซ้ายขวาคล้ายคลื่นน้ำ'),
-        LannaConsonant(char: 'ᨩ', reading: 'จ๊ะ/ชะ', thai: 'ช', description: 'ม้วนหัวกลมซ้าย โค้งมนขยักขึ้นคล้าย ช.ช้าง แบบตั๋วเมือง'),
-        LannaConsonant(char: 'ᨪ', reading: 'ซะ/ชะหางยาว', thai: 'ซ', description: 'เขียนเหมือน ตั๋ว ชะ แต่ลากส่วนหางพริ้วยาวเฉียงขึ้นขวา'),
-        LannaConsonant(char: 'ᨫ', reading: 'ฌะ/ช๊ะ', thai: 'ฌ', description: 'ม้วนหัวกลมล่างซ้าย ลากหยักสูงโค้งมนขวาเฉียงลง'),
-        LannaConsonant(char: 'ᨬ', reading: 'ญะ/ญ๋ะ', thai: 'ญ', description: 'ม้วนหัวกลมบน ลากลงล่างและมีหยักหางใต้ตัวอักษร'),
-        LannaConsonant(char: 'ᨭ', reading: 'ระต๊ะ', thai: 'ฏ', description: 'ม้วนหัวกลมล่างซ้าย ลากโค้งมนบนแล้วขยักหางม้วนซ่อนใต้ฐาน'),
-        LannaConsonant(char: 'ᨮ', reading: 'ระถะ', thai: 'ฐ', description: 'เริ่มลากเส้นหยักจากล่าง โค้งขึ้นวนขวาเป็นฐานหยักลอน'),
-        LannaConsonant(char: 'ᨯ', reading: 'ด๋ะ/ด๊ะ', thai: 'ด/ฑ', description: 'ม้วนหัวบน ลากหยักลง แล้วลากมนโค้งขวาขึ้นบนคล้าย ด.เด็ก'),
-        LannaConsonant(char: 'ᨰ', reading: 'ระทะ', thai: 'ฒ', description: 'ม้วนหัวซ้ายขยักสองลอน ลากลงขวาตวัดโค้งมนขึ้นบน'),
-        LannaConsonant(char: 'ᨱ', reading: 'ระนะ', thai: 'ณ', description: 'ม้วนหัวหยักบน ลากฐานคู่หยักตวัดขมวดซ้ายขึ้นบน'),
-        LannaConsonant(char: 'ᨲ', reading: 'ต๋ะ', thai: 'ต', description: 'ม้วนหัวกลมบน ลากลงขยักสองจังหวะคล้าย ต.เต่า ลอยตัว'),
-        LannaConsonant(char: 'ᨳ', reading: 'ถ๋ะ', thai: 'ถ', description: 'ม้วนหัวล่างซ้าย โค้งมนตวัดก้นหยักขยักขวาคล้าย ถ.ถุง'),
-        LannaConsonant(char: 'ᨴ', reading: 'ต๊ะ/ทะ', thai: 'ท', description: 'ม้วนหัวบน ลากฐานขยักลงแล้วเฉียงมนขวาขึ้นคล้าย ท.ทหาร'),
-        LannaConsonant(char: 'ᨵ', reading: 'ท๊ะ/ธะ', thai: 'ธ', description: 'ม้วนหัวบนซ้าย ลากโค้งฐานขวากว้างม้วนโค้งขึ้นสอดไส้'),
-        LannaConsonant(char: 'ᨶ', reading: 'นะ', thai: 'น', description: 'ม้วนหัวบน ลากเฉียงลงล่าง ม้วนฐานขมวดมนซ้ายแล้วเฉียงขวา'),
-        LannaConsonant(char: 'ᨷ', reading: 'บะ/ป๋ะ', thai: 'บ/ป', description: 'ม้วนหัวกลมขวา ลากฐานโค้งกว้างลอนคู่ใต้เส้นคล้าย บ.ใบไม้'),
-        LannaConsonant(char: 'ᨸ', reading: 'ป๋ะหางยาว/ผะ', thai: 'ป', description: 'คล้าย ตั๋ว ป๋ะ แต่ลากเส้นตั้งตรงด้านขวาชี้เฉียงสูงขึ้น'),
-        LannaConsonant(char: 'ᨹ', reading: 'ผ๋ะ', thai: 'ผ', description: 'ม้วนหัวด้านในขวา หยักลอนล่างขึ้นบนลอยเฉียงซ้ายคล้าย ผ.ผึ้ง'),
-        LannaConsonant(char: 'ᨺ', reading: 'ฝะ/ผ๋ะหางยาว', thai: 'ฝ', description: 'คล้าย ตั๋ว ผ๋ะ แต่ตวัดปลายเส้นตรงขวาสูงพ้นแนวบรรทัด'),
-        LannaConsonant(char: 'ᨻ', reading: 'ป๊ะ/พะ', thai: 'พ', description: 'ม้วนหัวนอกขวา ลากหยักสูงโค้งมนขวาเฉียงขึ้นคล้าย พ.พาน'),
-        LannaConsonant(char: 'ᨼ', reading: 'ฟะ/พ๊ะหางยาว', thai: 'ฟ', description: 'คล้าย ตั๋ว พะ แต่ลากหางตรงชวาขยับสูงขึ้นขวาพริ้วไหว'),
-        LannaConsonant(char: 'ᨽ', reading: 'พ๊ะ/ภะ', thai: 'ภ', description: 'ม้วนหัวกลมล่างซ้าย ลากหัวขึ้นหยักโค้งกว้างขวาคล้าย ภ.สำเภา'),
-        LannaConsonant(char: 'ᨾ', reading: 'มะ', thai: 'ม', description: 'ม้วนหัวหยักบน ลากฐานตรงลงล่างตวัดเฉียงขมวดขึ้นขวา'),
-        LannaConsonant(char: 'ᨿ', reading: 'ย๊ะ/ยะ', thai: 'ย', description: 'ม้วนหัวหยักบน ลากหยักลอนกลางตัวแล้วม้วนฐานขวาขึ้น'),
-        LannaConsonant(char: 'ᩀ', reading: 'ย๋ะ/ยะกลาง/ย่า', thai: 'ย', description: 'เริ่มหัวกลมกลาง ลากลงมาโค้งลอนใหญ่สองจังหวะโค้งมนขวา'),
-        LannaConsonant(char: 'ᩁ', reading: 'ระ/ละ', thai: 'ร', description: 'เริ่มลากจากล่างโค้งขึ้น ลากหยักโค้งหงายบนคล้าย ร.เรือ ตั๋วเมือง'),
-        LannaConsonant(char: 'ᩃ', reading: 'ล๊ะ/ละ', thai: 'ล', description: 'ม้วนหัวซ้ายล่าง โค้งขยักสองส่วนม้วนลงขวาคล้าย ล.ลิง'),
-        LannaConsonant(char: 'ᩅ', reading: 'ว๊ะ/วะ', thai: 'ว', description: 'ม้วนหัวซ้ายล่าง ลากเฉียงขวาแล้วปัดโค้งปิดบนคล้าย ว.แหวน'),
-        LannaConsonant(char: 'ᩈ', reading: 'สะ/ส๋ะ', thai: 'ส', description: 'ม้วนหัวซ้าย โค้งฐานล่างกว้างแล้วลากเฉียงหางขึ้นบนขวา'),
-        LannaConsonant(char: 'ᩉ', reading: 'ห๋ะ/หะ', thai: 'ห', description: 'ม้วนหัวบน ลากเส้นตรงลงล่าง ตวัดม้วนฐานไขว้ขึ้นขวาเฉียง'),
-        LannaConsonant(char: 'ᩋ', reading: 'อ๋ะ/อะ', thai: 'อ', description: 'ม้วนหัวซ้าย ลากโค้งอ่างก้นกว้าง ขยับปากเฉียงโค้งขึ้นบนขวา'),
-        LannaConsonant(char: 'ᩌ', reading: 'ฮ๊ะ/ฮอ', thai: 'ฮ', description: 'เขียนคล้าย ตั๋ว อ๋ะ แต่ตวัดขมวดโค้งเฉียงขึ้นด้านบนขวาพริ้ว'),
-        LannaConsonant(char: 'ᩊ', reading: 'ล๊ะ/ละ (ฬ)', thai: 'ฬ', description: 'เริ่มเขียนเหมือน ตั๋ว ล๊ะ แต่มีฐานขยักโค้งหย่อนใต้แนวเส้นบรรทัด'),
-      ];
-
-      final Set<String> groupKaChars = {'ᨠ', 'ᨡ', 'ᨢ', 'ᨣ', 'ᨤ', 'ᨥ', 'ᨦ'};
-      final Set<String> groupCaChars = {'ᨧ', 'ᨨ', 'ᨩ', 'ᨪ', 'ᨫ', 'ᨬ'};
-      final Set<String> groupRataChars = {'ᨭ', 'ᨮ', 'ᨯ', 'ᨰ', 'ᨱ'};
-      final Set<String> groupTaChars = {'ᨲ', 'ᨳ', 'ᨴ', 'ᨵ', 'ᨶ'};
-      final Set<String> groupPaChars = {'ᨷ', 'ᨸ', 'ᨹ', 'ᨺ', 'ᨻ', 'ᨼ', 'ᨽ', 'ᨾ'};
-
-      final List<LannaConsonant> listKa = [];
-      final List<LannaConsonant> listCa = [];
-      final List<LannaConsonant> listRata = [];
-      final List<LannaConsonant> listTa = [];
-      final List<LannaConsonant> listPa = [];
-      final List<LannaConsonant> listOut = [];
-      final List<LannaConsonant> listAdd = [];
+      final Map<String, List<LannaConsonant>> dynamicGroups = {};
 
       for (var c in apiConsonants) {
         final String rawThai = c.thaiEquivalent;
@@ -187,63 +134,31 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
         if (rawThai.contains('(') && rawThai.contains(')')) {
           parsedReading = rawThai.substring(rawThai.indexOf('(') + 1, rawThai.indexOf(')'));
         }
-        
-        final fallback = fallbackConsonants.firstWhere(
-          (f) => f.char == c.lannaChar,
-          orElse: () => LannaConsonant(
-            char: c.lannaChar,
-            reading: parsedReading,
-            thai: rawThai.split(' ').first,
-            description: 'พยัญชนะล้านนาตัว ${c.thaiEquivalent}',
-          ),
-        );
-        
         final consonant = LannaConsonant(
           char: c.lannaChar,
-          reading: fallback.reading,
-          thai: rawThai,
-          description: fallback.description,
+          reading: parsedReading,
+          thai: rawThai.split(' ').first,
+          description: 'พยัญชนะล้านนาตัว ${c.thaiEquivalent}',
         );
 
-        if (c.categoryCharId == 'CL0001') {
-          if (groupKaChars.contains(c.lannaChar)) {
-            listKa.add(consonant);
-          } else if (groupCaChars.contains(c.lannaChar)) {
-            listCa.add(consonant);
-          } else if (groupRataChars.contains(c.lannaChar)) {
-            listRata.add(consonant);
-          } else if (groupTaChars.contains(c.lannaChar)) {
-            listTa.add(consonant);
-          } else if (groupPaChars.contains(c.lannaChar)) {
-            listPa.add(consonant);
-          } else {
-            listOut.add(consonant);
-          }
-        } else if (c.categoryCharId == 'CL0002') {
-          listOut.add(consonant);
-        } else if (c.categoryCharId == 'CL0003') {
-          listAdd.add(consonant);
+        final catId = c.categoryCharId;
+        if (!dynamicGroups.containsKey(catId)) {
+          dynamicGroups[catId] = [];
         }
+        dynamicGroups[catId]!.add(consonant);
       }
 
-      _consonantsMap['KA'] = listKa;
-      _consonantsMap['CA'] = listCa;
-      _consonantsMap['RATA'] = listRata;
-      _consonantsMap['TA'] = listTa;
-      _consonantsMap['PA'] = listPa;
-      _consonantsMap['CL0002'] = listOut;
-      _consonantsMap['CL0003'] = listAdd;
+      // Sort categories to maintain some order (CL0001, CL0002, CL0003)
+      final sortedKeys = dynamicGroups.keys.toList()..sort();
 
       setState(() {
-        _groups = [
-          ConsonantGroup(name: 'วรรค กะ', categoryCharId: 'CL0001', consonants: listKa),
-          ConsonantGroup(name: 'วรรค จะ', categoryCharId: 'CL0001', consonants: listCa),
-          ConsonantGroup(name: 'วรรค ฏะ', categoryCharId: 'CL0001', consonants: listRata),
-          ConsonantGroup(name: 'วรรค ตะ', categoryCharId: 'CL0001', consonants: listTa),
-          ConsonantGroup(name: 'วรรค ปะ', categoryCharId: 'CL0001', consonants: listPa),
-          ConsonantGroup(name: 'พยัญชนะนอกวรรค', categoryCharId: 'CL0002', consonants: listOut),
-          ConsonantGroup(name: 'พยัญชนะเพิ่มเติม', categoryCharId: 'CL0003', consonants: listAdd),
-        ].where((g) => g.consonants.isNotEmpty).toList();
+        _groups = sortedKeys.map((key) {
+          return ConsonantGroup(
+            name: catNames[key] ?? key,
+            categoryCharId: key,
+            consonants: dynamicGroups[key]!,
+          );
+        }).toList();
 
         _tabController = TabController(length: _groups.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
@@ -981,6 +896,41 @@ class StrokePainter extends CustomPainter {
       return Offset(o.dx * size.width / 100, o.dy * size.height / 100);
     }
 
+    // Helper: Catmull-Rom spline
+    Path catmullRomPath(List<Offset> pts, Offset Function(Offset) scaler) {
+      final path = Path();
+      if (pts.isEmpty) return path;
+      final scaled = pts.map(scaler).toList();
+      path.moveTo(scaled[0].dx, scaled[0].dy);
+      if (scaled.length == 1) return path;
+      if (scaled.length == 2) { path.lineTo(scaled[1].dx, scaled[1].dy); return path; }
+      for (int i = 0; i < scaled.length - 1; i++) {
+        final p0 = scaled[(i - 1).clamp(0, scaled.length - 1)];
+        final p1 = scaled[i];
+        final p2 = scaled[i + 1];
+        final p3 = scaled[(i + 2).clamp(0, scaled.length - 1)];
+        final cp1x = p1.dx + (p2.dx - p0.dx) / 6;
+        final cp1y = p1.dy + (p2.dy - p0.dy) / 6;
+        final cp2x = p2.dx - (p3.dx - p1.dx) / 6;
+        final cp2y = p2.dy - (p3.dy - p1.dy) / 6;
+        path.cubicTo(cp1x, cp1y, cp2x, cp2y, p2.dx, p2.dy);
+      }
+      return path;
+    }
+
+    // 1. วาดเส้นไกด์พื้นหลังสี #F5D5C0 (ตามพิกัดจริง)
+    final paintGuide = Paint()
+      ..color = const Color(0xFFF5D5C0)
+      ..strokeWidth = 14
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    for (int i = 0; i < strokes.length; i++) {
+      final pts = strokes[i];
+      if (pts.isEmpty) continue;
+      canvas.drawPath(catmullRomPath(pts, scale), paintGuide);
+    }
+
     // 2. ปากกาสำหรับวาดเส้นที่เสร็จแล้ว (สีเทา #E5D5C5)
     final paintCompleted = Paint()
       ..color = const Color(0xFFE5D5C5)
@@ -995,47 +945,64 @@ class StrokePainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
-    // วาดเส้นก่อนหน้าที่เสร็จไปแล้ว
+    // วาดเส้นก่อนหน้าที่เสร็จไปแล้ว (smooth)
     for (int i = 0; i < currentIndex; i++) {
-      final points = strokes[i];
-      if (points.isEmpty) continue;
-      final path = Path();
-      path.moveTo(scale(points[0]).dx, scale(points[0]).dy);
-      for (int j = 1; j < points.length; j++) {
-        path.lineTo(scale(points[j]).dx, scale(points[j]).dy);
-      }
-      canvas.drawPath(path, paintCompleted);
+      final pts = strokes[i];
+      if (pts.isEmpty) continue;
+      canvas.drawPath(catmullRomPath(pts, scale), paintCompleted);
     }
 
-    // วาดอนิเมชันเส้นปัจจุบัน
+    // วาดอนิเมชันเส้นปัจจุบัน (smooth)
     if (currentIndex < strokes.length) {
       final currentPoints = strokes[currentIndex];
       if (currentPoints.isNotEmpty) {
-        final path = Path();
-        final start = scale(currentPoints[0]);
-        path.moveTo(start.dx, start.dy);
-
         final totalSegments = currentPoints.length - 1;
         final currentProgressSegment = progress * totalSegments;
         final fullSegments = currentProgressSegment.floor();
-        final partialSegmentProgress = currentProgressSegment - fullSegments;
-
-        for (int j = 1; j <= fullSegments; j++) {
-          final pt = scale(currentPoints[j]);
-          path.lineTo(pt.dx, pt.dy);
-        }
-
+        final partialProgress = currentProgressSegment - fullSegments;
+        final partialPoints = currentPoints.sublist(0, fullSegments + 1).toList();
         if (fullSegments < totalSegments) {
-          final p1 = scale(currentPoints[fullSegments]);
-          final p2 = scale(currentPoints[fullSegments + 1]);
-          final partialPt = Offset(
-            p1.dx + (p2.dx - p1.dx) * partialSegmentProgress,
-            p1.dy + (p2.dy - p1.dy) * partialSegmentProgress,
-          );
-          path.lineTo(partialPt.dx, partialPt.dy);
+          final p1 = currentPoints[fullSegments];
+          final p2 = currentPoints[fullSegments + 1];
+          partialPoints.add(Offset(
+            p1.dx + (p2.dx - p1.dx) * partialProgress,
+            p1.dy + (p2.dy - p1.dy) * partialProgress,
+          ));
         }
-        canvas.drawPath(path, paintCurrent);
+        canvas.drawPath(catmullRomPath(partialPoints, scale), paintCurrent);
       }
+    }
+
+    // 4. วาดจุดเริ่มต้นของเส้นหลัก (วงกลมพร้อมหมายเลขลำดับเส้น)
+    final paintStartActive = Paint()..color = const Color(0xFF924E19);
+    final paintStartInactive = Paint()..color = const Color(0xFFE5D5C5);
+
+    for (int i = 0; i < strokes.length; i++) {
+      if (strokes[i].isEmpty) continue;
+      final startPt = scale(strokes[i][0]);
+      final isCurrentOrCompleted = i <= currentIndex;
+      canvas.drawCircle(
+        startPt,
+        10,
+        isCurrentOrCompleted ? paintStartActive : paintStartInactive,
+      );
+      final textPainterNum = TextPainter(
+        text: TextSpan(
+          text: '${i + 1}',
+          style: const TextStyle(
+            fontSize: 8,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontFamily: 'sans-serif',
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+      textPainterNum.layout();
+      textPainterNum.paint(
+        canvas,
+        Offset(startPt.dx - textPainterNum.width / 2, startPt.dy - textPainterNum.height / 2),
+      );
     }
   }
 
@@ -1043,8 +1010,6 @@ class StrokePainter extends CustomPainter {
   bool shouldRepaint(covariant StrokePainter oldDelegate) => true;
 }
 
-
-// Helper function to load stroke paths
 List<List<Offset>> getStrokePaths(String char) {
   return sd.getStrokeData(char);
 }

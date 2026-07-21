@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'writing_data.dart';
 import 'writing_canvas.dart';
-import 'writing_ai_service.dart';
+
 import 'package:lanna/widgets/bottom.dart';
 
 class WritingModePage extends StatefulWidget {
@@ -99,7 +99,7 @@ class _WritingModePageState extends State<WritingModePage> {
                   const Icon(Icons.school_outlined, color: Color(0xFFBCAAA4), size: 26),
                   Expanded(
                     child: SizedBox(
-                      height: 58,
+                      height: 50,
                       child: PageView.builder(
                         controller: _pageController,
                         itemCount: widget.items.length,
@@ -196,12 +196,12 @@ class _WritingModePageState extends State<WritingModePage> {
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
 
             // ================= กระดานเขียน =================
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -255,8 +255,8 @@ class _WritingModePageState extends State<WritingModePage> {
       onTap: enabled ? onTap : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        width: 48,
-        height: 48,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: enabled

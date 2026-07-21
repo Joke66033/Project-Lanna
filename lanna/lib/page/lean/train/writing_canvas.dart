@@ -39,21 +39,7 @@ class WritingCanvasState extends State<WritingCanvas> {
       builder: (context, constraints) {
         return Stack(
           children: [
-            // Layer 1: Font guide (bottom)
-            Center(
-              child: Opacity(
-                opacity: 0.28,
-                child: Text(
-                  widget.character,
-                  style: TextStyle(
-                    fontFamily: widget.fontFamily,
-                    fontSize: 200,
-                    color: const Color(0xFFD2691E),
-                  ),
-                ),
-              ),
-            ),
-            // Layer 2: Drawing canvas (top)
+            // Drawing canvas (paints both font guide and drawing strokes)
             Positioned.fill(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
@@ -216,11 +202,45 @@ class _WritingPainter extends CustomPainter {
       return Offset(o.dx * size.width / 100, o.dy * size.height / 100);
     }
 
+    // Helper: Catmull-Rom spline
+    Path catmullRomPath(List<Offset> pts, Offset Function(Offset) scaler) {
+      final path = Path();
+      if (pts.isEmpty) return path;
+      final scaled = pts.map(scaler).toList();
+      path.moveTo(scaled[0].dx, scaled[0].dy);
+      if (scaled.length == 1) return path;
+      if (scaled.length == 2) { path.lineTo(scaled[1].dx, scaled[1].dy); return path; }
+      for (int i = 0; i < scaled.length - 1; i++) {
+        final p0 = scaled[(i - 1).clamp(0, scaled.length - 1)];
+        final p1 = scaled[i];
+        final p2 = scaled[i + 1];
+        final p3 = scaled[(i + 2).clamp(0, scaled.length - 1)];
+        final cp1x = p1.dx + (p2.dx - p0.dx) / 6;
+        final cp1y = p1.dy + (p2.dy - p0.dy) / 6;
+        final cp2x = p2.dx - (p3.dx - p1.dx) / 6;
+        final cp2y = p2.dy - (p3.dy - p1.dy) / 6;
+        path.cubicTo(cp1x, cp1y, cp2x, cp2y, p2.dx, p2.dy);
+      }
+      return path;
+    }
+
     // 2. ดึงลายเส้นตัวอักษรจริงสำหรับลำดับการเขียน (Ghost Character Template)
     final templateStrokes = getStrokeData(guideChar);
-    // [Aesthetic Upgrade] เอาส่วนเส้นร่างหนาออก เพื่อใช้รูปตัวอักขระจริงด้านหลัง และวาดจุดเริ่มต้น/สิ้นสุดบอกลำดับแทน
 
-    // 3. วาดจุดแสดงลำดับเส้น 1, 2, 3...
+    // 1. วาดเส้นไกด์พื้นหลังสี #F5D5C0 (ตามพิกัดจริง)
+    final paintGuide = Paint()
+      ..color = const Color(0xFFF5D5C0)
+      ..strokeWidth = 14
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    for (int i = 0; i < templateStrokes.length; i++) {
+      final pts = templateStrokes[i];
+      if (pts.isEmpty) continue;
+      canvas.drawPath(catmullRomPath(pts, scale), paintGuide);
+    }
+
+    // 3. วาดจุดแสดงลำดับเส้น 1, 2, 3... พร้อมทิศทาง
     final paintCircleBg = Paint()..color = const Color(0xFFEADBC8);
     final paintCircleBorder = Paint()
       ..color = const Color(0xFF7A5C3A).withValues(alpha: 0.5)

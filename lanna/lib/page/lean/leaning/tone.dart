@@ -100,21 +100,6 @@ class _TonePageState extends State<TonePage> {
       // 2. ดึงวรรณยุกต์ทั้งหมดจาก API เฉพาะกลุ่ม CL0006
       final apiTones = await _charService.getAllCharacters(categoryCharId: 'CL0006');
 
-      // ข้อมูลจำลองวิธีเขียนวรรณยุกต์เดิม
-      final List<LannaTone> fallbackTones = [
-        LannaTone(char: '\u1a74', reading: 'ไม้สัญญประกาศ', thai: 'เครื่องหมายเน้นคำ', description: 'ขีดเส้นขวางสั้นแนวนอนลอยเหนือตัวอักษรพยัญชนะ'),
-        LannaTone(char: '\u1a53', reading: 'เครื่องหมายย่อคำ', thai: 'เครื่องหมายลัดคำ', description: 'ม้วนฐานหยักมนขวาคล้ายเลขเก้าสั้นลอยเยื้องล่าง'),
-        LannaTone(char: '\u1a62', reading: 'ไม้หันอากาศ', thai: 'ไม้หันอากาศ (  ั )', description: 'ม้วนโค้งหยักสองจังหวะโค้งมนหงายขึ้นด้านบนพยัญชนะ'),
-        LannaTone(char: '\u1a75', reading: 'ไม้เอก', thai: 'ไม้เอก ( ่ )', description: 'ขีดเส้นตรงสั้นดิ่งลงมาบนกลางตัวอักษร'),
-        LannaTone(char: '\u1a76', reading: 'ไม้โท', thai: 'ไม้โท ( ้ )', description: 'เริ่มม้วนกลมซ้ายล่าง โค้งตวัดเฉียงขึ้นหางขวา'),
-        LannaTone(char: '\u1a77', reading: 'ไม้ตรี', thai: 'ไม้ตรี ( ๊ )', description: 'เขียนคล้ายรูปไม้โทซ้อนคู่ยกเอียงขวาเฉียงพริ้ว'),
-        LannaTone(char: '\u1a78', reading: 'ไม้จัตวา', thai: 'ไม้จัตวา ( ๋ )', description: 'ลากขีดรูปกากบาทตรงกลางตำแหน่งบนพยัญชนะ'),
-        LannaTone(char: '\u1a7a', reading: 'เครื่องหมายเสียงสูง', thai: 'เสียงสูง', description: 'เริ่มลากเส้นตรงเฉียงขึ้นขวายาวกว่าไม้เอกพริ้วไหว'),
-        LannaTone(char: '\u1a7b', reading: 'ไม้พัด/ไม้ระเบิด', thai: 'ไม้ระเบิด', description: 'เริ่มเขียนเป็นวงโค้งตวัดลาดก้นเฉียงขวาสูงเด่น'),
-        LannaTone(char: '\u1a7c', reading: 'ไม้ซัด', thai: 'ไม้ซัด', description: 'ลากโค้งมนจากซ้ายไปขวา ตวัดขดกางฐานปีกนกเฉียง'),
-        LannaTone(char: '\u1a7f', reading: 'เครื่องหมายเสียงต่ำ', thai: 'เสียงต่ำ', description: 'เริ่มเขียนม้วนขดกลมเยื้องต่ำขวาลอยใต้พยัญชนะ'),
-      ];
-
       // ดึงข้อมูลหมวดหมู่เพื่อเอาชื่อแสดงเป็นแท็บย่อย
       final categories = await _charService.getAllCategories();
       final Map<String, String> catNames = {
@@ -130,21 +115,11 @@ class _TonePageState extends State<TonePage> {
           parsedReading = rawThai.substring(rawThai.indexOf('(') + 1, rawThai.indexOf(')'));
         }
         
-        final fallback = fallbackTones.firstWhere(
-          (f) => f.char == c.lannaChar || f.char.runes.first == c.lannaChar.runes.first,
-          orElse: () => LannaTone(
-            char: c.lannaChar,
-            reading: parsedReading,
-            thai: rawThai.split(' ').first,
-            description: 'เครื่องหมายล้านนาตัว ${c.thaiEquivalent}',
-          ),
-        );
-        
         listMain.add(LannaTone(
           char: c.lannaChar,
-          reading: fallback.reading,
+          reading: parsedReading,
           thai: rawThai,
-          description: fallback.description,
+          description: 'เครื่องหมายล้านนาตัว ${c.thaiEquivalent}',
         ));
       }
 
@@ -836,24 +811,6 @@ class ToneStrokePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // 1. วาดไกด์ตัวอักษรจางๆ ไว้ด้านหลัง
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: char,
-        style: TextStyle(
-          fontSize: size.width * 0.8,
-          fontFamily: 'LannaAkkhara',
-          color: const Color(0xFFD2691E).withValues(alpha: 0.28),
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset((size.width - textPainter.width) / 2, (size.height - textPainter.height) / 2),
-    );
     // 0. Draw dotted grid background
     final paintDot = Paint()..color = const Color(0xFFDCC8B8).withValues(alpha: 0.4);
     const double spacing = 16.0;
@@ -867,20 +824,6 @@ class ToneStrokePainter extends CustomPainter {
     Offset scale(Offset o) {
       return Offset(o.dx * size.width / 100, o.dy * size.height / 100);
     }
-
-    // 2. ปากกาสำหรับวาดเส้นที่เสร็จแล้ว (สีเทา #E5D5C5)
-    final paintCompleted = Paint()
-      ..color = const Color(0xFFE5D5C5)
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-
-    // 3. ปากกาสำหรับวาดเส้นที่กำลังทำอนิเมชัน (สีน้ำตาล #924E19)
-    final paintCurrent = Paint()
-      ..color = const Color(0xFF924E19)
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
 
     // Helper: Catmull-Rom spline
     Path catmullRomPath(List<Offset> pts, Offset Function(Offset) scaler) {
@@ -903,6 +846,33 @@ class ToneStrokePainter extends CustomPainter {
       }
       return path;
     }
+
+    // 1. วาดเส้นไกด์พื้นหลังสี #F5D5C0 (ตามพิกัดจริง)
+    final paintGuide = Paint()
+      ..color = const Color(0xFFF5D5C0)
+      ..strokeWidth = 14
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    for (int i = 0; i < strokes.length; i++) {
+      final pts = strokes[i];
+      if (pts.isEmpty) continue;
+      canvas.drawPath(catmullRomPath(pts, scale), paintGuide);
+    }
+
+    // 2. ปากกาสำหรับวาดเส้นที่เสร็จแล้ว (สีเทา #E5D5C5)
+    final paintCompleted = Paint()
+      ..color = const Color(0xFFE5D5C5)
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    // 3. ปากกาสำหรับวาดเส้นที่กำลังทำอนิเมชัน (สีน้ำตาล #924E19)
+    final paintCurrent = Paint()
+      ..color = const Color(0xFF924E19)
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
 
     // วาดเส้นก่อนหน้าที่เสร็จไปแล้ว (smooth)
     for (int i = 0; i < currentIndex; i++) {
@@ -931,14 +901,44 @@ class ToneStrokePainter extends CustomPainter {
         canvas.drawPath(catmullRomPath(partialPoints, scale), paintCurrent);
       }
     }
+
+    // 4. วาดจุดเริ่มต้นของเส้นหลัก (วงกลมพร้อมหมายเลขลำดับเส้น)
+    final paintStartActive = Paint()..color = const Color(0xFF924E19);
+    final paintStartInactive = Paint()..color = const Color(0xFFE5D5C5);
+
+    for (int i = 0; i < strokes.length; i++) {
+      if (strokes[i].isEmpty) continue;
+      final startPt = scale(strokes[i][0]);
+      final isCurrentOrCompleted = i <= currentIndex;
+      canvas.drawCircle(
+        startPt,
+        10,
+        isCurrentOrCompleted ? paintStartActive : paintStartInactive,
+      );
+      final textPainterNum = TextPainter(
+        text: TextSpan(
+          text: '${i + 1}',
+          style: const TextStyle(
+            fontSize: 8,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontFamily: 'sans-serif',
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+      textPainterNum.layout();
+      textPainterNum.paint(
+        canvas,
+        Offset(startPt.dx - textPainterNum.width / 2, startPt.dy - textPainterNum.height / 2),
+      );
+    }
   }
 
   @override
   bool shouldRepaint(covariant ToneStrokePainter oldDelegate) => true;
 }
 
-
-// Helper function to load stroke paths
 List<List<Offset>> getStrokePaths(String char) {
   return sd.getStrokeData(char);
 }

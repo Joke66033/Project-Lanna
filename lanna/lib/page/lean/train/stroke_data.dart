@@ -5,75 +5,61 @@ import 'package:flutter/material.dart';
 /// ============================================================================
 
 List<List<Offset>> getStrokeData(String char) {
-  bool isSubjoined = false;
-  String cleanChar = char;
-  
+  // If char starts with sakot (\u1a60 or '᩠')
   if (char.startsWith('\u1a60') && char.length > 1) {
-    isSubjoined = true;
-    cleanChar = char.substring(1);
-  }
-
-  List<List<Offset>>? baseStrokes;
-
-  // Try to match consonants
-  final consonantPath = getConsonantStrokePaths(cleanChar);
-  if (consonantPath != null) {
-    baseStrokes = consonantPath;
-  } else {
-    // Try to match vowels
-    final vowelPath = getVowelStrokePaths(cleanChar);
-    if (vowelPath != null) {
-      baseStrokes = vowelPath;
-    } else {
-      // Try to match tones
-      final tonePath = getToneStrokePaths(cleanChar);
-      if (tonePath != null) {
-        baseStrokes = tonePath;
-      } else {
-        // Try to match numbers
-        final numberPath = getNumberStrokePaths(cleanChar);
-        if (numberPath != null) {
-          baseStrokes = numberPath;
-        }
-      }
-    }
-  }
-
-  // Fallback if not found
-  if (baseStrokes == null) {
-    if (cleanChar.isEmpty) {
-      baseStrokes = [
-        [const Offset(25, 50), const Offset(50, 25), const Offset(75, 50)],
+    final baseChar = char.substring(1);
+    
+    // Special custom strokes for '᩠ᩁ' (ระวง)
+    if (baseChar == 'ᩁ') {
+      return [
+        [const Offset(35, 72), const Offset(50, 84), const Offset(65, 80), const Offset(70, 68), const Offset(70, 52), const Offset(60, 42)],
       ];
-    } else {
-      final isEven = cleanChar.codeUnitAt(0) % 2 == 0;
-      if (isEven) {
-        baseStrokes = [
-          [const Offset(60, 70), const Offset(50, 80), const Offset(40, 70), const Offset(50, 60), const Offset(60, 70)],
-          [const Offset(60, 70), const Offset(40, 65), const Offset(30, 45), const Offset(45, 25), const Offset(65, 30), const Offset(75, 50), const Offset(60, 70)],
-        ];
-      } else {
-        baseStrokes = [
-          [const Offset(40, 40), const Offset(50, 30), const Offset(60, 40), const Offset(50, 50), const Offset(40, 40)],
-          [const Offset(50, 50), const Offset(35, 70), const Offset(55, 80), const Offset(75, 65), const Offset(70, 45)],
-        ];
-      }
     }
-  }
-
-  // If it is subjoined, transform the coordinates
-  if (isSubjoined) {
+    
+    final baseStrokes = getStrokeData(baseChar);
+    
+    // Scale by 0.65 and shift down by 26 to match LannaAkkhara subjoined rendering position
     return baseStrokes.map((stroke) {
-      return stroke.map((pt) {
-        // Scale down to 55% and shift down to center y around 76
-        final newX = 50.0 + (pt.dx - 50.0) * 0.55;
-        final newY = 76.0 + (pt.dy - 50.0) * 0.55;
-        return Offset(newX, newY);
+      return stroke.map((p) {
+        return Offset(p.dx * 0.65 + 17.5, p.dy * 0.65 + 26);
       }).toList();
     }).toList();
   }
 
-  return baseStrokes;
+  // Try to match consonants
+  final consonantPath = getConsonantStrokePaths(char);
+  if (consonantPath != null) return consonantPath;
+
+  // Try to match vowels
+  final vowelPath = getVowelStrokePaths(char);
+  if (vowelPath != null) return vowelPath;
+
+  // Try to match tones
+  final tonePath = getToneStrokePaths(char);
+  if (tonePath != null) return tonePath;
+
+  // Try to match numbers
+  final numberPath = getNumberStrokePaths(char);
+  if (numberPath != null) return numberPath;
+
+  // Generic fallback if character is unknown
+  if (char.isEmpty) {
+    return [
+      [const Offset(25, 50), const Offset(50, 25), const Offset(75, 50)],
+    ];
+  }
+  final isEven = char.codeUnitAt(0) % 2 == 0;
+  if (isEven) {
+    return [
+      [const Offset(60, 70), const Offset(50, 80), const Offset(40, 70), const Offset(50, 60), const Offset(60, 70)],
+      [const Offset(60, 70), const Offset(40, 65), const Offset(30, 45), const Offset(45, 25), const Offset(65, 30), const Offset(75, 50), const Offset(60, 70)],
+    ];
+  } else {
+    return [
+      [const Offset(40, 40), const Offset(50, 30), const Offset(60, 40), const Offset(50, 50), const Offset(40, 40)],
+      [const Offset(50, 50), const Offset(35, 70), const Offset(55, 80), const Offset(75, 65), const Offset(70, 45)],
+    ];
+  }
 }
 
 /// ============================================================================
@@ -83,57 +69,58 @@ List<List<Offset>>? getConsonantStrokePaths(String char) {
   switch (char) {
     case 'ᨠ': // ก๋ะ
       return [
-        [const Offset(60, 65), const Offset(50, 75), const Offset(40, 65), const Offset(50, 55), const Offset(60, 65)],
-        [const Offset(60, 65), const Offset(60, 45), const Offset(55, 35), const Offset(45, 30), const Offset(35, 35), const Offset(30, 45), const Offset(30, 75)],
+        [const Offset(35, 75), const Offset(28, 68), const Offset(35, 60), const Offset(42, 68), const Offset(35, 75)],
+        [const Offset(35, 68), const Offset(35, 42), const Offset(48, 28), const Offset(60, 32), const Offset(65, 45), const Offset(65, 75)],
       ];
     case 'ᨡ': // ข๋ะ
       return [
-        [const Offset(35, 35), const Offset(45, 25), const Offset(55, 35), const Offset(45, 45), const Offset(35, 35)],
-        [const Offset(45, 35), const Offset(65, 35), const Offset(70, 55), const Offset(60, 75), const Offset(40, 75)],
+        [const Offset(35, 35), const Offset(28, 28), const Offset(35, 20), const Offset(42, 28), const Offset(35, 35)],
+        [const Offset(35, 28), const Offset(55, 28), const Offset(65, 48), const Offset(58, 72), const Offset(42, 72)],
       ];
     case 'ᨢ': // ขะหางยาว
       return [
-        [const Offset(35, 35), const Offset(45, 25), const Offset(55, 35), const Offset(45, 45), const Offset(35, 35)],
-        [const Offset(45, 35), const Offset(60, 35), const Offset(65, 55), const Offset(55, 75), const Offset(40, 75)],
-        [const Offset(65, 55), const Offset(80, 35), const Offset(90, 15)],
+        [const Offset(35, 35), const Offset(28, 28), const Offset(35, 20), const Offset(42, 28), const Offset(35, 35)],
+        [const Offset(35, 28), const Offset(55, 28), const Offset(65, 48), const Offset(58, 72), const Offset(42, 72)],
+        [const Offset(58, 72), const Offset(75, 48), const Offset(85, 20)],
       ];
     case 'ᨣ': // ก๊ะ/คะ
       return [
-        [const Offset(45, 35), const Offset(55, 25), const Offset(65, 35), const Offset(55, 45), const Offset(45, 35)],
-        [const Offset(55, 45), const Offset(40, 65), const Offset(50, 80), const Offset(65, 80), const Offset(75, 60)],
+        [const Offset(45, 35), const Offset(38, 28), const Offset(45, 20), const Offset(52, 28), const Offset(45, 35)],
+        [const Offset(45, 35), const Offset(30, 60), const Offset(45, 75), const Offset(60, 75), const Offset(65, 55)],
       ];
     case 'ᨤ': // คะหางยาว
       return [
-        [const Offset(45, 35), const Offset(55, 25), const Offset(65, 35), const Offset(55, 45), const Offset(45, 35)],
-        [const Offset(55, 45), const Offset(40, 65), const Offset(50, 80), const Offset(65, 80), const Offset(75, 60)],
-        [const Offset(75, 60), const Offset(85, 40), const Offset(90, 25)],
+        [const Offset(45, 35), const Offset(38, 28), const Offset(45, 20), const Offset(52, 28), const Offset(45, 35)],
+        [const Offset(45, 35), const Offset(30, 60), const Offset(45, 75), const Offset(60, 75), const Offset(65, 55)],
+        [const Offset(65, 55), const Offset(75, 40), const Offset(80, 25)],
       ];
     case 'ᨥ': // ฆะ
       return [
-        [const Offset(35, 35), const Offset(45, 25), const Offset(55, 35), const Offset(45, 45), const Offset(35, 35)],
-        [const Offset(45, 45), const Offset(35, 65), const Offset(55, 75), const Offset(75, 60), const Offset(70, 40)],
+        [const Offset(35, 35), const Offset(28, 28), const Offset(35, 20), const Offset(42, 28), const Offset(35, 35)],
+        [const Offset(35, 35), const Offset(28, 55), const Offset(48, 72), const Offset(68, 60), const Offset(62, 40)],
       ];
     case 'ᨦ': // งะ
       return [
-        [const Offset(40, 35), const Offset(50, 25), const Offset(60, 35), const Offset(50, 45), const Offset(40, 35)],
-        [const Offset(50, 45), const Offset(50, 75), const Offset(35, 65)],
+        [const Offset(45, 35), const Offset(38, 28), const Offset(45, 20), const Offset(52, 28), const Offset(45, 35)],
+        [const Offset(45, 35), const Offset(45, 68), const Offset(32, 58)],
       ];
     case 'ᨧ': // จ๋ะ
       return [
-        [const Offset(35, 35), const Offset(45, 25), const Offset(55, 35), const Offset(45, 45), const Offset(35, 35)],
-        [const Offset(45, 45), const Offset(35, 65), const Offset(55, 75), const Offset(75, 65), const Offset(70, 45)],
+        [const Offset(35, 35), const Offset(28, 28), const Offset(35, 20), const Offset(42, 28), const Offset(35, 35)],
+        [const Offset(35, 35), const Offset(28, 55), const Offset(48, 72), const Offset(68, 55), const Offset(62, 35)],
       ];
     case 'ᨨ': // ฉ๋ะ
       return [
-        [const Offset(35, 35), const Offset(45, 25), const Offset(55, 35), const Offset(45, 45), const Offset(35, 35)],
-        [const Offset(45, 45), const Offset(35, 65), const Offset(55, 75), const Offset(75, 60)],
-        [const Offset(55, 75), const Offset(55, 90), const Offset(70, 85)],
+        [const Offset(35, 35), const Offset(28, 28), const Offset(35, 20), const Offset(42, 28), const Offset(35, 35)],
+        [const Offset(35, 35), const Offset(28, 55), const Offset(48, 72), const Offset(68, 55)],
+        [const Offset(48, 72), const Offset(48, 88), const Offset(62, 82)],
       ];
     case 'ᨩ': // จ๊ะ/ชะ
       return [
-        [const Offset(35, 45), const Offset(45, 35), const Offset(55, 45), const Offset(45, 55), const Offset(35, 45)],
-        [const Offset(45, 55), const Offset(35, 75), const Offset(55, 85), const Offset(75, 70)],
+        [const Offset(35, 45), const Offset(28, 38), const Offset(35, 30), const Offset(42, 38), const Offset(35, 45)],
+        [const Offset(35, 45), const Offset(28, 65), const Offset(48, 80), const Offset(68, 65)],
       ];
+
     case 'ᨪ': // ซะ
       return [
         [const Offset(35, 45), const Offset(45, 35), const Offset(55, 45), const Offset(45, 55), const Offset(35, 45)],

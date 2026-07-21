@@ -57,6 +57,7 @@ class _TranslatePageState extends State<TranslatePage> {
 
   String _resultText = '';
   String _selectedCategory = 'ทั้งหมด';
+  LannaDictItem? _matchingDictItem;
 
   // ⭐ เพิ่มสำหรับ pagination
   int _currentPage = 1;
@@ -107,6 +108,8 @@ class _TranslatePageState extends State<TranslatePage> {
           meaning: v.meaning,
         )).toList();
       });
+      // Try resolving initial input if any
+      _onInputChanged();
     } catch (e) {
       debugPrint('Error loading dictionary: $e');
     } finally {
@@ -161,6 +164,7 @@ class _TranslatePageState extends State<TranslatePage> {
     if (input.isEmpty) {
       setState(() {
         _resultText = '';
+        _matchingDictItem = null;
         _isFavorite = false;
       });
       return;
@@ -170,8 +174,20 @@ class _TranslatePageState extends State<TranslatePage> {
     final store = context.read<FavoriteStore>();
     final key = _thaiToLanna ? input : result;
 
+    // Search in dictionary
+    LannaDictItem? matchedItem;
+    final normalizedInput = input.toLowerCase();
+    for (var item in _dictItems) {
+      if (item.thaiSound.trim().toLowerCase() == normalizedInput ||
+          item.lanna.trim().toLowerCase() == normalizedInput) {
+        matchedItem = item;
+        break;
+      }
+    }
+
     setState(() {
       _resultText = result;
+      _matchingDictItem = matchedItem;
       _isFavorite = store.contains(key);
     });
 
@@ -247,8 +263,10 @@ class _TranslatePageState extends State<TranslatePage> {
 
     await _speech.listen(
       localeId: 'th-TH',
-      listenMode: stt.ListenMode.dictation,
-      partialResults: true,
+      listenOptions: stt.SpeechListenOptions(
+        listenMode: stt.ListenMode.dictation,
+        partialResults: true,
+      ),
       onResult: (result) {
         setState(() {
           _inputCtrl.text = result.recognizedWords;
@@ -677,22 +695,19 @@ class _TranslatePageState extends State<TranslatePage> {
 
   // ================= RESULT =================
   Widget _resultSection() {
-    final hasText = _resultText.isNotEmpty;
+    final bool hasText = _resultText.isNotEmpty;
+    final dictItem = _matchingDictItem;
+
     return Container(
-      constraints: const BoxConstraints(
-        minHeight: 80,
-      ),
+      width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFFDF6ED),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: const Color(0xFFEADBC8),
-          width: 1.5,
-        ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF5E6D3), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 16,
+            color: const Color(0xFF8B5A2B).withValues(alpha: 0.05),
+            blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
@@ -710,16 +725,63 @@ class _TranslatePageState extends State<TranslatePage> {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            _resultText.isEmpty ? '—' : _resultText,
-            style: TextStyle(
-              fontSize: 18,
-              height: 1.4,
-              fontFamily: _thaiToLanna ? 'LannaAkkhara' : null,
-              color: const Color(0xFFE16905),
-              fontWeight: _thaiToLanna ? FontWeight.normal : FontWeight.bold,
+          
+          if (dictItem != null) ...[
+            Center(
+              child: Text(
+                dictItem.lanna,
+                style: const TextStyle(
+                  fontSize: 52,
+                  height: 1.2,
+                  fontFamily: 'LannaAkkhara',
+                  color: Color(0xFF924E19),
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
+            if (dictItem.reading.isNotEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    '(คำอ่าน: ${dictItem.reading})',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF7A5C3A),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            if (dictItem.meaning.isNotEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'ความหมาย: ${dictItem.meaning}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF2D1A00),
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ] else ...[
+            Text(
+              _resultText.isEmpty ? '—' : _resultText,
+              style: TextStyle(
+                fontSize: 18,
+                height: 1.4,
+                fontFamily: _thaiToLanna ? 'LannaAkkhara' : null,
+                color: const Color(0xFFE16905),
+                fontWeight: _thaiToLanna ? FontWeight.normal : FontWeight.bold,
+              ),
+            ),
+          ],
+          
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -728,7 +790,15 @@ class _TranslatePageState extends State<TranslatePage> {
                 icon: Icons.volume_up_rounded,
                 color: hasText ? const Color(0xFFE16905) : Colors.grey.shade400,
                 bgColor: hasText ? const Color(0xFFFFF3E0) : Colors.grey.shade100,
-                onTap: hasText ? _speak : () {},
+                onTap: hasText
+                    ? () {
+                        if (dictItem != null && dictItem.reading.isNotEmpty) {
+                          _speakReading(dictItem.reading);
+                        } else {
+                          _speak();
+                        }
+                      }
+                    : () {},
               ),
               const SizedBox(width: 12),
               _circularActionButton(
@@ -1025,165 +1095,6 @@ class _TranslatePageState extends State<TranslatePage> {
     );
   }
 
-  Widget _tableHeader() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5EAD9),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFEADBC8), width: 1),
-      ),
-      child: const Row(
-        children: [
-          Expanded(
-            child: Text(
-              'อักษรล้านนา',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 8,
-                color: Color(0xFF2D1A00),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              'คำอ่าน',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 8,
-                color: Color(0xFF2D1A00),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              'เทียบเสียงไทย',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 8,
-                color: Color(0xFF2D1A00),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              'ความหมาย',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 8,
-                color: Color(0xFF2D1A00),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _tableRow(LannaDictItem item, int index) {
-    Widget cell(Widget child, {bool showRightBorder = true}) {
-      return Expanded(
-        flex: 1,
-        child: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-          decoration: BoxDecoration(
-            border: Border(
-              right: showRightBorder
-                  ? const BorderSide(
-                      color: Color(0xFFEADBC8),
-                      width: 1,
-                    )
-                  : BorderSide.none,
-            ),
-          ),
-          child: child,
-        ),
-      );
-    }
-
-    final isEven = index % 2 == 0;
-    return Container(
-      decoration: BoxDecoration(
-        color: isEven ? Colors.white : const Color(0xFFFDF6ED),
-        border: const Border(
-          bottom: BorderSide(color: Color(0xFFEADBC8), width: 1),
-        ),
-      ),
-      child: Row(
-        children: [
-          cell(
-            Text(
-              item.lanna,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontFamily: 'LannaAkkhara', fontSize: 12),
-            ),
-          ),
-
-          cell(
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  item.reading,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  softWrap: true,
-                ),
-                const SizedBox(height: 4),
-                GestureDetector(
-                  onTap: () => _speakReading(item.reading),
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFFF3E0),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.volume_up,
-                      size: 14,
-                      color: Color(0xFFE16905),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          cell(
-            Text(
-              item.thaiSound,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-
-          cell(
-            Text(
-              item.meaning,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFFE16905),
-              ),
-            ),
-            showRightBorder: false,
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _paginationControls() {
     if (_selectedCategory != 'ทั้งหมด') return const SizedBox();

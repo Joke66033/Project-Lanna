@@ -53,7 +53,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await ApiService.post(
+      await ApiService.post(
         '${ApiConfig.otp}?action=resetPassword',
         {
           'newPassword': _passwordCtrl.text,

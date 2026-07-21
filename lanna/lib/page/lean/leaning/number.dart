@@ -100,30 +100,6 @@ class _NumberPageState extends State<NumberPage> {
       // 2. ดึงตัวเลขทั้งหมดจาก API เฉพาะกลุ่ม CL0007
       final apiNumbers = await _charService.getAllCharacters(categoryCharId: 'CL0007');
 
-      // ข้อมูลจำลองวิธีเขียนตัวเลขเดิม
-      final List<LannaNumber> fallbackNumbers = [
-        LannaNumber(char: '᪐', reading: 'ศูนย์', thai: '๐', description: 'เริ่มม้วนหัวกลมจากด้านบนหมุนทวนเข็มนาฬิกาจนบรรจบกัน'),
-        LannaNumber(char: '᪑', reading: 'หนึ่ง', thai: '๑', description: 'เริ่มม้วนหัวล่างซ้าย ลากโค้งขึ้นวนซ้ำด้านขวาเฉียงลง'),
-        LannaNumber(char: '᪒', reading: 'สอง', thai: '๒', description: 'ม้วนหัวบนซ้าย ลากโค้งหยักมนตรงฐานขวางไปขวา'),
-        LannaNumber(char: '᪓', reading: 'สาม', thai: '๓', description: 'ม้วนหัวกลมบน ลากโค้งหยักลอนคู่ลงล่างคล้ายเลข ๓'),
-        LannaNumber(char: '᪔', reading: 'สี่', thai: '๔', description: 'ม้วนหัวซ้ายล่าง โค้งขึ้นบนแล้วตวัดหางเฉียงขึ้นขวาสูง'),
-        LannaNumber(char: '᪕', reading: 'ห้า', thai: '๕', description: 'ม้วนหัวซ้ายล่าง โค้งขึ้นแล้วตวัดหางไขว้ขวายาวกว่าสี่'),
-        LannaNumber(char: '᪖', reading: 'หก', thai: '๖', description: 'ม้วนหัวซ้ายบน ลากเส้นโค้งลงล่างแล้วตวัดหางดิ่งตรงสั้น'),
-        LannaNumber(char: '᪗', reading: 'เจ็ด', thai: '๗', description: 'ม้วนหัวซ้ายบน ลากฐานคู่ตวัดโค้งมนขึ้นบนขวาสูง'),
-        LannaNumber(char: '᪘', reading: 'แปด', thai: '๘', description: 'ม้วนหัวซ้ายล่าง โค้งกว้างขึ้นบนขวาขยักขมวดหางเฉียง'),
-        LannaNumber(char: '᪙', reading: 'เก้า', thai: '๙', description: 'เริ่มม้วนจากกลางวนขดซ้าย ตวัดหางเฉียงขึ้นบรรทัดขวา'),
-        LannaNumber(char: '᪀', reading: 'ศูนย์', thai: '๐', description: 'เริ่มม้วนหัวกลมจากด้านบนหมุนทวนเข็มนาฬิกาจนบรรจบกัน'),
-        LannaNumber(char: '᪁', reading: 'หนึ่ง', thai: '๑', description: 'ลากโค้งวนหยดน้ำจากก้นฐานขึ้นบนขวา'),
-        LannaNumber(char: '᪂', reading: 'สอง', thai: '๒', description: 'ม้วนหัวบนเฉียงลงฐาน แล้วตวัดหางสั้นขึ้นขวา'),
-        LannaNumber(char: '᪃', reading: 'สาม', thai: '๓', description: 'ม้วนหัวกลมบน โค้งหยักลอนลงล่างตวัดหาง'),
-        LannaNumber(char: '᪄', reading: 'สี่', thai: '๔', description: 'ม้วนหัวซ้ายล่าง โค้งตวัดตูดเฉียงขึ้นขวาสูง'),
-        LannaNumber(char: '᪅', reading: 'ห้า', thai: '๕', description: 'ม้วนหัวซ้ายล่าง โค้งตวัดตูดเฉียงขวาไขว้กางปีกสูง'),
-        LannaNumber(char: '᪆', reading: 'หก', thai: '๖', description: 'ม้วนหัวบน โค้งลากก้นหย่อนลาดตวัดหางขึ้นสูง'),
-        LannaNumber(char: '᪇', reading: 'เจ็ด', thai: '๗', description: 'ม้วนหัวบน โค้งฐานโค้งกว้างลากหางขึ้นบนขวาสูง'),
-        LannaNumber(char: '᪈', reading: 'แปด', thai: '๘', description: 'ม้วนหัวก้น ลากขึ้นตวัดหยักโค้งหงาย'),
-        LannaNumber(char: '᪉', reading: 'เก้า', thai: '๙', description: 'เริ่มม้วนหัวในเฉียง วงรอบกว้างตวัดหางตัดขึ้นสูง'),
-      ];
-
       // ดึงข้อมูลหมวดหมู่เพื่อเอาชื่อแสดงเป็นแท็บย่อย
       final categories = await _charService.getAllCategories();
       final Map<String, String> catNames = {
@@ -139,21 +115,11 @@ class _NumberPageState extends State<NumberPage> {
           parsedReading = rawThai.substring(rawThai.indexOf('(') + 1, rawThai.indexOf(')'));
         }
         
-        final fallback = fallbackNumbers.firstWhere(
-          (f) => f.char == c.lannaChar,
-          orElse: () => LannaNumber(
-            char: c.lannaChar,
-            reading: parsedReading,
-            thai: rawThai.split(' ').first,
-            description: 'ตัวเลขล้านนาตัว ${c.thaiEquivalent}',
-          ),
-        );
-        
         listDham.add(LannaNumber(
           char: c.lannaChar,
-          reading: fallback.reading,
+          reading: parsedReading,
           thai: rawThai,
-          description: fallback.description,
+          description: 'ตัวเลขล้านนาตัว ${c.thaiEquivalent}',
         ));
       }
 
@@ -845,24 +811,6 @@ class NumberStrokePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // 1. วาดไกด์ตัวอักษรจางๆ ไว้ด้านหลัง
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: char,
-        style: TextStyle(
-          fontSize: size.width * 0.8,
-          fontFamily: 'LannaAkkhara',
-          color: const Color(0xFFD2691E).withValues(alpha: 0.28),
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset((size.width - textPainter.width) / 2, (size.height - textPainter.height) / 2),
-    );
     // 0. Draw dotted grid background
     final paintDot = Paint()..color = const Color(0xFFDCC8B8).withValues(alpha: 0.4);
     const double spacing = 16.0;
@@ -876,20 +824,6 @@ class NumberStrokePainter extends CustomPainter {
     Offset scale(Offset o) {
       return Offset(o.dx * size.width / 100, o.dy * size.height / 100);
     }
-
-    // 2. ปากกาสำหรับวาดเส้นที่เสร็จแล้ว (สีเทา #E5D5C5)
-    final paintCompleted = Paint()
-      ..color = const Color(0xFFE5D5C5)
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-
-    // 3. ปากกาสำหรับวาดเส้นที่กำลังทำอนิเมชัน (สีน้ำตาล #924E19)
-    final paintCurrent = Paint()
-      ..color = const Color(0xFF924E19)
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
 
     // Helper: Catmull-Rom spline
     Path catmullRomPath(List<Offset> pts, Offset Function(Offset) scaler) {
@@ -912,6 +846,33 @@ class NumberStrokePainter extends CustomPainter {
       }
       return path;
     }
+
+    // 1. วาดเส้นไกด์พื้นหลังสี #F5D5C0 (ตามพิกัดจริง)
+    final paintGuide = Paint()
+      ..color = const Color(0xFFF5D5C0)
+      ..strokeWidth = 14
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    for (int i = 0; i < strokes.length; i++) {
+      final pts = strokes[i];
+      if (pts.isEmpty) continue;
+      canvas.drawPath(catmullRomPath(pts, scale), paintGuide);
+    }
+
+    // 2. ปากกาสำหรับวาดเส้นที่เสร็จแล้ว (สีเทา #E5D5C5)
+    final paintCompleted = Paint()
+      ..color = const Color(0xFFE5D5C5)
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    // 3. ปากกาสำหรับวาดเส้นที่กำลังทำอนิเมชัน (สีน้ำตาล #924E19)
+    final paintCurrent = Paint()
+      ..color = const Color(0xFF924E19)
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
 
     // วาดเส้นก่อนหน้าที่เสร็จไปแล้ว (smooth)
     for (int i = 0; i < currentIndex; i++) {
@@ -940,14 +901,44 @@ class NumberStrokePainter extends CustomPainter {
         canvas.drawPath(catmullRomPath(partialPoints, scale), paintCurrent);
       }
     }
+
+    // 4. วาดจุดเริ่มต้นของเส้นหลัก (วงกลมพร้อมหมายเลขลำดับเส้น)
+    final paintStartActive = Paint()..color = const Color(0xFF924E19);
+    final paintStartInactive = Paint()..color = const Color(0xFFE5D5C5);
+
+    for (int i = 0; i < strokes.length; i++) {
+      if (strokes[i].isEmpty) continue;
+      final startPt = scale(strokes[i][0]);
+      final isCurrentOrCompleted = i <= currentIndex;
+      canvas.drawCircle(
+        startPt,
+        10,
+        isCurrentOrCompleted ? paintStartActive : paintStartInactive,
+      );
+      final textPainterNum = TextPainter(
+        text: TextSpan(
+          text: '${i + 1}',
+          style: const TextStyle(
+            fontSize: 8,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontFamily: 'sans-serif',
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+      textPainterNum.layout();
+      textPainterNum.paint(
+        canvas,
+        Offset(startPt.dx - textPainterNum.width / 2, startPt.dy - textPainterNum.height / 2),
+      );
+    }
   }
 
   @override
   bool shouldRepaint(covariant NumberStrokePainter oldDelegate) => true;
 }
 
-
-// Helper function to load stroke paths
 List<List<Offset>> getStrokePaths(String char) {
   return sd.getStrokeData(char);
 }

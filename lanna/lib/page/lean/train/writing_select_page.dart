@@ -51,7 +51,7 @@ class WritingSelectPage extends StatelessWidget {
                     height: 32,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFFB8560A).withOpacity(0.12),
+                      color: const Color(0xFFB8560A).withValues(alpha: 0.12),
                     ),
                     child: const Icon(
                       Icons.brush_rounded,
@@ -140,7 +140,7 @@ class WritingSelectPage extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFD2691E).withOpacity(0.08),
+            color: const Color(0xFFD2691E).withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -166,7 +166,7 @@ class WritingSelectPage extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       accentColor,
-                      accentColor.withOpacity(0.8),
+                      accentColor.withValues(alpha: 0.8),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
@@ -192,7 +192,7 @@ class WritingSelectPage extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: [
                           accentColor,
-                          accentColor.withOpacity(0.8),
+                          accentColor.withValues(alpha: 0.8),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(16),

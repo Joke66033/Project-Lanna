@@ -1,0 +1,10 @@
+# Lightweight requirements for Render.com free-tier deployment.
+# PyTorch, TensorFlow, and the experimental OCR-Lanna model are excluded
+# to stay within the 512 MB RAM limit.
+# Core Thai OCR (Typhoon API) and Thai->Lanna conversion still work fully.
+
+aksharamukha
+typhoon-ocr
+opencv-python-headless
+python-multipart
+numpy>=1.24.0

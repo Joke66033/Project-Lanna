@@ -22,3 +22,16 @@ Lanna_Admin/.env
 
 # Local logs
 *.bak
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# AI Engine — model weights and training data (do not publish)
+Lanna_API/ai_engine/output_model/
+Lanna_API/ai_engine/third_party/
+Lanna_API/ai_engine/evaluation_samples/
+Lanna_API/ai_engine/lanna_ocr_evaluation.json
+Lanna_API/ai_engine/train.jsonl
+Lanna_API/ai_engine/val.jsonl

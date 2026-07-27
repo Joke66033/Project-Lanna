@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: lanna-ai
+    runtime: python
+    rootDir: Lanna_API
+    buildCommand: pip install -r ai_engine/requirements-render.txt
+    startCommand: python ai_engine/ai_server.py
+    plan: free
+    envVars:
+      - key: TYPHOON_OCR_API_KEY
+        sync: false        # กรอกใน Render Dashboard เอง — ห้ามใส่ที่นี่
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+    healthCheckPath: /health

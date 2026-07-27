@@ -1,0 +1,1226 @@
+[
+  {
+    "thai": "ต่อ",
+    "pronunciation": "[ต่อ]",
+    "lanna": "ᨲᩬ᩵",
+    "definition": "น. ตัวต่อ ก. ติด เพิ่ม ยืดออกไป สู้รับ ทำศึก"
+  },
+  {
+    "thai": "ต่อคำ",
+    "pronunciation": "[ต่อ - กำ]",
+    "lanna": "ᨲᩬ᩵ᨣᩴ",
+    "definition": "ก. ต่อว่า โต้เถียง โต้แย้ง"
+  },
+  {
+    "thai": "ต่อคำยาวสาวคำยืด",
+    "pronunciation": "[ต่อ - กำ - ยาว - สาว - กำ - ยืด]",
+    "lanna": "ᨲᩬ᩵ᨣᩴ᩠ᨿᩣ᩠ᩅᩈᩣ᩠ᩅᨣᩴ᩠ᨿᩢ᩠ᨯ",
+    "definition": "สำนวน ต่อความยาวสาวความยืด ไม่จบเรื่องง่ายๆ"
+  },
+  {
+    "thai": "ต่อเฒ่า",
+    "pronunciation": "[ต่อ - เฒ่า]",
+    "lanna": "ᨲᩬ᩵ᩉ᩠<ctrl42>᩶ᩣ",
+    "definition": "สัน. ตราบจนแก่เฒ่า"
+  },
+  {
+    "thai": "ต่อเท้า",
+    "pronunciation": "[ต่อ - เถ้า]",
+    "lanna": "ᨲᩬ᩵ᨲᩮ᩶ᩣ",
+    "definition": "สัน. ตราบถึง จนกระทั่ง"
+  },
+  {
+    "thai": "ต่อเท้าเฒ่า",
+    "pronunciation": "[ต่อ - เถ้า - เฒ่า]",
+    "lanna": "ᨲᩬ᩵ᨲᩮ᩶ᩣᩉ᩠<ctrl42>᩶ᩣ",
+    "definition": "สัน. ตราบถึงวัยชรา"
+  },
+  {
+    "thai": "ต่อละต่อกว้าง",
+    "pronunciation": "[ต่อ - ละ - ต่อ - ขว้าง]",
+    "lanna": "ᨲᩬ᩵ᩃᩡᨲᩬ᩵ᨡ᩠ᩅ᩶ᩣ᩠ᨦ",
+    "definition": "ก. ต่ออย่างกดราคา แล้วเดินหนี"
+  },
+  {
+    "thai": "ต่อหน็อบต่อหน็บ",
+    "pronunciation": "[ต่อ - น้อบ - ต่อ - แน่บ]",
+    "lanna": "ᨲᩬ᩵ᩉ᩠ᨶᩬ᩠ᨅᨲᩬ᩵ᩉ᩠ᨶᩮ᩠ᨅ",
+    "definition": "ก. ปะติดปะต่อ ต่อเหมาะ-ต่อแหนะ ก็ว่า"
+  },
+  {
+    "thai": "ต่อหน้าต่อตา",
+    "pronunciation": "[ต่อ - หน้า - ต่อ - ตา]",
+    "lanna": "ᨲᩬ᩵ᩉ᩠ᨶ᩶ᩣᨲᩬ᩵ᨲᩣ",
+    "definition": "สำนวน ทำอะไรซึ่งหน้าผู้ใหญ่ เห็นชัดเจน"
+  },
+  {
+    "thai": "ต้อ",
+    "pronunciation": "[ต้อ]",
+    "lanna": "ᨲᩬ᩶",
+    "definition": "น. โรคต้อ เรียกตะกร้อที่ใช้เล่นกีฬาว่า บ่าต้อ"
+  },
+  {
+    "thai": "ต้อแต้",
+    "pronunciation": "[ต้อ - แต็ก]",
+    "lanna": "ᨲᩬ᩶ᨲᩯ᩶",
+    "definition": "ว. ลักษณะที่มีลวดลายขนาดเล็กแต่สดใส"
+  },
+  {
+    "thai": "ดอก",
+    "pronunciation": "[ดอก]",
+    "lanna": "ᨯᩁ᩠ᨠ",
+    "definition": "น. เส้นดอก ก. แตก ทำให้แตก สกัด เค้นแยกเอาออกมา"
+  },
+  {
+    "thai": "ดอกกา",
+    "pronunciation": "[ดอก - กำ]",
+    "lanna": "ᨯᩁ᩠ᨠᨠᩣ",
+    "definition": "น. ดอกไม้ไผ่ สำหรับสานกะเว้เข้า"
+  },
+  {
+    "thai": "ดอกเกี้ยวกลอน",
+    "pronunciation": "[ดอก - เกี้ยว - ก่อน]",
+    "lanna": "ᨯᩁ᩠ᨠᨠ᩠ᨿ᩠᩶ᩅᨠ᩠ᩃᩁ᩠ᨶ",
+    "definition": "น. ดอกที่ใช้มัดดับคาหรือตับใบพลองมุงหลังคา"
+  },
+  {
+    "thai": "ดอกจ่าม",
+    "pronunciation": "[ดอก - จ่าม]",
+    "lanna": "ᨯᩁ᩠ᨠᨧ᩵ᩣ᩠ᨾ",
+    "definition": "น. ดอกที่จักให้แข็งเพื่อใช้กรองใบพลองเข้าเป็นตับ"
+  },
+  {
+    "thai": "ดอกซึ้ง",
+    "pronunciation": "[ดอก - ซึ้ง]",
+    "lanna": "ᨯᩁ᩠ᨠᨪึ᩠ᨦ",
+    "definition": "น. ดอกตัวยืนสำหรับขึ้นรูปเป็นโครงเครื่องจักสาน"
+  },
+  {
+    "thai": "ดอกมัดกล้า",
+    "pronunciation": "[ดอก - มัด - กำ]",
+    "lanna": "ᨯᩁ᩠ᨠᨾᩢ᩠ᨯᨠ᩠ᩃ᩶ᩣ",
+    "definition": "น. ไม้ไผ่จักเป็นเส้นๆ ใช้มัดต้นกล้าข้าว"
+  },
+  {
+    "thai": "ดอกมัดเข้า",
+    "pronunciation": "[ดอก - มัด - เข้า]",
+    "lanna": "ᨯᩁ᩠ᨠᨾᩢ᩠ᨯᨡ᩶ᩣ",
+    "definition": "น. ไม้ไผ่มัดรวงข้าว"
+  },
+  {
+    "thai": "อรุป",
+    "pronunciation": "[อ-รุบ]",
+    "lanna": "ᩋᩁᩩ᩠ᨷ",
+    "definition": "ไม่มีรูป อรูป"
+  },
+  {
+    "thai": "อาการ",
+    "pronunciation": "[อา-กาน]",
+    "lanna": "ᩋᩣᨠᩣᩁ",
+    "definition": "อาการ สภาพ"
+  },
+  {
+    "thai": "เอกราช",
+    "pronunciation": "[เอ-กะ-ราด]",
+    "lanna": "ᩑᨠᩁᩣᨧ",
+    "definition": "ความเป็นใหญ่ อิสระ"
+  },
+  {
+    "thai": "อิสาน",
+    "pronunciation": "[อิ-สาน]",
+    "lanna": "ᩋิᩈᩣ᩠ᨶ",
+    "definition": "ทิศตะวันออกเฉียงเหนือ"
+  },
+  {
+    "thai": "อีสา",
+    "pronunciation": "[อี-สา]",
+    "lanna": "ᩋีᩈᩣ",
+    "definition": "งอนไถ งอนเกวียน"
+  },
+  {
+    "thai": "โอกาส",
+    "pronunciation": "[โอ-กาด]",
+    "lanna": "ᩋᩪᨠᩣᩈ",
+    "definition": "จังหวะ เวลาที่เหมาะ"
+  },
+  {
+    "thai": "อุปการ",
+    "pronunciation": "[อุ-ปะ-กาน]",
+    "lanna": "ᩋᩩᨷᨠᩣᩁ",
+    "definition": "การช่วยเหลือ อุดหนุน"
+  },
+  {
+    "thai": "อูกา",
+    "pronunciation": "[อู-กา]",
+    "lanna": "ᩋᩪᨠᩣ",
+    "definition": "อูกา"
+  },
+  {
+    "thai": "จื้อว่า",
+    "pronunciation": "[จื้อ-ว่า]",
+    "lanna": "ᨧᩨ᩠ᩅᩣ",
+    "definition": "ชื่อว่า มีชื่อว่า"
+  },
+  {
+    "thai": "เสวย",
+    "pronunciation": "[สะ-เว็ย]",
+    "lanna": "ᩈᩮ᩠ᩅ᩠ᨿ",
+    "definition": "เสวย รับประทาน กิน (คำราชาศัพท์)"
+  },
+  {
+    "thai": "เข้าตอกดอกไม้",
+    "pronunciation": "[เข้า-ตอก-ดอก-ไม้]",
+    "lanna": "ᨡ᩶ᩣᨲᩁ᩠ᨠᨯᩁ᩠ᨠᨾ᩶ᩣ",
+    "definition": "ข้าวตอกดอกไม้ เครื่องสักการะ"
+  },
+  {
+    "thai": "ช้าง",
+    "pronunciation": "[ช้าง]",
+    "lanna": "ᩁᩣ",
+    "definition": "เครื่องหมายพิเศษอักษรล้านนา หมายถึง ช้าง"
+  },
+  {
+    "thai": "เข้าของเงินคำ",
+    "pronunciation": "[เข้า-ของ-เงิน-คำ]",
+    "lanna": "ᩉ",
+    "definition": "เครื่องหมายพิเศษอักษรล้านนา หมายถึง ข้าวของเงินทอง"
+  },
+  {
+    "thai": "เวียง",
+    "pronunciation": "[เวียง]",
+    "lanna": "ᩅ᩠ᨿ᩠ᨦ",
+    "definition": "สัญลักษณ์และคำล้านนา หมายถึง เวียง (เมือง)"
+  },
+  {
+    "thai": "สันติ",
+    "pronunciation": "[สัน-ติ]",
+    "lanna": "ᩈᩢ᩠ᨶ᩠ᨲิ",
+    "definition": "ความสงบ สันติภาพ"
+  },
+  {
+    "thai": "สนธิ",
+    "pronunciation": "[สน-ทิ]",
+    "lanna": "ᩈ᩠ᨶ᩠ᨵิ",
+    "definition": "การต่อ การเชื่อมคำ"
+  },
+  {
+    "thai": "สัญญา",
+    "pronunciation": "[สัน-ญา]",
+    "lanna": "ᩈᩢ᩠<ctrl42>ᩣ",
+    "definition": "ความจำ ข้อตกลง สัญญา"
+  },
+  {
+    "thai": "เมตตา",
+    "pronunciation": "[เมด-ตา]",
+    "lanna": "<ctrl42>ᨲ᩠ᨲᩣ",
+    "definition": "ความปรารถนาดี เมตตาธรรม"
+  },
+  {
+    "thai": "อุเบกขา",
+    "pronunciation": "[อุ-เบก-ขา]",
+    "lanna": "ᩋᩩ<ctrl42>ᨠ᩠ᨡᩣ",
+    "definition": "ความวางเฉย อุเบกขา"
+  },
+  {
+    "thai": "สักการ",
+    "pronunciation": "[สัก-กา-ระ]",
+    "lanna": "ᩈᩢ᩠ᨠ᩠ᨠᩣᩁ",
+    "definition": "การบูชา สักการะ"
+  },
+  {
+    "thai": "อุกกาบาต",
+    "pronunciation": "[อุก-กา-บาด]",
+    "lanna": "ᩋᩩ᩠ᨠ᩠ᨠᩣᨅᩣᨲ",
+    "definition": "อุกกาบาต ดาวตก"
+  },
+  {
+    "thai": "ภิกขุ",
+    "pronunciation": "[พิก-ขุ]",
+    "lanna": "ᨽิ᩠ᨠ᩠ᨡᩩ",
+    "definition": "พระภิกษุสงฆ์"
+  },
+  {
+    "thai": "รุกขะ",
+    "pronunciation": "[รุก-ขะ]",
+    "lanna": "ᩁᩩ᩠ᨠ᩠ᨡᩡ",
+    "definition": "ต้นไม้ รุกขชาติ"
+  },
+  {
+    "thai": "อัคคี",
+    "pronunciation": "[อัก-คี]",
+    "lanna": "ᩋᩢ᩠ᨣ᩠ᨣᩦ",
+    "definition": "ไฟ อัคคีภัย"
+  },
+  {
+    "thai": "บุคคล",
+    "pronunciation": "[บุก-คน]",
+    "lanna": "ᨅᩩ᩠ᨣ᩠ᨣᩃ",
+    "definition": "บุคคล คน"
+  },
+  {
+    "thai": "พยัคฆะ",
+    "pronunciation": "[พะ-ยัก-คะ]",
+    "lanna": "ᨻ<ctrl42>ᩢ᩠ᨣ᩠ᨤᩡ",
+    "definition": "เสือ เสือโคร่ง"
+  },
+  {
+    "thai": "ตัคฆะ",
+    "pronunciation": "[ตัก-คะ]",
+    "lanna": "ᨲᩢ᩠ᨣ᩠ᨤᩡ",
+    "definition": "ควรแก่ มีค่า"
+  },
+  {
+    "thai": "กามปังโก",
+    "pronunciation": "[กา-มะ-ปัง-โก]",
+    "lanna": "ᨠᩣᨾ<ctrl42>ᩢ᩠ᨦ<ctrl42>ᩮ",
+    "definition": "เปลือกตมคือกาม"
+  },
+  {
+    "thai": "ภาษา",
+    "pronunciation": "[ภา-สา]",
+    "lanna": "ᨽᩣᩆᩣ",
+    "definition": "ภาษา ถ้อยคำ"
+  },
+  {
+    "thai": "ตัสมา",
+    "pronunciation": "[ตัด-สะ-มา]",
+    "lanna": "ᨲᩢ᩠ᩈ᩠ᨾᩣ",
+    "definition": "เพราะฉะนั้น ดำเนินไป"
+  },
+  {
+    "thai": "อาวาส",
+    "pronunciation": "[อา-วาด]",
+    "lanna": "ᩋᩣᩅᩣᩈ",
+    "definition": "วัด ที่อยู่อาศัย"
+  },
+  {
+    "thai": "ตัสสะ",
+    "pronunciation": "[ตัด-สะ]",
+    "lanna": "ᨲᩢ᩠ᩈ᩠ᩈᩡ",
+    "definition": "แก่เขานั้น"
+  },
+  {
+    "thai": "อัสสะ",
+    "pronunciation": "[อัด-สะ]",
+    "lanna": "ᩋᩢ᩠ᩈ᩠ᩈᩡ",
+    "definition": "ม้า หรือ แก่ผู้นั้น"
+  },
+  {
+    "thai": "วิรุฬหกะ",
+    "pronunciation": "[วิ-รุน-หะ-กะ]",
+    "lanna": "ᩅิᩁᩩ᩠ᩉ᩠ᨠᩡ",
+    "definition": "ท้าววิรุฬหก"
+  },
+  {
+    "thai": "มาส",
+    "pronunciation": "[มาด]",
+    "lanna": "ᨾᩣᩈ",
+    "definition": "เดือน"
+  },
+  {
+    "thai": "บาส",
+    "pronunciation": "[บาท]",
+    "lanna": "ᨅᩣᩈ",
+    "definition": "บ่วง บ่วงแล้ว"
+  },
+  {
+    "thai": "ปัญญาเป็นแสงสว่างในโลก",
+    "pronunciation": "[ปัญญาเป็นแสงสว่างในโลก]",
+    "lanna": "<ctrl42>ᩢ<ctrl42>ᩣ <ctrl42>ᩁᩢᩈ᩠<ctrl42>ิ <ctrl42><ctrl42>ᩮ<ctrl42>",
+    "definition": "พุทธภาษิต: ปัญญาเป็นแสงสว่างในโลก"
+  },
+  {
+    "thai": "ขุณณา",
+    "pronunciation": "[ขุน-นา]",
+    "lanna": "ᨡᩩᨱ᩠ᨱᩣ",
+    "definition": "คุณค่า ความดีงาม"
+  },
+  {
+    "thai": "ก็บ่",
+    "pronunciation": "[ก็-บ่]",
+    "lanna": "ᨣᩴᨅ᩠᩵",
+    "definition": "ก็ไม่"
+  },
+  {
+    "thai": "ก็มี",
+    "pronunciation": "[ก็-มี]",
+    "lanna": "ᨣᩴᨾᩦ",
+    "definition": "ก็มี"
+  },
+  {
+    "thai": "ก็มา",
+    "pronunciation": "[ก็-มา]",
+    "lanna": "ᨣᩴᨾᩣ",
+    "definition": "ก็มา"
+  },
+  {
+    "thai": "ก็ดี",
+    "pronunciation": "[ก็-ดี]",
+    "lanna": "ᨣᩴᨯᩦ",
+    "definition": "ก็ดี"
+  },
+  {
+    "thai": "คาถา",
+    "pronunciation": "[คา-ถา]",
+    "lanna": "ᨣᩣᨳᩣ",
+    "definition": "คำสวด คาถา"
+  },
+  {
+    "thai": "คนึง",
+    "pronunciation": "[คะ-นึง]",
+    "lanna": "ᨣᨶึ᩠ᨦ",
+    "definition": "คิดถึง นึกถึง"
+  },
+  {
+    "thai": "นาย",
+    "pronunciation": "[นาย]",
+    "lanna": "ᨶᩣ᩠ᨿ",
+    "definition": "นาย ผู้เป็นใหญ่"
+  },
+  {
+    "thai": "นาง",
+    "pronunciation": "[นาง]",
+    "lanna": "ᨶᩣ᩠ᨦ",
+    "definition": "นาง หญิง"
+  },
+  {
+    "thai": "ฉลอง",
+    "pronunciation": "[ฉลอง]",
+    "lanna": "ᨨᩃᩁ᩠ᨦ",
+    "definition": "ฉลอง ทำบุญทำทาน"
+  },
+  {
+    "thai": "ดูรา",
+    "pronunciation": "[ดู-รา]",
+    "lanna": "ᨯᩪᩁᩣ",
+    "definition": "คำเรียก ดูก่อน ท่านเอ๋ย"
+  },
+  {
+    "thai": "ดูกรา",
+    "pronunciation": "[ดู-กะ-รา]",
+    "lanna": "ᨯᩪᨠᩕᩣ",
+    "definition": "คำเรียก ดูก่อนผู้เจริญ"
+  },
+  {
+    "thai": "ฤกษ์",
+    "pronunciation": "[เริก]",
+    "lanna": "ᩁᩢᨠ᩠ᩆ",
+    "definition": "ฤกษ์งามยามดี"
+  },
+  {
+    "thai": "เทสนา",
+    "pronunciation": "[เท-สะ-นา]",
+    "lanna": "ᨴᩮᩈ᩠ᨶᩣ",
+    "definition": "แสดงธรรม เทศนา"
+  },
+  {
+    "thai": "ทะราย",
+    "pronunciation": "[ทะ-ราย]",
+    "lanna": "ᨴᩡᩁᩣ᩠ᨿ",
+    "definition": "ทราย หรือ เนื้อทราย"
+  },
+  {
+    "thai": "นาน้ำ",
+    "pronunciation": "[นา-น้ำ]",
+    "lanna": "ᨶᩣ ᨶᩴᩣ",
+    "definition": "ทุ่งนาที่มีน้ำอุดมสมบูรณ์"
+  },
+  {
+    "thai": "อันตราย",
+    "pronunciation": "[อัน-ตะ-ราย]",
+    "lanna": "ᩋᩢ᩠ᨶ᩠ᨲᩁᩣ᩠ᨿ",
+    "definition": "ความเคาะห์ อันตรายภัยพิบัติ"
+  },
+  {
+    "thai": "สัมปัตติ",
+    "pronunciation": "[สัม-ปัด-ติ]",
+    "lanna": "ᩈᩢ᩠ᨾ᩠ᨷᩢ᩠ᨲิ",
+    "definition": "สมบัติ ความสมบูรณ์"
+  },
+  {
+    "thai": "สัมผัสสะ",
+    "pronunciation": "[สัม-ผัด-สะ]",
+    "lanna": "ᩈᩢ᩠ᨾ᩠ᨹᩢ᩠ᩈᩡ",
+    "definition": "การสัมผัส การถูกต้อง"
+  },
+  {
+    "thai": "สัมโพธิ",
+    "pronunciation": "[สัม-โพ-ธิ]",
+    "lanna": "ᩈᩢ᩠ᨾ᩠ᨻ᩠ᨵิ",
+    "definition": "ตรัสรู้ ตรัสรู้ชอบ"
+  },
+  {
+    "thai": "ถัมภะ",
+    "pronunciation": "[ถำ-พะ]",
+    "lanna": "ᨳᩢ᩠ᨾ᩠ᨽᩡ",
+    "definition": "หัวดื้อ ความกระด้าง"
+  },
+  {
+    "thai": "สารัมภะ",
+    "pronunciation": "[สา-รำ-พะ]",
+    "lanna": "ᩈᩣᩁᩢ᩠ᨾ᩠ᨽᩡ",
+    "definition": "การแข่งดี ความแข่งดี"
+  },
+  {
+    "thai": "ธัมโม",
+    "pronunciation": "[ทัม-โม]",
+    "lanna": "ᨵᩢ᩠ᨾ᩠ᨾᩮᩣ",
+    "definition": "พระธรรม คำสั่งสอน"
+  },
+  {
+    "thai": "กัมมัง",
+    "pronunciation": "[กำ-มัง]",
+    "lanna": "ᨠᩢ᩠ᨾ᩠ᨾᩢ᩠ᨦ",
+    "definition": "กรรม การกระทำ"
+  },
+  {
+    "thai": "ตุมเห",
+    "pronunciation": "[ตุม-เห]",
+    "lanna": "ᨲᩩ᩠ᨾ᩠ᩉᩡ",
+    "definition": "ท่านทั้งหลาย (สรรพนาม)"
+  },
+  {
+    "thai": "อัมเห",
+    "pronunciation": "[อัม-เห]",
+    "lanna": "ᩋᩢ᩠ᨾ᩠ᩉᩡ",
+    "definition": "ข้าพเจ้าทั้งหลาย (สรรพนาม)"
+  },
+  {
+    "thai": "วันนั้น",
+    "pronunciation": "[วัน-นั้น]",
+    "lanna": "ᩅᩢ᩠ᨶ᩠ᨶᩢ᩠᩶ᨶ",
+    "definition": "วันนั้น เวลาคราวนั้น"
+  },
+  {
+    "thai": "เชฏฐา",
+    "pronunciation": "[เชด-ฐา]",
+    "lanna": "ᨨᩮ᩠ᨮᩣ",
+    "definition": "พี่ชายใหญ่"
+  },
+  {
+    "thai": "รีบ",
+    "pronunciation": "[รีบ]",
+    "lanna": "ᩁᩦ᩠ᨅ",
+    "definition": "เร่งรีบ รวดเร็ว"
+  },
+  {
+    "thai": "รับ",
+    "pronunciation": "[รับ]",
+    "lanna": "ᩁᩢ᩠ᨅ",
+    "definition": "รับ สนองรับ"
+  },
+  {
+    "thai": "ผม",
+    "pronunciation": "[ผม]",
+    "lanna": "᩠᩹ᨾ",
+    "definition": "เกศา ผม"
+  },
+  {
+    "thai": "งาม",
+    "pronunciation": "[งาม]",
+    "lanna": "ᩋᩣ᩠ᨾ",
+    "definition": "สวยงาม สดใส"
+  },
+  {
+    "thai": "อรัญญา",
+    "pronunciation": "[อะ-รัน-ยา]",
+    "lanna": "ᩋᩁᩢ᩠ᨬᩣ",
+    "definition": "ป่า อรัญประเทศ"
+  },
+  {
+    "thai": "กาล",
+    "pronunciation": "[กาน]",
+    "lanna": "ᨠᩣᩃ",
+    "definition": "เวลา สมัย"
+  },
+  {
+    "thai": "กล่าว",
+    "pronunciation": "[กล่าว]",
+    "lanna": "ᨠ᩠ᩃ᩵ᩣ᩠ᩅ",
+    "definition": "พูด บอกกล่าว"
+  },
+  {
+    "thai": "มุยหาย",
+    "pronunciation": "[มุย-หาย]",
+    "lanna": "ᨾᩩ᩠ᨿᩉᩣ᩠ᨿ",
+    "definition": "มลาย สูญหาย"
+  },
+  {
+    "thai": "มหันต์",
+    "pronunciation": "[มะ-หัน]",
+    "lanna": "ᨾᩉᩢ᩠ᨶ᩠ᨲ์",
+    "definition": "ใหญ่ ยิ่งใหญ่"
+  },
+  {
+    "thai": "พระครู",
+    "pronunciation": "[พะ-ครู]",
+    "lanna": "ᨻᩕᨣᩕᩪ",
+    "definition": "พระอาจารย์ พระครู"
+  },
+  {
+    "thai": "อยู่",
+    "pronunciation": "[อยู่]",
+    "lanna": "᩠ᨿᩪ᩵",
+    "definition": "อยู่อาศัย พักอยู่"
+  },
+  {
+    "thai": "อย่า",
+    "pronunciation": "[อย่า]",
+    "lanna": "᩠ᨿ᩵ᩣ",
+    "definition": "ห้าม อย่าทำ"
+  },
+  {
+    "thai": "มัคคะ",
+    "pronunciation": "[มัก-คะ]",
+    "lanna": "ᨾᩢ᩠ᨠ᩠ᨠᩡ",
+    "definition": "ทาง หนทาง"
+  },
+  {
+    "thai": "สัคคะ",
+    "pronunciation": "[สัก-คะ]",
+    "lanna": "ᩈᩢ᩠ᨠ᩠ᨠᩡ",
+    "definition": "สวรรค์"
+  },
+  {
+    "thai": "สัจจะ",
+    "pronunciation": "[สัด-จะ]",
+    "lanna": "ᩈᩢ᩠ᨧ᩠ᨧᩡ",
+    "definition": "ความจริง สัจจะ"
+  },
+  {
+    "thai": "ทุจริต",
+    "pronunciation": "[ทุด-จะ-ริด]",
+    "lanna": "ᨴᩩ᩠ᨧ᩠ᨧᩁิᨲ",
+    "definition": "ความประพฤติชั่ว ทุจริต"
+  },
+  {
+    "thai": "มัชชะ",
+    "pronunciation": "[มัด-ชะ]",
+    "lanna": "ᨾᩢ᩠ᨧ᩠ᨧᩡ",
+    "definition": "น้ำเมา สุรา"
+  },
+  {
+    "thai": "พานิช",
+    "pronunciation": "[พา-นิด]",
+    "lanna": "ᨻᩣᨶิᨧ",
+    "definition": "พ่อค้า การค้าขาย"
+  },
+  {
+    "thai": "กัญญา",
+    "pronunciation": "[กัน-ยา]",
+    "lanna": "ᨠᩢ᩠ᨬᩣ",
+    "definition": "นางงาม หญิงสาว"
+  },
+  {
+    "thai": "วัฏฏะ",
+    "pronunciation": "[วัด-ตะ]",
+    "lanna": "ᩅᩢ᩠ᨭ᩠ᨭᩡ",
+    "definition": "การวนเวียน วัฏสงสาร"
+  },
+  {
+    "thai": "รัฏฐะ",
+    "pronunciation": "[รัด-ถะ]",
+    "lanna": "ᩁᩢ᩠ᨭ᩠ᨮᩡ",
+    "definition": "แว่นแคว้น ประเทศ"
+  },
+  {
+    "thai": "ตัณหา",
+    "pronunciation": "[ตัน-หา]",
+    "lanna": "ᨲᩢ᩠ᨱᩉᩣ",
+    "definition": "ความทะยานอยาก ตัณหา"
+  },
+  {
+    "thai": "วิญญาณ",
+    "pronunciation": "[วิน-ญาณ]",
+    "lanna": "ᩅิ᩠ᨬ᩠ᨬᩣᨱ",
+    "definition": "จิต วิญญาณ ความรู้แจ้ง"
+  },
+  {
+    "thai": "อัตตา",
+    "pronunciation": "[อัด-ตา]",
+    "lanna": "ᩋᩢ᩠ᨲ᩠ᨲᩣ",
+    "definition": "ตัวตน อัตตา"
+  },
+  {
+    "thai": "สัททา",
+    "pronunciation": "[สัด-ทา]",
+    "lanna": "ᩈᩢ᩠ᨴ᩠ᨴᩣ",
+    "definition": "ความเชื่อ ศรัทธา"
+  },
+  {
+    "thai": "นินทา",
+    "pronunciation": "[นิน-ทา]",
+    "lanna": "ᨶิ᩠ᨶ᩠ᨴᩣ",
+    "definition": "การว่าร้าย นินทา"
+  },
+  {
+    "thai": "สัพพะ",
+    "pronunciation": "[สับ-พะ]",
+    "lanna": "ᩈᩢ᩠ᨷ᩠ᨷᩡ",
+    "definition": "ทั้งปวง ทั้งหมด"
+  },
+  {
+    "thai": "นิพพาน",
+    "pronunciation": "[นิบ-พาน]",
+    "lanna": "ᨶิ᩠ᨷ᩠ᨷᩣ᩠ᨶ",
+    "definition": "ความดับกิเลส พระนิพพาน"
+  },
+  {
+    "thai": "กัลยาณี",
+    "pronunciation": "[กัน-ละ-ยา-นี]",
+    "lanna": "ᨠᩢ᩠ᩃ᩠ᨿᩣᨱᩦ",
+    "definition": "หญิงงาม หญิงผู้มีความดี"
+  },
+  {
+    "thai": "วิบุล",
+    "pronunciation": "[วิ-บุน]",
+    "lanna": "ᩅิᨅᩪᩃ",
+    "definition": "ไพบูลย์ ตระการตา"
+  },
+  {
+    "thai": "อากาส",
+    "pronunciation": "[อา-กาด]",
+    "lanna": "ᩋᩣᨠᩣᩈ",
+    "definition": "อากาศ ท้องฟ้า"
+  },
+  {
+    "thai": "อัฏฐะ",
+    "pronunciation": "[อัด-ถะ]",
+    "lanna": "ᩋᩢ᩠ᨭ᩠ᨮᩡ",
+    "definition": "แปด จำนวนแปด"
+  },
+  {
+    "thai": "ฬุฑโฑ",
+    "pronunciation": "[ลุด-โท]",
+    "lanna": "ᩊᩩ᩠ᨰᩮᩣ",
+    "definition": "คนโง่ คนเบาปัญญา"
+  },
+  {
+    "thai": "วุฑฒิ",
+    "pronunciation": "[วุด-ทิ]",
+    "lanna": "ᩅᩩ᩠ᨰᩦ",
+    "definition": "ความเจริญ วุฒิ"
+  },
+  {
+    "thai": "กัณฏโก",
+    "pronunciation": "[กัน-ตะ-โก]",
+    "lanna": "ᨠᩢ᩠ᨱ᩠ᨭᨠᩮᩣ",
+    "definition": "หนาม สิ่งกีดขวาง"
+  },
+  {
+    "thai": "สัณฐาน",
+    "pronunciation": "[สัน-ฐาน]",
+    "lanna": "ᩈᩢ᩠ᨱ᩠ᨮᩣ᩠ᨶ",
+    "definition": "ทรวดทรง รูปทรง"
+  },
+  {
+    "thai": "กัณฐะ",
+    "pronunciation": "[กัน-ฐะ]",
+    "lanna": "ᨠᩢ᩠ᨱ᩠ᨮᩡ",
+    "definition": "คอ ลำคอ"
+  },
+  {
+    "thai": "กุณฑล",
+    "pronunciation": "[กุน-ทน]",
+    "lanna": "ᨠᩩ᩠ᨱ᩠ᨯᩃ",
+    "definition": "ตุ้มหู ต่างหู"
+  },
+  {
+    "thai": "บัณฑิต",
+    "pronunciation": "[บัน-ดิด]",
+    "lanna": "ᨅᩢ᩠ᨱ᩠ᨯิᨲ",
+    "definition": "ผู้มีปัญญา บัณฑิต"
+  },
+  {
+    "thai": "ปัณณาการ",
+    "pronunciation": "[บัน-นา-กาน]",
+    "lanna": "ᨷᩢ᩠ᨱ᩠ᨱᩣᨠᩣᩁ",
+    "definition": "เครื่องตอบแทน บรรณาการ"
+  },
+  {
+    "thai": "สายัณห์",
+    "pronunciation": "[สา-ยัน]",
+    "lanna": "ᩈᩣ᩠ᨿᩢ᩠ᨱᩉ์",
+    "definition": "เวลาเย็น สายัณห์"
+  },
+  {
+    "thai": "สังข์",
+    "pronunciation": "[สัง]",
+    "lanna": "ᩈᩢ᩠ᨦᨡ์",
+    "definition": "หอยสังข์"
+  },
+  {
+    "thai": "กังขา",
+    "pronunciation": "[กัง-ขา]",
+    "lanna": "ᨠᩢ᩠ᨦᨡᩣ",
+    "definition": "ความสงสัย กังขา"
+  },
+  {
+    "thai": "อนงค์",
+    "pronunciation": "[อะ-นง]",
+    "lanna": "ᩋᨶ᩠ᨦᨣ์",
+    "definition": "นางงาม หญิงงาม"
+  },
+  {
+    "thai": "สิงคะ",
+    "pronunciation": "[สิง-คะ]",
+    "lanna": "ᩈิ᩠ᨦᨣᩡ",
+    "definition": "ยอด ยอดเขา"
+  },
+  {
+    "thai": "สงฆ์",
+    "pronunciation": "[สง]",
+    "lanna": "ᩈ᩠ᨦᨥ์",
+    "definition": "พระสงฆ์"
+  },
+  {
+    "thai": "ชังฆา",
+    "pronunciation": "[ชัง-ขา]",
+    "lanna": "ᨩᩢ᩠ᨦᨥᩣ",
+    "definition": "แข้ง หน้าแข้ง"
+  },
+  {
+    "thai": "กิจจะ",
+    "pronunciation": "[กิด-จะ]",
+    "lanna": "ᨠิ᩠ᨧ᩠ᨧᩡ",
+    "definition": "กิจการ งาน"
+  },
+  {
+    "thai": "อิจฉา",
+    "pronunciation": "[อิด-ฉา]",
+    "lanna": "ᩋิ᩠ᨧ᩠ᨨᩣ",
+    "definition": "ความอยาก ความริษยา"
+  },
+  {
+    "thai": "มัจฉา",
+    "pronunciation": "[มัด-ฉา]",
+    "lanna": "ᨾᩢ᩠ᨧ᩠ᨨᩣ",
+    "definition": "ปลา"
+  },
+  {
+    "thai": "วิชชา",
+    "pronunciation": "[วิด-ชา]",
+    "lanna": "ᩅิ᩠ᨧ᩠ᨩᩣ",
+    "definition": "วิชา ความรู้แจ้ง"
+  },
+  {
+    "thai": "อลัชชี",
+    "pronunciation": "[อะ-ลัด-ชี]",
+    "lanna": "ᩋᩃᩢ᩠ᨧ᩠ᨩᩦ",
+    "definition": "ผู้ไม่ละอายต่อบาป"
+  },
+  {
+    "thai": "มัชฌิมา",
+    "pronunciation": "[มัด-ชิ-มา]",
+    "lanna": "ᨾᩢ᩠ᨧ᩠ᨫิᨾᩣ",
+    "definition": "ปานกลาง สายกลาง"
+  },
+  {
+    "thai": "อุปัชฌายะ",
+    "pronunciation": "[อุ-ปัด-ชา-ยะ]",
+    "lanna": "ᩋᩩᨷᩢ᩠ᨧ᩠ᨫᩣᨿᩡ",
+    "definition": "พระอุปัชฌาย์"
+  },
+  {
+    "thai": "ปัญจะ",
+    "pronunciation": "[บัน-จะ]",
+    "lanna": "ᨷᩢ᩠ᨬ᩠ᨧᩡ",
+    "definition": "ห้า จำนวนห้า"
+  },
+  {
+    "thai": "กาญจนา",
+    "pronunciation": "[กาน-จะ-นา]",
+    "lanna": "ᨠᩣ᩠ᨬ᩠ᨧᨶᩣ",
+    "definition": "ทองคำ"
+  },
+  {
+    "thai": "สัญฉันนัง",
+    "pronunciation": "[สัน-ฉัน-นัง]",
+    "lanna": "ᩈᩢ᩠ᨬ᩠ᨨᩢ᩠ᨶ᩠ᨶᩢ᩠ᨦ",
+    "definition": "การปกปิด การมุงบัง"
+  },
+  {
+    "thai": "อัญชลี",
+    "pronunciation": "[อัน-ชะ-ลี]",
+    "lanna": "ᩋᩢ᩠ᨬ᩠ᨩᩃᩦ",
+    "definition": "การประนมมือ ไหว้"
+  },
+  {
+    "thai": "อุตตมะ",
+    "pronunciation": "[อุด-ตะ-มะ]",
+    "lanna": "ᩋᩩ᩠ᨲ᩠ᨲᨾᩡ",
+    "definition": "อุดม อุดมสมบูรณ์ เลิศ"
+  },
+  {
+    "thai": "อัตถะ",
+    "pronunciation": "[อัด-ถะ]",
+    "lanna": "ᩋᩢ᩠ᨲ᩠ᨳᩡ",
+    "definition": "ประโยชน์ ความหมาย"
+  },
+  {
+    "thai": "ปรมัตถะ",
+    "pronunciation": "[ปะ-ระ-มัด-ถะ]",
+    "lanna": "ᨷᩁᨾᩢ᩠ᨲ᩠ᨳᩡ",
+    "definition": "ความจริงอันสูงสุด ปรมัตถธรรม"
+  },
+  {
+    "thai": "พุทธ",
+    "pronunciation": "[พุด-ทะ]",
+    "lanna": "ᨻᩩ᩠ᨴ᩠ᨵ",
+    "definition": "พระพุทธเจ้า ผู้รู้"
+  },
+  {
+    "thai": "ลัทธิ",
+    "pronunciation": "[ลัด-ทิ]",
+    "lanna": "ᩃᩢ᩠ᨲ᩠ᨵิ",
+    "definition": "คติ ความเชื่อ ลัทธิ"
+  },
+  {
+    "thai": "อรหันต์",
+    "pronunciation": "[อะ-ระ-หัน]",
+    "lanna": "ᩋᩁᩉᩢ᩠ᨶ᩠ᨲ์",
+    "definition": "พระอรหันต์"
+  },
+  {
+    "thai": "ขันติ",
+    "pronunciation": "[ขัน-ติ]",
+    "lanna": "ᨡᩢ᩠ᨶ᩠ᨲิ",
+    "definition": "ความอดทน ขันติธรรม"
+  },
+  {
+    "thai": "ปัณฑะ",
+    "pronunciation": "[บัน-ทะ]",
+    "lanna": "ᨷᩢ᩠ᨱ᩠ᨯᩡ",
+    "definition": "ปัญญา หรือ บัณฑิต"
+  },
+  {
+    "thai": "สันถะวะ",
+    "pronunciation": "[สัน-ถะ-วะ]",
+    "lanna": "ᩈᩢ᩠ᨶ᩠ᨳᩅᩡ",
+    "definition": "ความสนิทสนม การสันทวะ"
+  },
+  {
+    "thai": "นันทบุรี",
+    "pronunciation": "[นัน-ทะ-บุ-รี]",
+    "lanna": "ᨶᩢ᩠ᨶ᩠ᨴᨅᩩᩁᩦ",
+    "definition": "เมืองนันทบุรี (น่าน)"
+  },
+  {
+    "thai": "พันธะ",
+    "pronunciation": "[พัน-ทะ]",
+    "lanna": "ᨻᩢ᩠ᨶ᩠ᨵᩡ",
+    "definition": "ผูกพัน ข้อผูกมัด"
+  },
+  {
+    "thai": "ปฏิสนธิ",
+    "pronunciation": "[ปะ-ติ-สน-ทิ]",
+    "lanna": "ᨷᨭิᩈ᩠ᨶ᩠ᨵิ",
+    "definition": "การเกิด ถือกำเนิด"
+  },
+  {
+    "thai": "ปันโน",
+    "pronunciation": "[บัน-โน]",
+    "lanna": "ᨷᩢ᩠ᨶ᩠ᨶᩮᩣ",
+    "definition": "ผู้ปฏิบัติแล้ว"
+  },
+  {
+    "thai": "อันนัง",
+    "pronunciation": "[อัน-นัง]",
+    "lanna": "ᩋᩢ᩠ᨶ᩠ᨶᩢ᩠ᨦ",
+    "definition": "ข้าว น้ำ อาหาร"
+  },
+  {
+    "thai": "สิปปะ",
+    "pronunciation": "[สิบ-ปะ]",
+    "lanna": "ᩈิ᩠ᨷ᩠ᨷᩡ",
+    "definition": "ศิลปะ วิชาช่าง"
+  },
+  {
+    "thai": "วัปปะ",
+    "pronunciation": "[รับ-ปะ]",
+    "lanna": "ᩅᩢ᩠ᨷ᩠ᨷᩡ",
+    "definition": "การว่าย หว่านพืช"
+  },
+  {
+    "thai": "ปุปผา",
+    "pronunciation": "[ปุบ-ผา]",
+    "lanna": "ᨷᩩ᩠ᨷ᩠ᨹᩣ",
+    "definition": "ดอกไม้"
+  },
+  {
+    "thai": "มหัปผลัง",
+    "pronunciation": "[มะ-หับ-ผะ-ลัง]",
+    "lanna": "ᨾᩉᩢ᩠ᨷ᩠ᨹᩃᩢ᩠ᨦ",
+    "definition": "มีผลใหญ่ มีอานิสงส์มาก"
+  },
+  {
+    "thai": "ปัพพตา",
+    "pronunciation": "[ปับ-พะ-ตา]",
+    "lanna": "ᨷᩢ᩠ᨷ᩠ᨷᨲᩣ",
+    "definition": "ภูเขา"
+  },
+  {
+    "thai": "คัพภะ",
+    "pronunciation": "[คับ-พะ]",
+    "lanna": "ᨣᩢ᩠ᨾ᩠ᨽᩡ",
+    "definition": "ครรภ์ ท้อง"
+  },
+  {
+    "thai": "อารัพภะ",
+    "pronunciation": "[อา-รับ-พะ]",
+    "lanna": "ᩋᩣᩁᩢ᩠ᨾ᩠ᨽᩡ",
+    "definition": "การปรารภ เริ่มต้น"
+  },
+  {
+    "thai": "พวก",
+    "pronunciation": "[พวก]",
+    "lanna": "ᨲ᩠ᩅᨠ",
+    "definition": "หมู่พวก ฝูงพวก"
+  },
+  {
+    "thai": "ลวก",
+    "pronunciation": "[ลวก]",
+    "lanna": "ᩃ᩠ᩅᨠ",
+    "definition": "ฉลาด หรือ ลวกน้ำร้อน"
+  },
+  {
+    "thai": "สังขัง",
+    "pronunciation": "[สัง-ขัง]",
+    "lanna": "ᩈᩢ᩠ᨦᨥᩴ",
+    "definition": "หมู่สงฆ์"
+  },
+  {
+    "thai": "อังคุลี",
+    "pronunciation": "[อัง-คุ-ลี]",
+    "lanna": "ᩋᩢ᩠ᨦᨣᩩᩃᩦ",
+    "definition": "นิ้วมือ"
+  },
+  {
+    "thai": "นิพนต์",
+    "pronunciation": "[นิ-พนต์]",
+    "lanna": "ᨶิ᩠ᨷ᩠ᨶ᩠ᨲ์",
+    "definition": "นิมนต์ อาราธนา"
+  },
+  {
+    "thai": "ประสงค์",
+    "pronunciation": "[ประ-สงค์]",
+    "lanna": "ᨷᩕᩈ᩠ᨦᨣ์",
+    "definition": "ความปรารถนา ประสงค์"
+  },
+  {
+    "thai": "นาค",
+    "pronunciation": "[นาก]",
+    "lanna": "ᩁᩣᨠ",
+    "definition": "งูใหญ่ พญานาค"
+  },
+  {
+    "thai": "นาด",
+    "pronunciation": "[นาด]",
+    "lanna": "ᩁᩣᨯ",
+    "definition": "เคลื่อนไหว สั่นสะเทือน"
+  },
+  {
+    "thai": "บ่ดี",
+    "pronunciation": "[บ่-ดี]",
+    "lanna": "ᨅ᩠ᨯᩦ",
+    "definition": "ไม่ดี"
+  },
+  {
+    "thai": "บ่มี",
+    "pronunciation": "[บ่-มี]",
+    "lanna": "ᨅ᩠ᨾᩦ",
+    "definition": "ไม่มี"
+  },
+  {
+    "thai": "บ่มา",
+    "pronunciation": "[บ่-มา]",
+    "lanna": "ᨅ᩠ᨾᩣ",
+    "definition": "ไม่มา"
+  },
+  {
+    "thai": "ผาถนา",
+    "pronunciation": "[ผา-ถะ-หนา]",
+    "lanna": "ᨻ᩠ᨈᩣ",
+    "definition": "ปรารถนา หวังไว้"
+  },
+  {
+    "thai": "เป็ดสะหนา",
+    "pronunciation": "[เป็ด-สะ-หนา]",
+    "lanna": "ᨻ᩠ᨿᩪᩈ᩠ᨶᩣ",
+    "definition": "ปริศนา"
+  },
+  {
+    "thai": "ผะญ่า",
+    "pronunciation": "[ผะ-หญ้า]",
+    "lanna": "ᨽ᩠ᨿᩣ",
+    "definition": "ปัญญา ความรู้ สติปัญญา"
+  },
+  {
+    "thai": "พระยา",
+    "pronunciation": "[พะ-ยา]",
+    "lanna": "ᨻᩕ᩠ᨿᩣ",
+    "definition": "พญา เจ้าเมือง ยศขุนนาง"
+  },
+  {
+    "thai": "เวทนา",
+    "pronunciation": "[เว-ทะ-นา]",
+    "lanna": "ᩓᨲᩣ",
+    "definition": "ความรู้สึก ความสงสาร"
+  },
+  {
+    "thai": "รัดสะหมี",
+    "pronunciation": "[รัด-สะ-หมี่]",
+    "lanna": "ᩁᩢᩈ᩠ᨾᩦ",
+    "definition": "รัศมี แสงสว่าง"
+  },
+  {
+    "thai": "และ",
+    "pronunciation": "[และ]",
+    "lanna": "ᩃᩡ",
+    "definition": "คำเชื่อม และ"
+  },
+  {
+    "thai": "แล",
+    "pronunciation": "[แล]",
+    "lanna": "ᩃᩯ",
+    "definition": "แล และ ดู"
+  },
+  {
+    "thai": "แล้ว",
+    "pronunciation": "[แล้ว]",
+    "lanna": "ᩃᩯ᩠ᩅ",
+    "definition": "เสร็จสิ้น แล้ว"
+  },
+  {
+    "thai": "แล้วและนา",
+    "pronunciation": "[แล้ว-และ-นา]",
+    "lanna": "ᩃᩯ᩠ᩅᩃᩯ᩠ᨶᩣ",
+    "definition": "เสร็จสิ้นแล้วเป็นแน่แท้"
+  },
+  {
+    "thai": "อินดู",
+    "pronunciation": "[อิน-ดู]",
+    "lanna": "ᩋิ᩠ᨶᨯᩪ",
+    "definition": "เอ็นดู สงสาร"
+  },
+  {
+    "thai": "อินทรีย์",
+    "pronunciation": "[อิน-ซี]",
+    "lanna": "ᩋิ᩠ᨶᨴᩕᩦ",
+    "definition": "ร่างกาย สภาพจิตใจ"
+  },
+  {
+    "thai": "ใส่น้ำ",
+    "pronunciation": "[ใส่-น้ำ]",
+    "lanna": "ᩈ᩠ᩅ᩠ᩁᩣ",
+    "definition": "เติมน้ำ เติมน้ำดื่ม"
+  },
+  {
+    "thai": "หน้าหนา",
+    "pronunciation": "[หน้า-หนา]",
+    "lanna": "ᩉ᩠ᨾᩢ᩠ᨶᩣ",
+    "definition": "หน้าหนา ชัดเจน"
+  },
+  {
+    "thai": "ดังนี้",
+    "pronunciation": "[ดัง-นี้]",
+    "lanna": "ᨯᩢ᩠ᨦ᩠ᨶᩦ",
+    "definition": "ดังนี้ เช่นนี้"
+  },
+  {
+    "thai": "พิมพา",
+    "pronunciation": "[พิม-พา]",
+    "lanna": "ᨻิ᩠ᨾ᩠ᨻᩣ",
+    "definition": "นางพิมพา"
+  },
+  {
+    "thai": "พี่น้อง",
+    "pronunciation": "[พี่-น้อง]",
+    "lanna": "ᨻᩦ᩠ᨶ᩠᩶ᨦ",
+    "definition": "ญาติพี่น้อง"
+  },
+  {
+    "thai": "รือ",
+    "pronunciation": "[รือ]",
+    "lanna": "ᩁᩪ",
+    "definition": "หรือ"
+  },
+  {
+    "thai": "ริดสะหนา",
+    "pronunciation": "[ริด-สะ-หนา]",
+    "lanna": "ᩁิᩈ᩠ᨶᩣ",
+    "definition": "กฤษณา กลิ่นหอม"
+  },
+  {
+    "thai": "สมพาน",
+    "pronunciation": "[สม-พาน]",
+    "lanna": "ᩈ᩠ᨾᨻᩣ᩠ᨶ",
+    "definition": "สมภาร บุญบารมี"
+  },
+  {
+    "thai": "สะหรม",
+    "pronunciation": "[สะ-หรม]",
+    "lanna": "ᩈ᩠ᨨᩁ᩾᩠ᨾ",
+    "definition": "ความอบอุ่น ร่มรื่น"
+  },
+  {
+    "thai": "เสนา",
+    "pronunciation": "[เส-นา]",
+    "lanna": "ᩈ᩠ᨶᩣ",
+    "definition": "ข้าราชการ อำมาตย์เสนา"
+  },
+  {
+    "thai": "สงัด",
+    "pronunciation": "[สะ-งัด]",
+    "lanna": "ᩈ᩠ᨦᩢ᩠ᨯ",
+    "definition": "เงียบสงบ"
+  },
+  {
+    "thai": "สังขยา",
+    "pronunciation": "[สัง-ขะ-ยา]",
+    "lanna": "ᩈ᩠ᨦᨡ᩠ᨿᩣ",
+    "definition": "นับ จำนวน การคำนวณ"
+  },
+  {
+    "thai": "หิมพาน",
+    "pronunciation": "[หิ-มะ-พาน]",
+    "lanna": "ᩉิ᩠ᨾᨻᩣ᩠ᨶ",
+    "definition": "ป่าหิมพานต์"
+  },
+  {
+    "thai": "หิมพานต์",
+    "pronunciation": "[หิ-มะ-พาน]",
+    "lanna": "ᩉิ᩠ᨾᨻᩣ᩠ᨶ᩠ᨲ",
+    "definition": "ป่าหิมพานต์"
+  },
+  {
+    "thai": "คือว่า",
+    "pronunciation": "[คือ-ว่า]",
+    "lanna": "ᨣื᩠ᩅᩣ",
+    "definition": "หมายความว่า"
+  },
+  {
+    "thai": "คั้นว่า",
+    "pronunciation": "[คั้น-ว่า]",
+    "lanna": "ᨣᩢ᩠ᨶ᩠ᩅᩣ",
+    "definition": "หากว่า ถ้าหากว่า"
+  },
+  {
+    "thai": "คว้าน",
+    "pronunciation": "[คว้าน]",
+    "lanna": "ᨣ᩠ᩅᩣ᩠ᨶ",
+    "definition": "ค้นหา ควานหา"
+  },
+  {
+    "thai": "แม้นว่า",
+    "pronunciation": "[แม้น-ว่า]",
+    "lanna": "ᨾᩯ᩠ᨶ᩠ᩅᩣ",
+    "definition": "แม้ว่า ถึงหากว่า"
+  },
+  {
+    "thai": "ทั้งหลาย",
+    "pronunciation": "[ทั้ง-หลาย]",
+    "lanna": "ᨴ᩠ᩃᩢ᩠ᨿ",
+    "definition": "ทั้งหมด ทุกสิ่งทุกอย่าง"
+  }
+]

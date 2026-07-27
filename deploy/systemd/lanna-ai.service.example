@@ -1,0 +1,19 @@
+[Unit]
+Description=Lanna OCR and transliteration service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=CHANGE_ME
+Group=CHANGE_ME
+WorkingDirectory=/CHANGE_ME/Lanna_API
+EnvironmentFile=/CHANGE_ME/Lanna_API/.env
+ExecStart=/CHANGE_ME/.venv/bin/python ai_engine/ai_server.py
+Restart=on-failure
+RestartSec=5
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -4,7 +4,13 @@ import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
 import LearningCategorySelect from "../components/LearningCategorySelect.jsx";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
 import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
 
@@ -229,25 +235,28 @@ export default function CategoryLannaChar() {
     originalForm &&
     (form.name !== originalForm.name || form.learning_category_code !== originalForm.learning_category_code);
 
-  /* ===== DELETE ===== */
+  /* ===== DELETE (SQL API) ===== */
   const handleDelete = async () => {
     try {
       setLoading(true);
+      const categoryId = deleteItem.category_char_id || deleteItem.id;
+
+      // Call PHP SQL API endpoint to perform cascade delete on MySQL DB
       const res = await fetch(
-        `${BASE}/endpoints/category_lanna_char_api.php?action=delete&id=${encodeURIComponent(deleteItem.id)}`,
+        `${BASE}/endpoints/category_lanna_char_api.php?action=delete&id=${encodeURIComponent(categoryId)}`,
         { method: "POST" }
       );
-      const { error: resError } = await res.json();
-      if (resError) throw resError;
+      const resJson = await res.json();
+      if (resJson.error) throw new Error(resJson.error.message || resJson.error);
 
       setShowDelete(false);
       setDeleteItem(null);
       setDeleteIndex(null);
-      setSuccessText("ลบหมวดหมู่เรียบร้อยแล้ว");
+      setSuccessText("ลบหมวดหมู่การเรียนรู้และข้อมูลที่เกี่ยวข้องเรียบร้อยแล้ว");
       setShowSuccess(true);
       fetchData();
     } catch (err) {
-      alert("Error deleting category: " + err.message);
+      alert("Error deleting category: " + (err.message || err));
     } finally {
       setLoading(false);
     }

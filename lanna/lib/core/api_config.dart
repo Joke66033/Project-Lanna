@@ -3,8 +3,16 @@ import 'package:flutter/foundation.dart';
 class ApiConfig {
   // --- HOSTING CONFIGURATION ---
   // ตั้งค่าเป็น true เมื่อต้องการเชื่อมต่อกับ Hosting จริง
+  // Hosting is the default because the local PHP server cannot access the
+  // hosting database. It can still be overridden for local-only development
+  // with: --dart-define=USE_HOSTING=false
+  // Production API is the single source of truth for the app. Keep this
+  // fixed so a stale local dart-define cannot redirect normal app traffic.
   static const bool useHosting = true;
   static const String _hostingUrl = 'https://siripaporn.lnw.mn';
+  // Translation is intentionally isolated from the production PHP API.
+  // Only the translate page calls this local AI service.
+  static const String aiTranslationBaseUrl = 'http://localhost:8005';
 
   // Base URLs for different environments (Localhost/Debug)
   static const String _androidEmulatorUrl = 'http://10.10.100.104:8000';
@@ -50,4 +58,9 @@ class ApiConfig {
   static String get otp => '$baseUrl/endpoints/otp_api.php';
   static String get learningCategory =>
       '$baseUrl/endpoints/learning_category_api.php';
+  static String get typhoonOcr => '$baseUrl/endpoints/typhoon_ocr_api.php';
+  static String get lannaOcr => '$baseUrl/endpoints/lanna_ocr_api.php';
+  static String get autoOcr => '$baseUrl/endpoints/auto_ocr_api.php';
+  static String get characterStrokes =>
+      '$baseUrl/endpoints/character_strokes_api.php';
 }

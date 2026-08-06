@@ -18,8 +18,23 @@ class BottomNav extends StatelessWidget {
 
   static const Color primaryOrange = Color(0xFF924E19);
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Visual Tab Indices (BottomNav):
+  //   0 = แปลภาษา (ปุ่มกลาง floating)
+  //   1 = กล้อง
+  //   2 = เรียนรู้
+  //   3 = พจนานุกรม
+  //   4 = เข้าสู่ระบบ (guest) / รายการโปรด (user)
+  // ───────────────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
+    // ไอคอน/ป้ายสำหรับ slot 4 ขึ้นอยู่กับสถานะล็อกอิน
+    final IconData slot4Icon = isGuest
+        ? Icons.login_rounded
+        : Icons.star_rounded;
+    final String slot4Label = isGuest ? 'เข้าสู่ระบบ' : 'รายการโปรด';
+
     return SafeArea(
       top: false,
       child: Container(
@@ -40,27 +55,21 @@ class BottomNav extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            // ===== แถวไอคอนซ้าย-ขวา =====
+            // ── แถวไอคอนซ้าย-ขวา ──
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildItem(context, 2, Icons.school_rounded, 'เรียนรู้'),
                 _buildItem(context, 1, Icons.camera_alt_rounded, 'กล้อง'),
-                // ช่องว่างกลาง
+                // ช่องว่างกลางสำหรับปุ่ม floating
                 const SizedBox(width: 48),
-                _buildItem(context, 3, Icons.star_rounded, 'รายการโปรด'),
-                _buildItem(
-                  context,
-                  4,
-                  isGuest ? Icons.lock_outline_rounded : Icons.person_rounded,
-                  isGuest ? 'เข้าสู่ระบบ' : 'โปรไฟล์',
-                  isProfile: true,
-                ),
+                _buildItem(context, 3, Icons.menu_book_rounded, 'พจนานุกรม'),
+                _buildItem(context, 4, slot4Icon, slot4Label, isAuthSlot: true),
               ],
             ),
 
-            // ===== ปุ่มกลาง Floating (แปลภาษา) =====
+            // ── ปุ่มกลาง Floating (แปลภาษา) ──
             Positioned(
               top: -18,
               left: 0,
@@ -79,7 +88,9 @@ class BottomNav extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF924E19).withValues(alpha: 0.35),
+                              color: const Color(
+                                0xFF924E19,
+                              ).withValues(alpha: 0.35),
                               blurRadius: 10,
                               offset: const Offset(0, 3),
                             ),
@@ -96,8 +107,12 @@ class BottomNav extends StatelessWidget {
                         'แปลภาษา',
                         style: TextStyle(
                           fontSize: 9,
-                          fontWeight: index == 0 ? FontWeight.bold : FontWeight.w400,
-                          color: index == 0 ? const Color(0xFF924E19) : const Color(0xFF7A5C3A),
+                          fontWeight: index == 0
+                              ? FontWeight.bold
+                              : FontWeight.w400,
+                          color: index == 0
+                              ? const Color(0xFF924E19)
+                              : const Color(0xFF7A5C3A),
                         ),
                       ),
                     ],
@@ -116,7 +131,7 @@ class BottomNav extends StatelessWidget {
     int i,
     IconData icon,
     String label, {
-    bool isProfile = false,
+    bool isAuthSlot = false,
   }) {
     final bool active = index == i;
 
@@ -124,7 +139,8 @@ class BottomNav extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          if (isProfile && isGuest) {
+          if (isAuthSlot && isGuest) {
+            // slot 4 เมื่อ guest → ไปหน้า login
             onLoginTap();
           } else {
             onTap(i);
@@ -139,7 +155,9 @@ class BottomNav extends StatelessWidget {
               Icon(
                 icon,
                 size: 24,
-                color: active ? primaryOrange : const Color(0xFF7A5C3A).withValues(alpha: 0.6),
+                color: active
+                    ? primaryOrange
+                    : const Color(0xFF7A5C3A).withValues(alpha: 0.6),
               ),
               const SizedBox(height: 2),
               Text(
@@ -149,7 +167,9 @@ class BottomNav extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: active ? FontWeight.bold : FontWeight.w400,
-                  color: active ? primaryOrange : const Color(0xFF7A5C3A).withValues(alpha: 0.6),
+                  color: active
+                      ? primaryOrange
+                      : const Color(0xFF7A5C3A).withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(height: 2),

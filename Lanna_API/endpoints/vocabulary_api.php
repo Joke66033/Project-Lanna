@@ -1,7 +1,6 @@
 <?php
 /**
  * vocabulary_api.php
- * ย้าย logic จาก vocabularyApi.js → PHP
  * Table: vocabulary (PK: vocab_id เช่น V00001, V00002)
  * JOIN: category_vocab(name) → เพิ่ม field "category" = name หรือ "ทั่วไป"
  *
@@ -11,21 +10,23 @@
  *   ?action=search&keyword=      → OR filter บน lanna_word/reading/thai_word/meaning + mapping
  *
  * Actions (POST):
- *   ?action=create               → auto-generate ID (V#####) แล้ว INSERT
+ *   ?action=create               → auto-generate ID (V#####), auto-generate lanna_word หากเว้นว่าง แล้ว INSERT
  *   ?action=update&id=           → UPDATE WHERE vocab_id = id (body: JSON)
  *   ?action=delete&id=           → DELETE WHERE vocab_id = id
  */
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../helpers/lanna_generator.php';
 setCorsHeaders();
 
-/* $action = $_GET['action'] ?? ''; */
 $action = $_GET['action'] ?? 'getAll';
 
 // ===== Helper: map category_vocab nested object → "category" field =====
 function mapVocabCategory(array $items): array {
     return array_map(function ($item) {
-        $item['category'] = $item['category_vocab']['name'] ?? 'ทั่วไป';
+        // PDO join คืนชื่อหมวดเป็น category_vocab_name
+        $item['category'] = $item['category_vocab_name']
+            ?? ($item['category_vocab']['name'] ?? 'คำศัพท์ทั่วไป');
         return $item;
     }, $items);
 }
@@ -35,7 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     switch ($action) {
 
         case 'getAll':
-            // SELECT *,category_vocab(name) ORDER BY vocab_id.asc
+            try {
+                $pdo = getPdo();
+                // Delete any vocabulary entries where category_vocab_id is NULL, empty, or no longer exists in category_vocab table
+                $pdo->exec("DELETE FROM `vocabulary` WHERE `category_vocab_id` IS NULL OR `category_vocab_id` = '' OR `category_vocab_id` NOT IN (SELECT `category_vocab_id` FROM `category_vocab`)");
+            } catch (Exception $e) {
+                // Ignore cleanup error if table is locked
+            }
+
             $res = dbRequest('GET', 'vocabulary', [
                 'select' => '*,category_vocab(name)',
                 'order'  => 'vocab_id.desc',
@@ -59,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         case 'search':
             $keyword = $_GET['keyword'] ?? '';
             if ($keyword === '') { jsonError('Missing keyword'); break; }
-            $kw = '*' . $keyword . '*';   // PostgREST ilike wildcard style
+            $kw = '*' . $keyword . '*';
             $orFilter = 'lanna_word.ilike.' . $kw
                 . ',reading.ilike.' . $kw
                 . ',thai_word.ilike.' . $kw
@@ -71,6 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             ]);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk(mapVocabCategory($res['data'] ?? []));
+            break;
+
+        case 'translate':
+            $keyword = $_GET['keyword'] ?? $_GET['text'] ?? '';
+            if ($keyword === '') { jsonError('Missing keyword'); break; }
+            $res = translateThaiToLannaFull($keyword);
+            jsonOk(array_merge(['status' => 'success', 'thai_word' => $keyword], $res));
             break;
 
         default:
@@ -99,7 +114,13 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $nextId = 'V' . str_pad((string)$nextNumber, 5, '0', STR_PAD_LEFT);
 
-            // 2. INSERT with generated ID
+            // 2. Auto-generate lanna_word หากเว้นว่างไว้
+            if (empty($body['lanna_word'])) {
+                $baseText = !empty($body['thai_word']) ? $body['thai_word'] : ($body['reading'] ?? '');
+                $body['lanna_word'] = generateLannaUnicode($baseText);
+            }
+
+            // 3. INSERT with generated ID
             $finalData = array_merge($body, ['vocab_id' => $nextId]);
             $res = dbInsert('vocabulary', $finalData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
@@ -109,6 +130,10 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'update':
             $id = $_GET['id'] ?? '';
             if ($id === '') { jsonError('Missing id'); break; }
+            if (empty($body['lanna_word']) && (!empty($body['thai_word']) || !empty($body['reading']))) {
+                $baseText = !empty($body['thai_word']) ? $body['thai_word'] : ($body['reading'] ?? '');
+                $body['lanna_word'] = generateLannaUnicode($baseText);
+            }
             $res = dbUpdate('vocabulary', ['vocab_id' => 'eq.' . rawurlencode($id)], $body);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
@@ -120,6 +145,13 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = dbDelete('vocabulary', ['vocab_id' => 'eq.' . rawurlencode($id)]);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
+            break;
+
+        case 'translate':
+            $keyword = $body['keyword'] ?? $body['text'] ?? $body['thai_word'] ?? $_GET['keyword'] ?? '';
+            if ($keyword === '') { jsonError('Missing keyword'); break; }
+            $res = translateThaiToLannaFull($keyword);
+            jsonOk(array_merge(['status' => 'success', 'thai_word' => $keyword], $res));
             break;
 
         default:

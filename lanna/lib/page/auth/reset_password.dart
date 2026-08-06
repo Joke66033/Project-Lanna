@@ -88,71 +88,97 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'เปลี่ยนรหัสผ่านสำเร็จ',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title
+              const Text(
+                'เปลี่ยนรหัสผ่านสำเร็จ',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF2D1A00),
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Subtitle
+              const Text(
+                'คุณต้องการไปที่ไหนต่อ?',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF7A5C3A),
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Text link — หน้าการเรียนรู้
+              Align(
+                alignment: Alignment.centerRight,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/home-guest',
+                      (route) => false,
+                    );
+                  },
+                  child: const Text(
+                    'หน้าการเรียนรู้',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: kPrimaryOrange,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Primary button — เข้าสู่ระบบ
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/login',
+                    (route) => false,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimaryOrange,
+                  minimumSize: const Size.fromHeight(44),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                ),
+                child: const Text(
+                  'เข้าสู่ระบบ',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        content: const Text(
-          'คุณต้องการไปที่ไหนต่อ?',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/home-guest',
-                (route) => false,
-              );
-            },
-            child: const Text(
-              'หน้าการเรียนรู้',
-              style: TextStyle(
-                color: kPrimaryOrange,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimaryOrange,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/login',
-                (route) => false,
-              );
-            },
-            child: const Text(
-              'เข้าสู่ระบบ',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(

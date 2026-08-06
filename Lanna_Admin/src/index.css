@@ -1,21 +1,26 @@
-/* ฟอนต์นี้เป็นฟอนต์บังคับสำหรับตัวอักษรล้านนาทั้งโปรเจกต์ ห้ามเปลี่ยนหรือใช้ font อื่นแทนโดยไม่ปรึกษาก่อน */
 @font-face {
-  font-family: "LannaAkkhara";
-  src: url("./fonts/AKKHARA-KM.TTF") format("truetype");
+  font-family: "PayapLanna";
+  src: url("./fonts/PayapLanna-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
-/* ฟอนต์นี้เป็นฟอนต์บังคับสำหรับตัวอักษรล้านนาทั้งโปรเจกต์ ห้ามเปลี่ยนหรือใช้ font อื่นแทนโดยไม่ปรึกษาก่อน */
+@font-face {
+  font-family: "PayapLanna";
+  src: url("./fonts/PayapLanna-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
 .lanna-text {
-  font-family: "Noto Sans Tai Tham", "LannaAkkhara", serif;
-  font-size: 1.35em;
+  font-family: "PayapLanna", "Noto Sans Tai Tham", serif;
+  font-size: 1.4em;
   line-height: 1.8;
 }
 
 .lanna-char {
-  font-family: "Noto Sans Tai Tham", "LannaAkkhara", sans-serif;
-  font-size: 1.35em;
+  font-family: "PayapLanna", "Noto Sans Tai Tham", sans-serif;
+  font-size: 1.4em;
   line-height: 1.8;
 }
 
@@ -31,6 +36,11 @@ textarea.lanna-char {
   overflow: visible !important;
 }
 
+
+/* ช่องค้นหา - บังคับ padding-left 44px ไม่ให้ไอคอนแว่นขยายทับข้อความ */
+.admin-search-input {
+  padding-left: 44px !important;
+}
 
 @tailwind base;
 @tailwind components;

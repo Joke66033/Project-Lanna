@@ -1,0 +1,25 @@
+{
+  "source_file": "data\\raw\\lanna_dict.json",
+  "seed": 20260802,
+  "raw_records": 7381,
+  "verified_override_records": 1,
+  "external_input_files": [
+    "data\\raw\\external\\approved_records.jsonl"
+  ],
+  "external_raw_records": 7176,
+  "external_approved_records": 7176,
+  "accepted_pairs": 7331,
+  "rejected_records": 50,
+  "rejection_reasons": {
+    "control_placeholder": 8,
+    "thai_character_in_lanna_target": 42,
+    "duplicate_pair": 1
+  },
+  "pair_splits": {
+    "test": 733,
+    "validation": 733,
+    "train": 5865
+  },
+  "training_rows_bidirectional": 11730,
+  "warning": "This word-level dataset is suitable only for a proof of concept, not production sentence translation."
+}

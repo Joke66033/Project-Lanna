@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:lanna/widgets/bottom.dart';
 
 import 'camera.dart';
+import 'dictionary.dart';
 import 'favorite.dart';
 import 'package:lanna/page/profile.dart';
 
@@ -9,13 +11,14 @@ import 'package:lanna/page/lean/learn.dart';
 import 'package:lanna/page/translate_guest.dart';
 import 'package:lanna/page/translate_user.dart';
 import 'package:lanna/page/auth/login.dart';
+import 'package:lanna/services/auth_provider.dart';
 
 // Visual Tab Indices (BottomNav):
 // 0 = แปลภาษา
 // 1 = กล้อง
 // 2 = เรียนรู้
-// 3 = รายการโปรด
-// 4 = โปรไฟล์
+// 3 = พจนานุกรม
+// 4 = เข้าสู่ระบบ (guest) / รายการโปรด (user)
 
 class HomeShell extends StatefulWidget {
   final bool isGuest;
@@ -27,56 +30,52 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _selectedTab = 0; // Default tab is Translate (index 0 in BottomNav)
+  final GlobalKey<LearnPageState> _learnPageKey = GlobalKey<LearnPageState>();
 
-
-
-  // Map visual tab index to IndexedStack child index
-  int get _stackIndex {
-    switch (_selectedTab) {
-      case 0: return 0; // แปลภาษา
-      case 1: return 2; // กล้อง
-      case 2: return 1; // เรียนรู้
-      case 3: return 3; // รายการโปรด
-      case 4: return 4; // โปรไฟล์
-      default: return 0;
-    }
-  }
+  // Map visual tab index directly to IndexedStack child index
+  int get _stackIndex => _selectedTab;
 
   void _onTabTap(int tab) {
-    if (widget.isGuest && tab == 3) {
-      _showLoginRequiredDialog(context);
-      return;
-    }
-    if (widget.isGuest && tab == 4) {
+    final authProvider = context.read<AuthProvider>();
+    final bool isGuest = !authProvider.isLoggedIn && widget.isGuest;
+    if (isGuest && tab == 4) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const LoginPage()),
       );
       return;
     }
+    if (tab == 2) {
+      _learnPageKey.currentState?.resetToMenu();
+    }
     setState(() => _selectedTab = tab);
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final bool isGuest = !authProvider.isLoggedIn && widget.isGuest;
     final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF7),
       body: IndexedStack(
         index: _stackIndex,
         children: [
           // index 0 → แปลภาษา
-          widget.isGuest
+          isGuest
               ? const TranslateGuestPage()
               : const TranslateUserPage(),
-          // index 1 → เรียนรู้
-          LearnPage(isGuest: widget.isGuest),
-          // index 2 → กล้อง
+          // index 1 → กล้อง
           CameraPage(isActive: _selectedTab == 1),
-          // index 3 → รายการโปรด
-          const FavoritePage(),
-          // index 4 → โปรไฟล์
-          ProfileContent(isGuest: widget.isGuest),
+          // index 2 → เรียนรู้
+          LearnPage(key: _learnPageKey, isGuest: isGuest),
+          // index 3 → พจนานุกรม
+          const DictionaryPage(),
+          // index 4 → รายการโปรด (user) / โปรไฟล์ (guest)
+          isGuest
+              ? ProfileContent(isGuest: isGuest)
+              : const FavoritePage(),
         ],
       ),
 
@@ -85,7 +84,7 @@ class _HomeShellState extends State<HomeShell> {
           ? null
           : BottomNav(
               index: _selectedTab,
-              isGuest: widget.isGuest,
+              isGuest: isGuest,
               onLoginTap: () {
                 Navigator.push(
                   context,

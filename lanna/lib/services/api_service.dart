@@ -142,11 +142,41 @@ class ApiService {
 
   /// Helper to parse standard response: {"data": ..., "error": ...}
   static dynamic _parseResponse(http.Response response) {
-    if (response.body.isEmpty) {
+    final body = response.body.trim();
+    if (body.isEmpty) {
       throw Exception('เซิร์ฟเวอร์ตอบกลับด้วยข้อมูลที่ว่างเปล่า');
     }
 
-    final decoded = jsonDecode(response.body);
+    final contentType = response.headers['content-type']?.toLowerCase() ?? '';
+    final looksLikeHtml =
+        contentType.contains('text/html') ||
+        body.startsWith('<!DOCTYPE') ||
+        body.startsWith('<html') ||
+        body.startsWith('<HTML');
+
+    if (looksLikeHtml) {
+      throw Exception(
+        'เซิร์ฟเวอร์ส่งหน้าเว็บกลับมาแทนข้อมูล API '
+        '(HTTP ${response.statusCode}) กรุณาตรวจสอบ URL ของ API',
+      );
+    }
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(
+        'เซิร์ฟเวอร์ตอบกลับ HTTP ${response.statusCode}: '
+        '${body.length > 160 ? '${body.substring(0, 160)}…' : body}',
+      );
+    }
+
+    dynamic decoded;
+    try {
+      decoded = jsonDecode(body);
+    } on FormatException {
+      throw Exception(
+        'ข้อมูลจากเซิร์ฟเวอร์ไม่ใช่ JSON ที่ถูกต้อง '
+        '(Content-Type: ${contentType.isEmpty ? 'ไม่ระบุ' : contentType})',
+      );
+    }
     if (decoded is Map<String, dynamic>) {
       if (decoded.containsKey('error') && decoded['error'] != null) {
         final errorMsg = decoded['error']['message'] ?? 'เกิดข้อผิดพลาดในการดึงข้อมูล';

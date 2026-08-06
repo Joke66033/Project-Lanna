@@ -57,7 +57,7 @@ $payload = json_encode([
     'mime_type' => $mimeType,
 ], JSON_UNESCAPED_UNICODE);
 
-$ch = curl_init('http://127.0.0.1:8005/api/ocr-auto');
+$ch = curl_init('https://lanna-ai.onrender.com/api/ocr-auto');
 curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => $payload,

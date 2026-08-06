@@ -82,9 +82,25 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'delete':
             $id = $_GET['id'] ?? '';
             if ($id === '') { jsonError('Missing id'); break; }
-            $res = dbDelete('category_vocab', ['category_vocab_id' => 'eq.' . rawurlencode($id)]);
-            if ($res['error']) { jsonError($res['error']['message']); break; }
-            jsonOk($res['data']);
+
+            try {
+                $pdo = getPdo();
+
+                // 1. Delete all vocabulary entries linked to this category_vocab_id BEFORE deleting category_vocab
+                $stmt1 = $pdo->prepare("DELETE FROM `vocabulary` WHERE `category_vocab_id` = :id");
+                $stmt1->execute(['id' => $id]);
+
+                // 2. Clean up any orphan vocabulary entries whose category_vocab_id is NULL, empty, or missing
+                $pdo->exec("DELETE FROM `vocabulary` WHERE `category_vocab_id` IS NULL OR `category_vocab_id` = '' OR `category_vocab_id` NOT IN (SELECT `category_vocab_id` FROM `category_vocab`)");
+
+                // 3. Delete the category entry itself
+                $stmt2 = $pdo->prepare("DELETE FROM `category_vocab` WHERE `category_vocab_id` = :id");
+                $stmt2->execute(['id' => $id]);
+
+                jsonOk(['message' => 'Deleted category and all linked vocabulary successfully']);
+            } catch (Exception $e) {
+                jsonError('Database delete error: ' . $e->getMessage());
+            }
             break;
 
         default:

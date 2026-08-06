@@ -159,6 +159,20 @@ export default function Sidebar() {
           จัดการข้อมูลอักขระ
         </NavLink>
 
+        {/* จัดการเส้นทางการวาดอักขระ */}
+        <NavLink
+          to="/characterStrokes"
+          className={({ isActive }) =>
+            `block px-4 py-2 rounded-lg text-base font-medium transition ${
+              isActive
+                ? `${categoryColors.alphabet.sidebarActive} font-bold pl-3 shadow-sm`
+                : `${categoryColors.alphabet.sidebarNormal}`
+            }`
+          }
+        >
+          จัดการเส้นทางการวาดอักขระ
+        </NavLink>
+
         {/* จัดการหมวดหมู่คำศัพท์ */}
         <NavLink
           to="/categoryAlphabet"

@@ -1,0 +1,403 @@
+[
+  {
+    "source_index": 3,
+    "thai": "ต่อเฒ่า",
+    "lanna": "ᨲᩬ᩵ᩉ᩠<ctrl42>᩶ᩣ",
+    "reasons": [
+      "control_placeholder"
+    ]
+  },
+  {
+    "source_index": 5,
+    "thai": "ต่อเท้าเฒ่า",
+    "lanna": "ᨲᩬ᩵ᨲᩮ᩶ᩣᩉ᩠<ctrl42>᩶ᩣ",
+    "reasons": [
+      "control_placeholder"
+    ]
+  },
+  {
+    "source_index": 15,
+    "thai": "ดอกซึ้ง",
+    "lanna": "ᨯᩁ᩠ᨠᨪึ᩠ᨦ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 21,
+    "thai": "อิสาน",
+    "lanna": "ᩋิᩈᩣ᩠ᨶ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 22,
+    "thai": "อีสา",
+    "lanna": "ᩋีᩈᩣ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 32,
+    "thai": "สันติ",
+    "lanna": "ᩈᩢ᩠ᨶ᩠ᨲิ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 33,
+    "thai": "สนธิ",
+    "lanna": "ᩈ᩠ᨶ᩠ᨵิ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 34,
+    "thai": "สัญญา",
+    "lanna": "ᩈᩢ᩠<ctrl42>ᩣ",
+    "reasons": [
+      "control_placeholder"
+    ]
+  },
+  {
+    "source_index": 35,
+    "thai": "เมตตา",
+    "lanna": "<ctrl42>ᨲ᩠ᨲᩣ",
+    "reasons": [
+      "control_placeholder"
+    ]
+  },
+  {
+    "source_index": 36,
+    "thai": "อุเบกขา",
+    "lanna": "ᩋᩩ<ctrl42>ᨠ᩠ᨡᩣ",
+    "reasons": [
+      "control_placeholder"
+    ]
+  },
+  {
+    "source_index": 39,
+    "thai": "ภิกขุ",
+    "lanna": "ᨽิ᩠ᨠ᩠ᨡᩩ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 43,
+    "thai": "พยัคฆะ",
+    "lanna": "ᨻ<ctrl42>ᩢ᩠ᨣ᩠ᨤᩡ",
+    "reasons": [
+      "control_placeholder"
+    ]
+  },
+  {
+    "source_index": 45,
+    "thai": "กามปังโก",
+    "lanna": "ᨠᩣᨾ<ctrl42>ᩢ᩠ᨦ<ctrl42>ᩮ",
+    "reasons": [
+      "control_placeholder"
+    ]
+  },
+  {
+    "source_index": 51,
+    "thai": "วิรุฬหกะ",
+    "lanna": "ᩅิᩁᩩ᩠ᩉ᩠ᨠᩡ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 54,
+    "thai": "ปัญญาเป็นแสงสว่างในโลก",
+    "lanna": "<ctrl42>ᩢ<ctrl42>ᩣ <ctrl42>ᩁᩢᩈ᩠<ctrl42>ิ <ctrl42><ctrl42>ᩮ<ctrl42>",
+    "reasons": [
+      "control_placeholder",
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 61,
+    "thai": "คนึง",
+    "lanna": "ᨣᨶึ᩠ᨦ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 72,
+    "thai": "สัมปัตติ",
+    "lanna": "ᩈᩢ᩠ᨾ᩠ᨷᩢ᩠ᨲิ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 74,
+    "thai": "สัมโพธิ",
+    "lanna": "ᩈᩢ᩠ᨾ᩠ᨻ᩠ᨵิ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 91,
+    "thai": "มหันต์",
+    "lanna": "ᨾᩉᩢ᩠ᨶ᩠ᨲ์",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 98,
+    "thai": "ทุจริต",
+    "lanna": "ᨴᩩ᩠ᨧ᩠ᨧᩁิᨲ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 100,
+    "thai": "พานิช",
+    "lanna": "ᨻᩣᨶิᨧ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 105,
+    "thai": "วิญญาณ",
+    "lanna": "ᩅิ᩠ᨬ᩠ᨬᩣᨱ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 108,
+    "thai": "นินทา",
+    "lanna": "ᨶิ᩠ᨶ᩠ᨴᩣ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 110,
+    "thai": "นิพพาน",
+    "lanna": "ᨶิ᩠ᨷ᩠ᨷᩣ᩠ᨶ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 112,
+    "thai": "วิบุล",
+    "lanna": "ᩅิᨅᩪᩃ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 121,
+    "thai": "บัณฑิต",
+    "lanna": "ᨅᩢ᩠ᨱ᩠ᨯิᨲ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 123,
+    "thai": "สายัณห์",
+    "lanna": "ᩈᩣ᩠ᨿᩢ᩠ᨱᩉ์",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 124,
+    "thai": "สังข์",
+    "lanna": "ᩈᩢ᩠ᨦᨡ์",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 126,
+    "thai": "อนงค์",
+    "lanna": "ᩋᨶ᩠ᨦᨣ์",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 127,
+    "thai": "สิงคะ",
+    "lanna": "ᩈิ᩠ᨦᨣᩡ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 128,
+    "thai": "สงฆ์",
+    "lanna": "ᩈ᩠ᨦᨥ์",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 130,
+    "thai": "กิจจะ",
+    "lanna": "ᨠิ᩠ᨧ᩠ᨧᩡ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 131,
+    "thai": "อิจฉา",
+    "lanna": "ᩋิ᩠ᨧ᩠ᨨᩣ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 133,
+    "thai": "วิชชา",
+    "lanna": "ᩅิ᩠ᨧ᩠ᨩᩣ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 135,
+    "thai": "มัชฌิมา",
+    "lanna": "ᨾᩢ᩠ᨧ᩠ᨫิᨾᩣ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 145,
+    "thai": "ลัทธิ",
+    "lanna": "ᩃᩢ᩠ᨲ᩠ᨵิ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 146,
+    "thai": "อรหันต์",
+    "lanna": "ᩋᩁᩉᩢ᩠ᨶ᩠ᨲ์",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 147,
+    "thai": "ขันติ",
+    "lanna": "ᨡᩢ᩠ᨶ᩠ᨲิ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 152,
+    "thai": "ปฏิสนธิ",
+    "lanna": "ᨷᨭิᩈ᩠ᨶ᩠ᨵิ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 155,
+    "thai": "สิปปะ",
+    "lanna": "ᩈิ᩠ᨷ᩠ᨷᩡ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 166,
+    "thai": "นิพนต์",
+    "lanna": "ᨶิ᩠ᨷ᩠ᨶ᩠ᨲ์",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 167,
+    "thai": "ประสงค์",
+    "lanna": "ᨷᩕᩈ᩠ᨦᨣ์",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 183,
+    "thai": "อินดู",
+    "lanna": "ᩋิ᩠ᨶᨯᩪ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 184,
+    "thai": "อินทรีย์",
+    "lanna": "ᩋิ᩠ᨶᨴᩕᩦ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 188,
+    "thai": "พิมพา",
+    "lanna": "ᨻิ᩠ᨾ᩠ᨻᩣ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 191,
+    "thai": "ริดสะหนา",
+    "lanna": "ᩁิᩈ᩠ᨶᩣ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 197,
+    "thai": "หิมพาน",
+    "lanna": "ᩉิ᩠ᨾᨻᩣ᩠ᨶ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 198,
+    "thai": "หิมพานต์",
+    "lanna": "ᩉิ᩠ᨾᨻᩣ᩠ᨶ᩠ᨲ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 199,
+    "thai": "คือว่า",
+    "lanna": "ᨣื᩠ᩅᩣ",
+    "reasons": [
+      "thai_character_in_lanna_target"
+    ]
+  },
+  {
+    "source_index": 3432,
+    "thai": "ดูรา",
+    "lanna": "ᨯᩪᩁᩣ",
+    "reasons": [
+      "duplicate_pair"
+    ]
+  }
+]

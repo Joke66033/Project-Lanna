@@ -1,0 +1,23 @@
+{
+  "rows": {
+    "train": 11730,
+    "validation": 1466,
+    "test": 1466
+  },
+  "pairs": {
+    "train": 5865,
+    "validation": 733,
+    "test": 733
+  },
+  "directions": {
+    "train:th_to_lanna": 5865,
+    "train:lanna_to_th": 5865,
+    "validation:th_to_lanna": 733,
+    "validation:lanna_to_th": 733,
+    "test:th_to_lanna": 733,
+    "test:lanna_to_th": 733
+  },
+  "owner_verified_greeting_found": true,
+  "violations": [],
+  "passed": true
+}

@@ -35,3 +35,4 @@ Lanna_API/ai_engine/evaluation_samples/
 Lanna_API/ai_engine/lanna_ocr_evaluation.json
 Lanna_API/ai_engine/train.jsonl
 Lanna_API/ai_engine/val.jsonl
+*.zip

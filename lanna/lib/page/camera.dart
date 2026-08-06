@@ -1,14 +1,29 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart' as ip;
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:http/http.dart' as http;
 
+import '../core/api_config.dart';
 import '../services/lanna_transliterator.dart';
 import '../widgets/app_header.dart';
 
 const Color kPrimaryOrange = Color(0xFF924E19);
+
+class _CameraOcrResult {
+  final String text;
+  final bool isLannaOutput;
+  final String directionLabel;
+
+  const _CameraOcrResult({
+    required this.text,
+    required this.isLannaOutput,
+    required this.directionLabel,
+  });
+}
 
 class CameraPage extends StatefulWidget {
   final bool isActive;
@@ -33,6 +48,8 @@ class _CameraPageState extends State<CameraPage>
   bool _loading = false;
   bool _flashOn = false;
   String _resultText = '';
+  bool _resultIsLanna = true;
+  String _resultDirection = 'ภาษาไทย → ภาษาล้านนา';
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnim;
@@ -173,7 +190,7 @@ class _CameraPageState extends State<CameraPage>
         _image = null;
         _resultText = '';
       });
-      await _processImageWebPath(file.path);
+      await _processImageWeb(bytes, file.name);
     } else {
       final imgFile = File(file.path);
       setState(() {
@@ -188,35 +205,206 @@ class _CameraPageState extends State<CameraPage>
   // ================= OCR MOBILE =================
   Future<void> _processImageMobile(File file) async {
     setState(() => _loading = true);
-    final inputImage = InputImage.fromFile(file);
-    final recognizer = TextRecognizer();
     try {
-      final result = await recognizer.processImage(inputImage);
-      final raw = result.text.trim();
+      final result = await _requestAutoOcr(
+        await file.readAsBytes(),
+        file.path.split(Platform.pathSeparator).last,
+      );
       setState(() {
-        _resultText = raw.isEmpty ? '' : _conv.thaiToLanna(raw);
+        _resultText = result.text;
+        _resultIsLanna = result.isLannaOutput;
+        _resultDirection = result.directionLabel;
       });
+    } catch (error) {
+      debugPrint('Typhoon OCR unavailable, using local OCR: $error');
+      await _processImageWithLocalOcr(file);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Typhoon OCR ยังไม่พร้อม ระบบจึงใช้การอ่านภาษาไทยบนเครื่องแทน',
+            ),
+          ),
+        );
+      }
     } finally {
-      recognizer.close();
-      setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
-  // ================= OCR WEB =================
-  Future<void> _processImageWebPath(String path) async {
-    setState(() => _loading = true);
-    final inputImage = InputImage.fromFilePath(path);
+  Future<void> _processImageWithLocalOcr(File file) async {
     final recognizer = TextRecognizer();
     try {
-      final result = await recognizer.processImage(inputImage);
+      final result = await recognizer.processImage(InputImage.fromFile(file));
       final raw = result.text.trim();
-      setState(() {
-        _resultText = raw.isEmpty ? '' : _conv.thaiToLanna(raw);
-      });
+      if (mounted) {
+        setState(() {
+          _resultText = raw.isEmpty ? '' : _conv.thaiToLanna(raw);
+          _resultIsLanna = true;
+          _resultDirection = 'ภาษาไทย → ภาษาล้านนา';
+        });
+      }
     } finally {
       recognizer.close();
-      setState(() => _loading = false);
     }
+  }
+
+  Future<void> _processImageWeb(Uint8List bytes, String filename) async {
+    setState(() => _loading = true);
+    try {
+      final result = await _requestAutoOcr(bytes, filename);
+      if (mounted) {
+        setState(() {
+          _resultText = result.text;
+          _resultIsLanna = result.isLannaOutput;
+          _resultDirection = result.directionLabel;
+        });
+      }
+    } catch (error) {
+      debugPrint('Typhoon OCR error: $error');
+      if (mounted) {
+        final errStr = error.toString();
+        final displayMsg = (errStr.contains('Failed to fetch') || errStr.contains('ClientException') || errStr.contains('SocketException'))
+            ? 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ OCR ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต หรือสถานะเซิร์ฟเวอร์'
+            : 'เกิดข้อผิดพลาดในการอ่านอักษร: ${errStr.replaceAll('Exception: ', '')}';
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(displayMsg)));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  Future<_CameraOcrResult> _requestAutoOcr(
+    Uint8List imageBytes,
+    String filename,
+  ) async {
+    try {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse(ApiConfig.autoOcr),
+      );
+      request.files.add(
+        http.MultipartFile.fromBytes('file', imageBytes, filename: filename),
+      );
+      final streamedResponse = await request.send().timeout(
+        const Duration(seconds: 150),
+      );
+      final response = await http.Response.fromStream(streamedResponse);
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final data = decoded['data'] as Map<String, dynamic>?;
+        final text = (data?['text'] as String? ?? '').trim();
+        final isLannaOutput = data?['is_lanna_output'] as bool? ?? false;
+        final direction = data?['direction'] as String? ?? '';
+        if (text.isNotEmpty) {
+          return _CameraOcrResult(
+            text: text,
+            isLannaOutput: isLannaOutput,
+            directionLabel: direction == 'lanna_to_thai'
+                ? 'ภาษาล้านนา → ภาษาไทย (ทดลอง)'
+                : 'ภาษาไทย → ภาษาล้านนา',
+          );
+        }
+      }
+    } catch (error) {
+      debugPrint('Unified OCR endpoint unavailable: $error');
+    }
+
+    // Compatibility fallback while an older PHP backend is still deployed.
+    return _requestLegacyAutoOcr(imageBytes, filename);
+  }
+
+  Future<_CameraOcrResult> _requestLegacyAutoOcr(
+    Uint8List imageBytes,
+    String filename,
+  ) async {
+    // Prefer Lanna -> Thai only when the experimental classifier is confident.
+    // A low-confidence Lanna result must never override readable Thai OCR.
+    try {
+      final lannaResult = await _requestLannaOcr(imageBytes, filename);
+      if (lannaResult != null) return lannaResult;
+    } catch (error) {
+      debugPrint('Experimental Lanna OCR unavailable: $error');
+    }
+
+    final thaiText = await _requestTyphoonOcr(imageBytes, filename);
+    final lannaText = _conv.thaiToLanna(thaiText);
+    if (lannaText.trim().isEmpty) {
+      throw Exception('ไม่พบข้อความภาษาไทยในภาพ');
+    }
+    return _CameraOcrResult(
+      text: lannaText,
+      isLannaOutput: true,
+      directionLabel: 'ภาษาไทย → ภาษาล้านนา',
+    );
+  }
+
+  Future<_CameraOcrResult?> _requestLannaOcr(
+    Uint8List imageBytes,
+    String filename,
+  ) async {
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ApiConfig.lannaOcr),
+    );
+    request.files.add(
+      http.MultipartFile.fromBytes('file', imageBytes, filename: filename),
+    );
+    final streamedResponse = await request.send().timeout(
+      const Duration(seconds: 120),
+    );
+    final response = await http.Response.fromStream(streamedResponse);
+    if (response.statusCode < 200 || response.statusCode >= 300) return null;
+
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    final data = decoded['data'] as Map<String, dynamic>?;
+    final isLowConfidence = data?['is_low_confidence'] as bool? ?? true;
+    final confidence = (data?['confidence'] as num?)?.toDouble() ?? 0;
+    final text = (data?['text'] as String? ?? '').trim();
+    if (isLowConfidence || confidence < 0.65 || text.isEmpty) return null;
+
+    return _CameraOcrResult(
+      text: text,
+      isLannaOutput: false,
+      directionLabel: 'ภาษาล้านนา → ภาษาไทย (ทดลอง)',
+    );
+  }
+
+  Future<String> _requestTyphoonOcr(
+    Uint8List imageBytes,
+    String filename,
+  ) async {
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ApiConfig.typhoonOcr),
+    );
+    request.files.add(
+      http.MultipartFile.fromBytes('file', imageBytes, filename: filename),
+    );
+
+    final streamedResponse = await request.send().timeout(
+      const Duration(seconds: 120),
+    );
+    final response = await http.Response.fromStream(streamedResponse);
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final error = decoded['error'] as Map<String, dynamic>?;
+      throw Exception(error?['message'] ?? 'ไม่สามารถอ่านภาพได้');
+    }
+
+    final data = decoded['data'] as Map<String, dynamic>?;
+    final text = (data?['text'] as String? ?? '').trim();
+    if (text.isEmpty) {
+      throw Exception('ไม่พบอักษรในภาพ');
+    }
+    return text;
   }
 
   void _clearImage() {
@@ -399,10 +587,13 @@ class _CameraPageState extends State<CameraPage>
 
   // ─── Image preview (after capture) ───
   Widget _buildImagePreview() {
-    return SizedBox.expand(
-      child: _image != null
-          ? Image.file(_image!, fit: BoxFit.cover)
-          : Image.memory(_webImage!, fit: BoxFit.cover),
+    return Container(
+      color: const Color(0xFF111111),
+      child: SizedBox.expand(
+        child: _image != null
+            ? Image.file(_image!, fit: BoxFit.contain)
+            : Image.memory(_webImage!, fit: BoxFit.contain),
+      ),
     );
   }
 
@@ -475,11 +666,20 @@ class _CameraPageState extends State<CameraPage>
           ),
           const SizedBox(height: 8),
           Text(
-            _resultText,
+            _resultDirection,
             style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            _resultText,
+            style: TextStyle(
               color: Colors.white,
               fontSize: 19,
-              fontFamily: 'LannaAkkhara',
+              fontFamily: _resultIsLanna ? 'PayapLanna' : null,
               height: 1.5,
             ),
           ),
@@ -491,7 +691,7 @@ class _CameraPageState extends State<CameraPage>
   // ─── Bottom control bar (White design) ───
   Widget _buildControlBar(bool hasImage) {
     return Container(
-      padding: const EdgeInsets.only(left: 24, right: 24, top: 14, bottom: 72),
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 12),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),

@@ -25,6 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     switch ($action) {
 
         case 'getAll':
+            try {
+                $pdo = getPdo();
+                // Clean up orphan characters whose category_char_id is NULL, empty, or no longer exists in category_lanna_char table
+                $pdo->exec("DELETE FROM `lanna_char` WHERE `category_char_id` IS NULL OR `category_char_id` = '' OR `category_char_id` NOT IN (SELECT `category_char_id` FROM `category_lanna_char`)");
+            } catch (Exception $e) {
+                // Ignore cleanup error if table is locked
+            }
+
             $filters = [];
             $category_char_id = $_GET['category_char_id'] ?? '';
             if ($category_char_id !== '') {

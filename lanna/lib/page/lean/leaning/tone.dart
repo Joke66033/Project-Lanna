@@ -3,9 +3,12 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lanna/services/lanna_char_service.dart';
 import 'package:lanna/services/article_service.dart';
 import 'package:lanna/models/article_model.dart';
+import '../learning_navigation.dart';
+import 'lanna_glyph_card.dart';
+import 'char_detail_page.dart';
 import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
-import '../train/stroke_data.dart' as sd;
+import 'package:lanna/services/character_stroke_service.dart';
 
 /// ============================================================================
 /// MODEL : LANNA TONE
@@ -208,56 +211,50 @@ class _TonePageState extends State<TonePage> {
       ),
       body: _groups.isEmpty
           ? const SizedBox.shrink()
-          : ListView.builder(
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 80),
-              itemCount: _groups.first.tones.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    child: _IntroCard(article: _article),
+          : NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  if (_article != null)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: _IntroCard(article: _article),
+                      ),
+                    ),
+                ];
+              },
+              body: PaginatedLannaGrid<LannaTone>(
+                items: _groups.first.tones,
+                pageSize: 16,
+                itemBuilder: (context, tone, globalIndex) {
+                  final initialIndex = allTonesForTrain.indexWhere((t) => t.char == tone.char);
+                  return GestureDetector(
+                    onTap: () => pushLearningPage(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CharDetailPage(
+                          char: tone.char,
+                          reading: tone.reading,
+                          thai: tone.thai,
+                          description: tone.description,
+                          isGuest: widget.isGuest,
+                          writingType: WritingType.tone,
+                          allChars: allTonesForTrain
+                              .map((t) => {'char': t.char, 'label': t.reading})
+                              .toList(),
+                          initialWritingIndex: initialIndex >= 0 ? initialIndex : 0,
+                          categoryName: 'วรรณยุกต์ล้านนา',
+                        ),
+                      ),
+                    ),
+                    child: LannaGlyphCard(
+                      glyph: tone.char,
+                      thaiEquivalent: tone.thai,
+                    ),
                   );
-                }
-                final tone = _groups.first.tones[index - 1];
-                      return _ToneCard(
-                        tone: tone,
-                        onPlaySound: () => _speak(tone.reading),
-                        onTapStrokeOrder: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            barrierColor: Colors.black.withValues(alpha: 0.5),
-                            builder: (_) => ToneStrokeOrderBottomSheet(tone: tone),
-                          );
-                        },
-                        onTapPractice: () {
-                          if (widget.isGuest) {
-                            _showLoginRequiredAlert(context);
-                            return;
-                          }
-                          final allWritingItems = allTonesForTrain.map((t) => WritingItem(
-                            char: t.char,
-                            label: t.reading,
-                            type: WritingType.tone,
-                          )).toList();
-
-                          final initialIndex = allTonesForTrain.indexWhere((t) => t.char == tone.char);
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => WritingModePage(
-                                items: allWritingItems,
-                                title: 'ฝึกเขียนวรรณยุกต์',
-                                initialIndex: initialIndex >= 0 ? initialIndex : 0,
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+                },
+              ),
+            ),
     );
   }
 
@@ -473,7 +470,7 @@ class _ToneCard extends StatelessWidget {
                     tone.char,
                     style: const TextStyle(
                       fontSize: 28,
-                      fontFamily: 'LannaAkkhara',
+                      fontFamily: 'PayapLanna',
                       color: Color(0xFF924E19),
                       fontWeight: FontWeight.bold,
                     ),
@@ -695,7 +692,7 @@ class _ToneStrokeOrderBottomSheetState extends State<ToneStrokeOrderBottomSheet>
             widget.tone.char,
             style: const TextStyle(
               fontSize: 27,
-              fontFamily: 'LannaAkkhara',
+              fontFamily: 'PayapLanna',
               color: Color(0xFF924E19),
               fontWeight: FontWeight.bold,
             ),
@@ -940,5 +937,5 @@ class ToneStrokePainter extends CustomPainter {
 }
 
 List<List<Offset>> getStrokePaths(String char) {
-  return sd.getStrokeData(char);
+  return getStrokeData(char);
 }

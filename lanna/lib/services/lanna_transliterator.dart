@@ -1,230 +1,266 @@
-import '../models/lanna_word_composition.dart';
 import 'lanna_rules_data.dart';
 
+/// ตัวแปลงอักษรล้านนาสำหรับคำที่ไม่พบในพจนานุกรม
+///
+/// คำที่มีรูปสะกดมาตรฐานควรถูกค้นจากฐานข้อมูลก่อน ตัวแปลงนี้จึงเป็น
+/// rule-based fallback และต้องรักษาตัวซ้อน (ไม้สกด) กลุ่มพยัญชนะ
+/// และตำแหน่งเครื่องหมาย ไม่ใช่การแทนอักษรแบบ 1:1
 class LannaTransliterator {
-  /// แปลงภาษาไทยเป็นภาษาล้านนาโดยคำนึงถึงโครงสร้างอักขระและการผสมคำ (Compositional Translation)
+  static const String _sakot = '\u1A60';
+  /// Direct Thai Consonant -> Lanna Consonant Character Map
+  static const Map<String, String> consonantMap = {
+    'ก': 'ᨠ',
+    'ข': 'ᨡ',
+    'ฃ': 'ᨡ',
+    'ค': 'ᨣ',
+    'ฅ': 'ᨣ',
+    'ฆ': 'ᨤ',
+    'ง': 'ᨦ',
+    'จ': 'ᨧ',
+    'ฉ': 'ᨨ',
+    'ช': 'ᨩ',
+    'ซ': 'ᨪ',
+    'ฌ': 'ᨫ',
+    'ญ': 'ᨬ',
+    'ฎ': 'ᨯ',
+    'ฏ': 'ᨲ',
+    'ฐ': 'ᨳ',
+    'ฑ': 'ᨴ',
+    'ฒ': 'ᨵ',
+    'ณ': 'ᨶ',
+    'ด': 'ᨯ',
+    'ต': 'ᨲ',
+    'ถ': 'ᨳ',
+    'ท': 'ᨴ',
+    'ธ': 'ᨵ',
+    'น': 'ᨶ',
+    'บ': 'ᨷ',
+    'ป': 'ᨸ',
+    'ผ': 'ᨹ',
+    'ฝ': 'ᨺ',
+    'พ': 'ᨻ',
+    'ฟ': 'ᨼ',
+    'ภ': 'ᨽ',
+    'ม': 'ᨾ',
+    'ย': 'ᨿ',
+    'ร': 'ᩁ',
+    'ล': 'ᩃ',
+    'ว': 'ᩅ',
+    'ศ': 'ᩈ',
+    'ษ': 'ᩈ',
+    'ส': 'ᩈ',
+    'ห': 'ᩉ',
+    'ฬ': 'ᩃ',
+    'อ': 'ᩋ',
+    'ฮ': 'ᩉ',
+  };
+
+  /// Direct Thai Vowels -> Lanna Vowels Character Map
+  static const Map<String, String> vowelMap = {
+    'ะ': 'ᩣ',
+    'า': 'ᩣ',
+    'ิ': 'ᩥ',
+    'ี': 'ᩦ',
+    'ึ': 'ᩧ',
+    'ื': 'ᩨ',
+    'ุ': 'ᩩ',
+    'ู': 'ᩪ',
+    'เ': 'ᩮ',
+    'แ': 'ᩯ',
+    'โ': 'ᩰ',
+    'ใ': 'ᩲ',
+    'ไ': 'ᩱ',
+    'ำ': 'ᩣᩴ',
+    '็': '᩼',
+    'ั': 'ᩢ',
+    '์': '᩺',
+  };
+
+  /// Direct Thai Tones -> Lanna Tones Character Map
+  static const Map<String, String> toneMap = {
+    '่': '᩵',
+    '้': '᩶',
+    '๊': '᩷',
+    '๋': '᩸',
+  };
+
+  /// Direct Thai Digits -> Lanna Digits Character Map
+  static const Map<String, String> numberMap = {
+    '0': '᪀',
+    '1': '᪁',
+    '2': '᪂',
+    '3': '᪃',
+    '4': '᪄',
+    '5': '᪅',
+    '6': '᪆',
+    '7': '᪇',
+    '8': '᪈',
+    '9': '᪉',
+  };
+
+  /// Direct Reverse Character Map (Lanna -> Thai)
+  static const Map<String, String> reverseCharMap = {
+    // Consonants
+    'ᨠ': 'ก', 'ᨡ': 'ข', 'ᨣ': 'ค', 'ᨤ': 'ฆ', 'ᨦ': 'ง',
+    'ᨧ': 'จ', 'ᨨ': 'ฉ', 'ᨩ': 'ช', 'ᨪ': 'ซ', 'ᨫ': 'ฌ', 'ᨬ': 'ญ',
+    'ᨲ': 'ต', 'ᨳ': 'ถ', 'ᨴ': 'ท', 'ᨵ': 'ธ', 'ᨶ': 'น',
+    'ᨯ': 'ด',
+    'ᨷ': 'บ',
+    'ᨸ': 'ป',
+    'ᨹ': 'ผ',
+    'ᨺ': 'ฝ',
+    'ᨻ': 'พ',
+    'ᨼ': 'ฟ',
+    'ᨽ': 'ภ',
+    'ᨾ': 'ม',
+    'ᨿ': 'ย', 'ᩁ': 'ร', 'ᩃ': 'ล', 'ᩅ': 'ว', 'ᩈ': 'ส', 'ᩉ': 'ห', 'ᩋ': 'อ',
+    // Vowels
+    'ᩣ': 'า', 'ᩥ': 'ิ', 'ᩦ': 'ี', 'ᩧ': 'ึ', 'ᩨ': 'ื',
+    'ᩩ': 'ุ', 'ᩪ': 'ู', 'ᩮ': 'เ', 'ᩯ': 'แ', 'ᩰ': 'โ', 'ᩱ': 'ไ', 'ᩲ': 'ใ',
+    'ᩢ': 'ั', '᩼': '็', '᩺': '์',
+    // Tones
+    '᩵': '่', '᩶': '้', '᩷': '๊', '᩸': '๋',
+    // Digits
+    '᪀': '0', '᪁': '1', '᪂': '2', '᪃': '3', '᪄': '4',
+    '᪅': '5', '᪆': '6', '᪇': '7', '᪈': '8', '᪉': '9',
+    // Sakot (Subjoiner) - ignore when mapping back
+    '\u1A60': '',
+  };
+
+  static const Set<String> _clusterFollowers = {'ร', 'ล', 'ว', 'ย'};
+  static const Set<String> _thaiCombiningMarks = {
+    'ะ', 'า', 'ิ', 'ี', 'ึ', 'ื', 'ุ', 'ู', 'ำ', 'ั', '็',
+    '่', '้', '๊', '๋', '์',
+  };
+
+  /// แปลงข้อความไทยเป็นล้านนาตามโครงสร้างคำพื้นฐาน
   String thaiToLanna(String input) {
-    final t = input.trim();
-    if (t.isEmpty) return '';
-    
-    // 1. ตรวจสอบตารางคำเขียนอ่านพิเศษหลักทั้งหมด
-    if (LannaRulesData.irregularSpellingMap.containsKey(t)) {
-      return LannaRulesData.irregularSpellingMap[t]!;
-    }
-    
-    // ค้นหาย่อยและแทนที่ด้วยตารางคำพิเศษ
-    String parsedText = t;
-    LannaRulesData.irregularSpellingMap.forEach((thai, lanna) {
-      parsedText = parsedText.replaceAll(thai, lanna);
-    });
-    
-    if (parsedText != t) {
-      return parsedText;
-    }
+    final text = input.trim();
+    if (text.isEmpty) return '';
+
+    final irregular = LannaRulesData.irregularSpellingMap[text];
+    if (irregular != null) return irregular;
 
     final buffer = StringBuffer();
-    int i = 0;
-    
-    while (i < input.length) {
-      final char = input[i];
-
-      // จัดการตัวเลขโหรา
-      if (LannaRulesData.horaNumbers.containsKey(char)) {
-        buffer.write(LannaRulesData.horaNumbers[char]!);
-        i++;
+    var offset = 0;
+    final irregularEntries =
+        LannaRulesData.irregularSpellingMap.entries.toList()
+          ..sort((a, b) => b.key.length.compareTo(a.key.length));
+    while (offset < text.length) {
+      MapEntry<String, String>? matchedEntry;
+      for (final entry in irregularEntries) {
+        if (text.startsWith(entry.key, offset)) {
+          matchedEntry = entry;
+          break;
+        }
+      }
+      if (matchedEntry != null) {
+        buffer.write(matchedEntry.value);
+        offset += matchedEntry.key.length;
         continue;
       }
 
-      // ตรวจสอบกรณีเป็นพยัญชนะต้น
-      if (_isConsonant(char)) {
-        final String mainConsonant = _mapConsonant(char);
-        String? subjoined;
-        String? finalConsonant;
-        String? vowel;
-        String? tone;
-        String? specialSign;
+      final char = text[offset];
+      if (consonantMap.containsKey(char)) {
+        buffer.write(consonantMap[char]);
+        final next = offset + 1 < text.length ? text[offset + 1] : '';
+        final afterNext = offset + 2 < text.length ? text[offset + 2] : '';
 
-        int offset = 1;
-
-        // ดึงสระหน้า (ถ้ามีสระหน้านำหน้าตัวพยัญชนะต้นนี้ในอินพุต)
-        String? preVowel;
-        if (i > 0) {
-          final prevChar = input[i - 1];
-          if (_isPreVowel(prevChar)) {
-            preVowel = _mapVowel(prevChar);
+        // พยัญชนะควบ/ตัวซ้อน เช่น กร กล กว และ พญ
+        if (_clusterFollowers.contains(next) &&
+            consonantMap.containsKey(next) &&
+            afterNext.isNotEmpty) {
+          buffer
+            ..write(_sakot)
+            ..write(consonantMap[next]);
+          offset++;
+        } else if (_isFinalConsonant(text, offset)) {
+          // ตัวสะกดล้านนาเขียนเป็นตัวซ้อนใต้พยัญชนะต้น
+          // ยกเว้นเมื่อเครื่องหมายสกดถูกใส่ไว้แล้ว
+          final previous = offset > 0 ? text[offset - 1] : '';
+          if (previous != '์') {
+            final written = consonantMap[char]!;
+            var current = buffer.toString();
+            current = current.substring(0, current.length - written.length);
+            if (current.endsWith('ᩢ')) {
+              current = current.substring(0, current.length - 1);
+            }
+            buffer
+              ..clear()
+              ..write(current)
+              ..write(_sakot)
+              ..write(written);
           }
         }
-
-        // ตรวจสอบอักขระถัดๆ ไปเพื่อประกอบพยางค์
-        while (i + offset < input.length) {
-          final next = input[i + offset];
-
-          if (_isTone(next)) {
-            tone = _mapTone(next);
-            offset++;
-          } else if (_isVowel(next)) {
-            final vMapped = _mapVowel(next);
-            if (vowel == null) {
-              vowel = vMapped;
-            } else {
-              vowel += vMapped;
-            }
-            offset++;
-          } else if (_isConsonant(next)) {
-            // เจอยลอยหรือตัวสะกดด้านหลัง
-            // ตรวจสอบกฎพยัญชนะสังโยค (ตัวซ้อนบาลี) หรือตัวห้อย
-            final bool canBeSubjoined = _checkCanSubjoin(char, next);
-            
-            if (canBeSubjoined && subjoined == null) {
-              subjoined = _mapConsonant(next);
-              offset++;
-            } else if (_isStandardSpelling(next) || _isSpecialSpelling(next)) {
-              if (finalConsonant == null) {
-                finalConsonant = _mapConsonant(next);
-                offset++;
-              } else {
-                break;
-              }
-            } else {
-              break;
-            }
-          } else {
-            break;
-          }
-        }
-
-        // TODO: ขอข้อมูลเพิ่มเติมจากผู้เชี่ยวชาญภาษาล้านนาสำหรับกรณีการซ้อนกล้ำระโรง (ร)
-        // และอักขรวิธีสำหรับคำถิ่นเฉพาะ (เช่น เชียงใหม่, ลำพูน) เพื่อนำมาปรับปรุง logic ให้สมบูรณ์แบบที่สุด
-
-        final syllable = LannaSyllable(
-          consonant: mainConsonant,
-          subjoinedConsonant: subjoined,
-          vowel: (preVowel ?? '') + (vowel ?? ''),
-          tone: tone,
-          finalConsonant: finalConsonant,
-          specialSign: specialSign,
-        );
-
-        buffer.write(syllable.toLannaString());
-        i += offset;
-        continue;
-      }
-
-      // จัดการอักขระเดี่ยวๆ ที่ไม่ได้อยู่ในโครงสร้างพยางค์พยัญชนะต้น
-      if (_isPreVowel(char)) {
-        if (i == input.length - 1) {
-          buffer.write(_mapVowel(char));
-        }
-        i++;
-      } else if (_isVowel(char)) {
-        buffer.write(_mapVowel(char));
-        i++;
-      } else if (_isTone(char)) {
-        buffer.write(_mapTone(char));
-        i++;
+      } else if (vowelMap.containsKey(char)) {
+        buffer.write(vowelMap[char]);
+      } else if (toneMap.containsKey(char)) {
+        buffer.write(toneMap[char]);
+      } else if (numberMap.containsKey(char)) {
+        buffer.write(numberMap[char]);
       } else {
         buffer.write(char);
-        i++;
       }
+      offset++;
     }
-    
     return buffer.toString();
   }
 
-  /// แปลงภาษาล้านนากลับเป็นภาษาไทย (Transliterate back to Thai)
-  String lannaToThai(String input) {
-    final t = input.trim();
-    if (t.isEmpty) return '';
-    
-    // ค้นหาในตารางคำพิเศษ
-    for (var entry in LannaRulesData.irregularSpellingMap.entries) {
-      if (entry.value == t) return entry.key;
-    }
-    
-    // TODO: พัฒนาระบบถอดรหัส (Decoding) แปลผกผันล้านนาเป็นไทยแบบละเอียดสำหรับคำทั่วไป
-    return input;
-  }
-
-  // ================= HELPERS FOR RULE CHECKING =================
-
-  bool _isConsonant(String char) {
-    return LannaRulesData.consonants.any((c) => c.thaiChar == char);
-  }
-
-  bool _isVowel(String char) {
-    return LannaRulesData.generalVowels.containsKey(char);
-  }
-
-  bool _isPreVowel(String char) {
-    return char == 'เ' || char == 'แ' || char == 'โ' || char == 'ไ' || char == 'ใ';
-  }
-
-  bool _isTone(String char) {
-    return char == '่' || char == '้' || char == '๊' || char == '๋';
-  }
-
-  bool _isStandardSpelling(String char) {
-    return LannaRulesData.standardSpellingConsonants.contains(char);
-  }
-
-  bool _isSpecialSpelling(String char) {
-    return LannaRulesData.specialSpellingConsonants.contains(char);
-  }
-
-  String _mapConsonant(String char) {
-    final info = LannaRulesData.consonants.firstWhere(
-      (c) => c.thaiChar == char,
-      orElse: () => LannaConsonantInfo(thaiChar: char, lannaChar: char, groupIndex: 0, positionInGroup: 0),
-    );
-    return info.lannaChar;
-  }
-
-  String _mapVowel(String char) {
-    return LannaRulesData.generalVowels[char] ?? char;
-  }
-
-  String _mapTone(String char) {
-    if (char == '่') return '\u1A75';
-    if (char == '้') return '\u1A76';
-    if (char == '๊') return '\u1A77';
-    if (char == '๋') return '\u1A78';
-    return char;
-  }
-
-  bool _checkCanSubjoin(String c1, String c2) {
-    final info1 = LannaRulesData.consonants.firstWhere((c) => c.thaiChar == c1, orElse: () => const LannaConsonantInfo(thaiChar: '', lannaChar: '', groupIndex: 0, positionInGroup: 0));
-    final info2 = LannaRulesData.consonants.firstWhere((c) => c.thaiChar == c2, orElse: () => const LannaConsonantInfo(thaiChar: '', lannaChar: '', groupIndex: 0, positionInGroup: 0));
-
-    if (info1.thaiChar.isEmpty || info2.thaiChar.isEmpty) return false;
-
-    // กฎพยัญชนะสังโยค (ตัวซ้อนภาษาบาลี)
-    if (info1.groupIndex > 0 && info1.groupIndex == info2.groupIndex) {
-      final pos1 = info1.positionInGroup;
-      final pos2 = info2.positionInGroup;
-
-      if (pos1 == 1) {
-        return pos2 == 1 || pos2 == 2;
-      }
-      if (pos1 == 3) {
-        return pos2 == 3 || pos2 == 4;
-      }
-      if (pos1 == 5) {
-        if (info1.thaiChar == 'ง' && info2.thaiChar == 'ง') return false;
-        return true;
-      }
+  bool _isFinalConsonant(String text, int index) {
+    if (index == 0 || !consonantMap.containsKey(text[index])) return false;
+    final next = index + 1 < text.length ? text[index + 1] : '';
+    if (next.isNotEmpty &&
+        next.trim().isNotEmpty &&
+        !_thaiCombiningMarks.contains(next)) {
+      return false;
     }
 
-    // ข้อยกเว้นพิเศษของการซ้อนวรรค
-    if (info1.thaiChar == 'น' && info2.thaiChar == 'ธ') return true;
-    if (info1.thaiChar == 'ณ' && info2.thaiChar == 'ฐ') return true;
-
-    // กรณีซ้อน ย ย และ ว ว
-    if (info1.thaiChar == 'ย' && info2.thaiChar == 'ย') return true;
-    if (info1.thaiChar == 'ว' && info2.thaiChar == 'ว') return true;
-
-    // กฎตัวสะกดทั่วไปสามารถห้อยได้หากทำหน้าที่เป็นตัวสะกด
-    if (LannaRulesData.standardSpellingConsonants.contains(c2)) return true;
-
+    // ต้องมีพยัญชนะต้นอยู่ก่อนหน้าในคำเดียวกัน จึงจะถือเป็นตัวสะกด
+    for (var i = index - 1; i >= 0 && text[i].trim().isNotEmpty; i--) {
+      if (consonantMap.containsKey(text[i])) return true;
+    }
     return false;
+  }
+
+  /// แปลงข้อความล้านนากลับเป็นไทย โดยอ่านตัวซ้อนเป็นตัวสะกด
+  String lannaToThai(String input) {
+    final text = input.trim();
+    if (text.isEmpty) return '';
+
+    for (final entry in LannaRulesData.irregularSpellingMap.entries) {
+      if (entry.value == text) return entry.key;
+    }
+
+    final buffer = StringBuffer();
+    for (final rune in text.runes) {
+      final char = String.fromCharCode(rune);
+      if (reverseCharMap.containsKey(char)) {
+        buffer.write(reverseCharMap[char]);
+      } else {
+        buffer.write(char);
+      }
+    }
+    return buffer.toString();
+  }
+
+  /// แปลงข้อความให้อยู่ในรูปแบบลำดับการพิมพ์ เช่น "นายฯ / น่านฯ / เน + ้ + ๋ + ๑ + ฯ"
+  String formatTypingSequence(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return '';
+    if (trimmed.contains('+') || trimmed.contains('/')) return trimmed;
+
+    final chars = trimmed.split('');
+    final filtered = chars.where((c) => c.trim().isNotEmpty).toList();
+    return filtered.join(' + ');
+  }
+
+  /// แยกรายการลำดับการพิมพ์จากรูปแบบ "คำ1 / คำ2 / คำ3"
+  List<String> parseTypingSequence(String sequenceText) {
+    if (sequenceText.isEmpty) return [];
+    return sequenceText
+        .split('/')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
   }
 }

@@ -11,7 +11,13 @@ import Pagination from "../components/Pagination.jsx";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity";
 import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
 
 import Modal from "../components/Modal.jsx";
 import { categoryColors, getCategoryBadgeStyle } from "../lib/categoryColors";
@@ -61,14 +67,37 @@ export default function Articles() {
 
   /* ===== FETCH CHAR CATEGORIES, LANNA CHARS & LEARNING CATEGORIES ===== */
   useEffect(() => {
-    const fetchCharCategories = async () => {
-      const { data: cats, error } = await supabase
-        .from("category_lanna_char")
-        .select("category_char_id, name, learning_category_code")
-        .order("category_char_id", { ascending: true });
-      if (!error && cats) setCharCategories(cats);
+    const fetchAllCategories = async () => {
+      try {
+        // 1. Fetch active learning categories
+        const { data: learnData } = await supabase
+          .from("learning_category")
+          .select("category_code, title, is_active")
+          .order("category_code", { ascending: true });
+
+        const activeLearnCats = (learnData || []).filter(
+          (c) => c.is_active !== false && c.is_active !== "0" && c.is_active !== 0
+        );
+        setLearningCategories(activeLearnCats);
+        const activeCodes = new Set(activeLearnCats.map((c) => c.category_code));
+
+        // 2. Fetch char categories belonging only to active learning categories
+        const { data: cats } = await supabase
+          .from("category_lanna_char")
+          .select("category_char_id, name, learning_category_code")
+          .order("category_char_id", { ascending: true });
+
+        if (cats) {
+          const activeCharCats = cats.filter(
+            (c) => !c.learning_category_code || activeCodes.has(c.learning_category_code)
+          );
+          setCharCategories(activeCharCats);
+        }
+      } catch (err) {
+        console.error("Error fetching categories in articles:", err);
+      }
     };
-    fetchCharCategories();
+    fetchAllCategories();
   }, []);
 
   useEffect(() => {
@@ -79,17 +108,6 @@ export default function Articles() {
       if (!error && data) setLannaChars(data);
     };
     fetchLannaChars();
-  }, []);
-
-  useEffect(() => {
-    const fetchLearningCategories = async () => {
-      const { data, error } = await supabase
-        .from("learning_category")
-        .select("category_code, title")
-        .order("category_code", { ascending: true });
-      if (!error && data) setLearningCategories(data);
-    };
-    fetchLearningCategories();
   }, []);
 
   /* ===== FETCH ARTICLES ===== */
@@ -505,7 +523,7 @@ export default function Articles() {
               <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
                 <th className="th-num">#</th>
                 <th className="th-left w-[25%]">หัวข้อเนื้อหา</th>
-                <th className="w-[15%]">หมวดหมู่เนื้อหา</th>
+                <th className="w-[15%]">หมวดหมู่การเรียนรู้</th>
                 <th className="th-left w-[45%]">รายละเอียดเนื้อหา</th>
                 <th className="w-[15%]">หมวดหมู่อักขระ</th>
                 <th>จัดการ</th>

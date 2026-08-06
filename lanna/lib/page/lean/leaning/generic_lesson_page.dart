@@ -3,6 +3,11 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lanna/models/category_model.dart';
 import 'package:lanna/models/lanna_char_model.dart';
 import 'package:lanna/services/lanna_char_service.dart';
+import '../learning_navigation.dart';
+import 'lanna_glyph_card.dart';
+import 'char_detail_page.dart';
+import '../train/writing_mode.dart';
+import '../train/writing_data.dart';
 
 class GenericLessonPage extends StatefulWidget {
   final CategoryModel category;
@@ -184,14 +189,41 @@ class _GenericLessonPageState extends State<GenericLessonPage> with TickerProvid
                             ),
                           );
                         }
-                        return ListView.builder(
-                          padding: const EdgeInsets.only(top: 8, bottom: 80),
-                          itemCount: chars.length,
-                          itemBuilder: (context, idx) {
-                            final c = chars[idx];
-                            return _GenericCharCard(
-                              charModel: c,
-                              onPlaySound: () => _speak(c.thaiEquivalent),
+                        return PaginatedLannaGrid<LannaCharModel>(
+                          items: chars,
+                          pageSize: 16,
+                          itemBuilder: (context, charModel, globalIndex) {
+                            final initialIndex = chars.indexWhere((c) => c.lannaChar == charModel.lannaChar);
+                            String parsedReading = charModel.thaiEquivalent;
+                            if (parsedReading.contains('(') && parsedReading.contains(')')) {
+                              parsedReading = parsedReading.substring(
+                                parsedReading.indexOf('(') + 1,
+                                parsedReading.indexOf(')'),
+                              );
+                            }
+                            return GestureDetector(
+                              onTap: () => pushLearningPage(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CharDetailPage(
+                                    char: charModel.lannaChar,
+                                    reading: parsedReading,
+                                    thai: charModel.thaiEquivalent,
+                                    description: '${widget.category.title}ตัว ${charModel.thaiEquivalent}',
+                                    isGuest: false,
+                                    writingType: WritingType.consonant,
+                                    allChars: chars
+                                        .map((c) => {'char': c.lannaChar, 'label': c.thaiEquivalent})
+                                        .toList(),
+                                    initialWritingIndex: initialIndex >= 0 ? initialIndex : 0,
+                                    categoryName: sub.name,
+                                  ),
+                                ),
+                              ),
+                              child: LannaGlyphCard(
+                                glyph: charModel.lannaChar,
+                                thaiEquivalent: charModel.thaiEquivalent,
+                              ),
                             );
                           },
                         );
@@ -241,7 +273,7 @@ class _GenericCharCard extends StatelessWidget {
                 charModel.lannaChar,
                 style: const TextStyle(
                   fontSize: 28,
-                  fontFamily: 'LannaAkkhara',
+                  fontFamily: 'PayapLanna',
                   color: Color(0xFFD2691E),
                   fontWeight: FontWeight.bold,
                 ),

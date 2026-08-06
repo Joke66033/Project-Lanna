@@ -3,9 +3,12 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lanna/services/lanna_char_service.dart';
 import 'package:lanna/services/article_service.dart';
 import 'package:lanna/models/article_model.dart';
+import '../learning_navigation.dart';
+import 'lanna_glyph_card.dart';
+import 'char_detail_page.dart';
 import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
-import '../train/stroke_data.dart' as sd;
+import 'package:lanna/services/character_stroke_service.dart';
 
 /// ============================================================================
 /// MODEL : LANNA CONSONANT
@@ -282,53 +285,40 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
         body: TabBarView(
           controller: _tabController,
           children: _groups.map((group) {
-            return ListView.builder(
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 80),
-              itemCount: group.consonants.length,
-              itemBuilder: (context, index) {
-                final consonant = group.consonants[index];
-                    return _ConsonantCard(
-                      consonant: consonant,
-                      onPlaySound: () => _speak(consonant.reading),
-                      onTapStrokeOrder: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          barrierColor: Colors.black.withValues(alpha: 0.5),
-                          builder: (_) => StrokeOrderBottomSheet(consonant: consonant),
-                        );
-                      },
-                      onTapPractice: () {
-                        if (widget.isGuest) {
-                          _showLoginRequiredAlert(context);
-                          return;
-                        }
-                        final allWritingItems = allConsonantsForTrain.map((c) => WritingItem(
-                          char: c.char,
-                          label: c.reading,
-                          type: WritingType.consonant,
-                        )).toList();
-
-                        final initialIndex = allConsonantsForTrain.indexWhere((c) => c.char == consonant.char);
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => WritingModePage(
-                              items: allWritingItems,
-                              title: 'ฝึกเขียนพยัญชนะ',
-                              initialIndex: initialIndex >= 0 ? initialIndex : 0,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
+            return PaginatedLannaGrid<LannaConsonant>(
+              items: group.consonants,
+              pageSize: 16,
+              itemBuilder: (context, consonant, globalIndex) {
+                final initialIndex = allConsonantsForTrain.indexWhere((c) => c.char == consonant.char);
+                return GestureDetector(
+                  onTap: () => pushLearningPage(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CharDetailPage(
+                        char: consonant.char,
+                        reading: consonant.reading,
+                        thai: consonant.thai,
+                        description: consonant.description,
+                        isGuest: widget.isGuest,
+                        writingType: WritingType.consonant,
+                        allChars: allConsonantsForTrain
+                            .map((c) => {'char': c.char, 'label': c.reading})
+                            .toList(),
+                        initialWritingIndex: initialIndex >= 0 ? initialIndex : 0,
+                        categoryName: group.name,
+                      ),
+                    ),
+                  ),
+                  child: LannaGlyphCard(
+                    glyph: consonant.char,
+                    thaiEquivalent: consonant.thai,
+                  ),
                 );
-              }).toList(),
-            ),
-          ),
+              },
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
@@ -492,381 +482,6 @@ class _IntroCard extends StatelessWidget {
   }
 }
 
-/// ============================================================================
-/// COMPONENT : CONSONANT GRID CARD
-/// ============================================================================
-class _ConsonantCard extends StatelessWidget {
-  final LannaConsonant consonant;
-  final VoidCallback onPlaySound;
-  final VoidCallback onTapStrokeOrder;
-  final VoidCallback onTapPractice;
-
-  const _ConsonantCard({
-    required this.consonant,
-    required this.onPlaySound,
-    required this.onTapStrokeOrder,
-    required this.onTapPractice,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFEADBC8), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                // Square Lanna Character with Rounded corners background
-                Container(
-                  width: 64,
-                  height: 64,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5EAE1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    consonant.char,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontFamily: 'LannaAkkhara',
-                      color: Color(0xFF924E19),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                
-                // Reading and Thai equivalent
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'เสียงอ่าน: ${consonant.reading}',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2C1A04),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'เทียบเสียงไทย: ${consonant.thai}',
-                        style: const TextStyle(
-                          fontSize: 8,
-                          color: Color(0xFF7A5C3A),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Pronunciation Button (Small warm circle)
-                Material(
-                  color: const Color(0xFFF5EAE1),
-                  shape: const CircleBorder(),
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: onPlaySound,
-                    child: const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Icon(
-                        Icons.volume_up_rounded,
-                        color: Color(0xFF924E19),
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            const Divider(color: Color(0xFFEADBC8), thickness: 1),
-            const SizedBox(height: 8),
-            
-            // Description
-            Text(
-              consonant.description,
-              style: TextStyle(
-                fontSize: 8,
-                color: Colors.grey.shade700,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Buttons: Stroke Order and Practice
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: onTapStrokeOrder,
-                    icon: const Icon(Icons.menu_book_rounded, size: 16),
-                    label: const Text('วิธีเขียน'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF5EAE1),
-                      foregroundColor: const Color(0xFF924E19),
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: onTapPractice,
-                    icon: const Icon(Icons.brush_rounded, size: 16),
-                    label: const Text('ฝึกเขียน'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF924E19),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }}
-
-
-// ============================================================================
-// STROKE ORDER BOTTOM SHEET FOR LANNACONSONANT
-// ============================================================================
-class StrokeOrderBottomSheet extends StatefulWidget {
-  final LannaConsonant consonant;
-  const StrokeOrderBottomSheet({super.key, required this.consonant});
-
-  @override
-  State<StrokeOrderBottomSheet> createState() => _StrokeOrderBottomSheetState();
-}
-
-class _StrokeOrderBottomSheetState extends State<StrokeOrderBottomSheet>
-    with SingleTickerProviderStateMixin {
-  late List<List<Offset>> _strokes;
-  int _currentStrokeIndex = 0;
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _strokes = getStrokePaths(widget.consonant.char);
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    )..addListener(() {
-        setState(() {});
-      });
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _replay() {
-    _controller.reset();
-    _controller.forward();
-  }
-
-  void _next() {
-    if (_currentStrokeIndex < _strokes.length - 1) {
-      setState(() {
-        _currentStrokeIndex++;
-      });
-      _replay();
-    }
-  }
-
-  void _prev() {
-    if (_currentStrokeIndex > 0) {
-      setState(() {
-        _currentStrokeIndex--;
-      });
-      _replay();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      padding: EdgeInsets.fromLTRB(
-        24,
-        12,
-        24,
-        MediaQuery.of(context).padding.bottom + 24,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'วิธีเขียน ตั๋ว ${widget.consonant.reading}',
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D1A00),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            widget.consonant.char,
-            style: const TextStyle(
-              fontSize: 27,
-              fontFamily: 'LannaAkkhara',
-              color: Color(0xFF924E19),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            width: 220,
-            height: 220,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFEADBC8), width: 1.2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: CustomPaint(
-              painter: StrokePainter(
-                strokes: _strokes,
-                currentIndex: _currentStrokeIndex,
-                progress: _animation.value,
-                char: widget.consonant.char,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'เส้นที่ ${_currentStrokeIndex + 1} จากทั้งหมด ${_strokes.length} เส้น',
-            style: const TextStyle(
-              fontSize: 8,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF7A5C3A),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5EAE1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFEADBC8), width: 1.0),
-            ),
-            child: Text(
-              widget.consonant.description,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D1A00),
-                height: 1.4,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.skip_previous_rounded, size: 36),
-                color: _currentStrokeIndex > 0 ? const Color(0xFF924E19) : Colors.grey[300],
-                onPressed: _currentStrokeIndex > 0 ? _prev : null,
-              ),
-              const SizedBox(width: 24),
-              ElevatedButton.icon(
-                onPressed: _replay,
-                icon: const Icon(Icons.refresh),
-                label: const Text(
-                  'เล่นใหม่',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF924E19),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
-              const SizedBox(width: 24),
-              IconButton(
-                icon: const Icon(Icons.skip_next_rounded, size: 36),
-                color: _currentStrokeIndex < _strokes.length - 1 ? const Color(0xFF924E19) : Colors.grey[300],
-                onPressed: _currentStrokeIndex < _strokes.length - 1 ? _next : null,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class StrokePainter extends CustomPainter {
   final List<List<Offset>> strokes;
   final int currentIndex;
@@ -1011,7 +626,7 @@ class StrokePainter extends CustomPainter {
 }
 
 List<List<Offset>> getStrokePaths(String char) {
-  return sd.getStrokeData(char);
+  return getStrokeData(char);
 }
 
 

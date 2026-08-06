@@ -9,17 +9,26 @@ import { loadLannaMap, convertThaiToLanna } from "../lib/thaiToLanna.js";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
 import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
 
 import Modal from "../components/Modal.jsx";
 import { categoryColors, getCategoryBadgeStyle } from "../lib/categoryColors";
 
 /* ================= HELPERS ================= */
 const mapVocabCategory = (items) => {
-  return items.map((item) => ({
-    ...item,
-    category: item.category_vocab?.name || "ทั่วไป",
-  }));
+  // Only keep vocabulary items that have a valid category
+  return items
+    .filter((item) => item.category_vocab && item.category_vocab.name)
+    .map((item) => ({
+      ...item,
+      category: item.category_vocab.name,
+    }));
 };
 
 /* ================= PAGE ================= */
@@ -43,7 +52,16 @@ export default function VocabularyPage() {
     setLoading(true);
     setError(null);
     try {
-      // 1. Fetch vocabulary with pagination and category
+      // 1. Fetch valid active categories
+      const { data: catData } = await supabase
+        .from("category_vocab")
+        .select("category_vocab_id, name")
+        .order("category_vocab_id", { ascending: true });
+      
+      setCategories(catData || []);
+      const validCatMap = new Map((catData || []).map((c) => [c.category_vocab_id, c.name]));
+
+      // 2. Fetch vocabulary with pagination and category
       let query = supabase
         .from("vocabulary")
         .select("*, category_vocab(name)", { count: "exact" });
@@ -64,24 +82,52 @@ export default function VocabularyPage() {
       const to = from + ITEMS_PER_PAGE - 1;
       query = query.range(from, to);
 
-      const { data: resData, error: resError, count } = await query;
+      const { data: resData, error: resError } = await query;
       if (resError) throw resError;
 
-      if (page > 1 && (!resData || resData.length === 0)) {
+      // 3. Filter out orphan vocabulary items whose category was deleted & delete them
+      const orphanIds = [];
+      const validItems = [];
+
+      for (const item of resData || []) {
+        const catName = validCatMap.get(item.category_vocab_id) || (item.category_vocab && item.category_vocab.name);
+        if (catName) {
+          validItems.push({
+            ...item,
+            category: catName,
+          });
+        } else {
+          // Category no longer exists in DB!
+          orphanIds.push(item.vocab_id);
+          try {
+            fetch(`${BASE}/endpoints/vocabulary_api.php?action=delete&id=${encodeURIComponent(item.vocab_id)}`, { method: "POST" });
+          } catch (e) {}
+        }
+      }
+
+      if (orphanIds.length > 0) {
+        try {
+          await supabase.from("vocabulary").delete().in("vocab_id", orphanIds);
+        } catch (cleanErr) {
+          console.warn("Supabase orphan cleanup notice:", cleanErr);
+        }
+      }
+
+      // Explicitly delete any vocabulary rows where category_vocab_id is null or empty
+      try {
+        await supabase.from("vocabulary").delete().is("category_vocab_id", null);
+      } catch (cleanNullErr) {
+        console.warn("Supabase null category cleanup notice:", cleanNullErr);
+      }
+
+      if (page > 1 && validItems.length === 0) {
         setCurrentPage(page - 1);
       } else {
-        const sorted = sortRecentData(mapVocabCategory(resData || []), "vocabulary", "vocab_id");
+        const sorted = sortRecentData(validItems, "vocabulary", "vocab_id");
         setData(sorted);
-        setTotalCount(count || 0);
+        setTotalCount(validItems.length);
         setError(null);
-      }// 2. Fetch categories for modal dropdown
-      const { data: catData, error: catError } = await supabase
-        .from("category_vocab")
-        .select("category_vocab_id, name")
-        .order("category_vocab_id", { ascending: true });
-      if (catError) throw catError;
-      setCategories(catData || []);
-
+      }
     } catch (err) {
       console.error("Error fetching data inside VocabularyPage:", err);
       setError(err.message || "เกิดข้อผิดพลาดในการโหลดข้อมูล");
@@ -145,14 +191,36 @@ export default function VocabularyPage() {
 
   const [errors, setErrors] = useState({});
 
-  const handleConvert = () => {
+  const handleConvert = async () => {
     if (!form.thai_word) return;
-    const converted = convertThaiToLanna(form.thai_word, lannaMap);
-    const normalized = normalizeLannaText(converted);
-    setForm((prev) => ({
-      ...prev,
-      lanna_word: normalized
-    }));
+    try {
+      setLoading(true);
+      const res = await fetch(
+        `${BASE}/endpoints/vocabulary_api.php?action=translate&keyword=${encodeURIComponent(form.thai_word)}`
+      );
+      const resJson = await res.json();
+      const apiData = resJson.data;
+      if (apiData && apiData.lanna_word) {
+        const normalized = normalizeLannaText(apiData.lanna_word);
+        setForm((prev) => ({
+          ...prev,
+          lanna_word: normalized,
+          reading: apiData.reading || prev.reading || `[${form.thai_word}]`,
+          meaning: apiData.meaning && !apiData.meaning.includes("ผลถอดอักษรอัตโนมัติ") ? apiData.meaning : prev.meaning,
+        }));
+      } else {
+        const converted = convertThaiToLanna(form.thai_word, lannaMap);
+        const normalized = normalizeLannaText(converted);
+        setForm((prev) => ({ ...prev, lanna_word: normalized }));
+      }
+    } catch (err) {
+      console.error("Failed to translate using API, using fallback mapper:", err);
+      const converted = convertThaiToLanna(form.thai_word, lannaMap);
+      const normalized = normalizeLannaText(converted);
+      setForm((prev) => ({ ...prev, lanna_word: normalized }));
+    } finally {
+      setLoading(false);
+    }
   };
 
   /* ===== AUTO CLOSE SUCCESS ===== */
@@ -389,7 +457,7 @@ export default function VocabularyPage() {
                   <th className="th-num">#</th>
                   <th className="th-left">คำศัพท์ล้านนา</th>
                   <th>คำศัพท์ไทย</th>
-                  <th>คำอ่าน</th>
+                  <th>คำอ่าน / ลำดับการพิมพ์</th>
                   <th className="th-left">ความหมาย</th>
                   <th>หมวดหมู่</th>
                   <th>จัดการ</th>
@@ -405,7 +473,7 @@ export default function VocabularyPage() {
                     </td>
 
                     {/* คำศัพท์ล้านนา */}
-                    <td className="text-left text-2xl">
+                    <td className="text-left text-lg">
                       <LannaText>{d.lanna_word}</LannaText>
                     </td>
 
@@ -554,12 +622,12 @@ export default function VocabularyPage() {
                 {errors.thai_word && <p className="text-red-500 text-sm mt-1">{errors.thai_word}</p>}
               </div>
 
-              {/* คำอ่าน */}
+              {/* คำอ่าน / ลำดับการพิมพ์ */}
               <div>
-                <label className="text-sm font-medium">คำอ่าน</label>
+                <label className="text-sm font-medium">คำอ่าน / ลำดับการพิมพ์</label>
                 <input
                   value={form.reading}
-                  placeholder="ตัวอย่าง: สะ-บาย-ดี"
+                  placeholder="ตัวอย่าง: นายฯ / น่านฯ / เน + ้ + ๋ + ๑ + ฯ"
                   className={`mt-1 w-full border rounded-xl px-4 py-3 ${
                     errors.reading ? "border-red-500" : ""
                   }`}

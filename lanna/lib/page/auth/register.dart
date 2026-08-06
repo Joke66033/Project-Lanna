@@ -66,60 +66,128 @@ class _RegisterPageState extends State<RegisterPage> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => AlertDialog(
-          title: const Text(
-            'สมัครสมาชิกสำเร็จ 🎉',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
+        builder: (_) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
           ),
-          content: const Text(
-            'คุณต้องการไปที่หน้าใดต่อ?',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // ปิด dialog
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const HomeShell(isGuest: false), // isGuest should be false since we are logged in!
+          backgroundColor: const Color(0xFFFFFDFB),
+          surfaceTintColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top Success Icon Badge
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF7F2),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFFEADBC8), width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF924E19).withValues(alpha: 0.1),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  (route) => false,
-                );
-              },
-              child: const Text(
-                'กลับไปหน้าหลัก',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                  child: const Center(
+                    child: Icon(
+                      Icons.check_circle_rounded,
+                      color: Color(0xFF924E19),
+                      size: 44,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: kPrimaryOrange),
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                );
-              },
-              child: const Text(
-                'ไปหน้าเข้าสู่ระบบ',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                const SizedBox(height: 20),
+
+                // Title
+                const Text(
+                  'สมัครสมาชิกสำเร็จ 🎉',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D1A00),
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
+                const SizedBox(height: 8),
+
+                // Content
+                const Text(
+                  'คุณต้องการไปที่หน้าใดต่อ?',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF7A5C3A),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+
+                // Primary Action: Home
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context); // ปิด dialog
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const HomeShell(isGuest: false),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF924E19),
+                    minimumSize: const Size.fromHeight(48),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                  child: const Text(
+                    'กลับไปหน้าหลัก',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // Secondary Action: Login Page
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                    side: const BorderSide(color: Color(0xFFEADBC8), width: 1.2),
+                    backgroundColor: const Color(0xFFFFF7F2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                  child: const Text(
+                    'ไปหน้าเข้าสู่ระบบ',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF924E19),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     } catch (e) {

@@ -5,7 +5,13 @@ import Pagination from "../components/Pagination.jsx";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
 import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
 
 import Modal from "../components/Modal.jsx";
 import { categoryColors } from "../lib/categoryColors";
@@ -222,25 +228,28 @@ export default function CategoryLearning() {
       form.is_active !== (originalForm.is_active ? 1 : 0) ||
       (parseInt(form.total_items) || 0) !== (parseInt(originalForm.total_items) || 0));
 
-  /* ===== DELETE ===== */
+  /* ===== DELETE (SQL API) ===== */
   const handleDelete = async () => {
     try {
       setLoading(true);
+      const code = deleteItem.category_code;
+
+      // Call PHP SQL API endpoint to perform cascade delete on MySQL DB
       const res = await fetch(
-        `${BASE}/endpoints/learning_category_api.php?action=delete&id=${encodeURIComponent(deleteItem.category_code)}`,
+        `${BASE}/endpoints/learning_category_api.php?action=delete&id=${encodeURIComponent(code)}`,
         { method: "POST" }
       );
       const resJson = await res.json();
-      if (resJson.error) throw resJson.error;
+      if (resJson.error) throw new Error(resJson.error.message || resJson.error);
 
       setShowDelete(false);
-      setSuccessText("ลบหมวดหมู่การเรียนรู้เรียบร้อยแล้ว");
+      setSuccessText("ลบหมวดหมู่การเรียนรู้และข้อมูลย่อยทั้งหมดเรียบร้อยแล้ว");
       setShowSuccess(true);
 
-      setData((prev) => prev.filter((item) => item.category_code !== deleteItem.category_code));
+      setData((prev) => prev.filter((item) => item.category_code !== code));
       fetchData();
     } catch (err) {
-      alert("ไม่สามารถลบข้อมูลได้: " + err.message);
+      alert("ไม่สามารถลบข้อมูลได้: " + (err.message || err));
     } finally {
       setLoading(false);
       setDeleteItem(null);

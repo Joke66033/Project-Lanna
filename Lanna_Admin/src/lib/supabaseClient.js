@@ -1,49 +1,78 @@
-import { createClient } from '@supabase/supabase-js'
-
-/**
- * Supabase client สำหรับ Real-time subscriptions และ Storage เท่านั้น
- * CRUD ปกติให้เรียกผ่าน PHP API (VITE_API_BASE_URL)
- */
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  global: {
-    fetch: (url, options) => {
-      let rewrittenUrl = url;
-      if (typeof url === 'string' && url.includes('/rest/v1/')) {
-        const match = url.match(/\/rest\/v1\/([a-zA-Z0-9_]+)/);
-        if (match) {
-          const tableName = match[1];
-          
-          // หาตำแหน่ง '?' ตัวสุดท้ายซึ่งเป็นจุดเริ่มต้นของ Query Parameters จริงจาก Supabase
-          const lastQuestionMarkIdx = url.lastIndexOf('?');
-          let queryStr = '';
-          if (lastQuestionMarkIdx !== -1) {
-            queryStr = url.substring(lastQuestionMarkIdx + 1);
-          }
-
-          if (options && options.headers) {
-            const range = options.headers['Range'] || options.headers['range'];
-            if (range && typeof range === 'string') {
-              const rangeMatch = range.match(/(\d+)-(\d+)/);
-              if (rangeMatch) {
-                const from = parseInt(rangeMatch[1]);
-                const to = parseInt(rangeMatch[2]);
-                const limit = to - from + 1;
-                const offset = from;
-                queryStr += (queryStr ? '&' : '') + `limit=${limit}&offset=${offset}`;
-              }
-            }
-          }
-
-          rewrittenUrl = `https://siripaporn.lnw.mn/endpoints/supabase_proxy.php?table=${tableName}`;
-          if (queryStr) {
-            rewrittenUrl += `&${queryStr}`;
-          }
-        }
-      }
-      return fetch(rewrittenUrl, options);
-    }
+const getApiBase = () => {
+  if (typeof window !== "undefined" && window.location.hostname === "siripaporn.lnw.mn") {
+    return "https://siripaporn.lnw.mn";
   }
-})
+  return import.meta.env.VITE_API_BASE_URL || "https://siripaporn.lnw.mn";
+};
+const BASE = getApiBase();
+
+export const supabase = {
+  from: (table) => {
+    const builder = {
+      _select: "*",
+      _count: null,
+      _filters: [],
+      _order: null,
+      _limit: null,
+
+      select(fields = "*", opts = {}) {
+        this._select = fields;
+        if (opts.count) this._count = opts.count;
+        return this;
+      },
+      eq(col, val) {
+        this._filters.push(`${col}=eq.${encodeURIComponent(val)}`);
+        return this;
+      },
+      neq(col, val) {
+        this._filters.push(`${col}=neq.${encodeURIComponent(val)}`);
+        return this;
+      },
+      ilike(col, val) {
+        this._filters.push(`${col}=ilike.${encodeURIComponent(val)}`);
+        return this;
+      },
+      order(col, opts = {}) {
+        this._order = `${col}.${opts.ascending === false ? "desc" : "asc"}`;
+        return this;
+      },
+      range(from, to) {
+        this._limit = to - from + 1;
+        return this;
+      },
+      limit(n) {
+        this._limit = n;
+        return this;
+      },
+      async then(resolve, reject) {
+        try {
+          const params = new URLSearchParams();
+          params.set("table", table);
+          params.set("select", this._select);
+          if (this._order) params.set("order", this._order);
+          if (this._limit) params.set("limit", this._limit);
+          this._filters.forEach((f) => {
+            const [k, v] = f.split("=");
+            params.set(k, v);
+          });
+
+          const url = `${BASE}/endpoints/supabase_proxy.php?${params.toString()}`;
+          const res = await fetch(url);
+          const json = await res.json();
+          resolve({ data: json.data || [], count: json.count ?? json.data?.length ?? 0, error: json.error });
+        } catch (err) {
+          resolve({ data: [], count: 0, error: err });
+        }
+      },
+    };
+    return builder;
+  },
+  channel: () => ({
+    on: function () {
+      return this;
+    },
+    subscribe: function () {
+      return this;
+    },
+  }),
+};

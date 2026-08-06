@@ -94,9 +94,25 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'delete':
             $id = $_GET['id'] ?? '';
             if ($id === '') { jsonError('Missing id'); break; }
-            $res = dbDelete('category_lanna_char', ['category_char_id' => 'eq.' . rawurlencode($id)]);
-            if ($res['error']) { jsonError($res['error']['message']); break; }
-            jsonOk($res['data']);
+
+            try {
+                $pdo = getPdo();
+
+                // 1. Delete all lanna_char entries linked to this category_char_id
+                $stmt1 = $pdo->prepare("DELETE FROM `lanna_char` WHERE `category_char_id` = :id");
+                $stmt1->execute(['id' => $id]);
+
+                // 2. Delete the category entry itself
+                $stmt2 = $pdo->prepare("DELETE FROM `category_lanna_char` WHERE `category_char_id` = :id");
+                $stmt2->execute(['id' => $id]);
+
+                // 3. Clean up any orphan lanna_char entries
+                $pdo->exec("DELETE FROM `lanna_char` WHERE `category_char_id` IS NULL OR `category_char_id` = '' OR `category_char_id` NOT IN (SELECT `category_char_id` FROM `category_lanna_char`)");
+
+                jsonOk(['message' => 'Deleted category and all linked Lanna characters successfully']);
+            } catch (Exception $e) {
+                jsonError('Database delete error: ' . $e->getMessage());
+            }
             break;
 
         default:

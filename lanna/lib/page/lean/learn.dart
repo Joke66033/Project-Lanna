@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'learning_navigation.dart';
 
 import '../../widgets/app_header.dart';
 import 'leaning/consonant.dart';
@@ -136,13 +137,25 @@ class LearnPage extends StatefulWidget {
   const LearnPage({super.key, required this.isGuest});
 
   @override
-  State<LearnPage> createState() => _LearnPageState();
+  State<LearnPage> createState() => LearnPageState();
 }
 
-class _LearnPageState extends State<LearnPage> {
+class LearnPageState extends State<LearnPage> {
   int? _pressedIndex;
   int? _hoveredIndex;
   int _currentPage = -1;
+
+  void resetToMenu() {
+    if (learningNavigatorKey.currentState?.canPop() ?? false) {
+      learningNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+    }
+    if (_currentPage != -1) {
+      setState(() {
+        _currentPage = -1;
+      });
+    }
+    _loadData();
+  }
   // API Integration states
   final LearningCategoryService _categoryService = LearningCategoryService();
   List<CategoryModel> _categories = [];
@@ -242,8 +255,12 @@ class _LearnPageState extends State<LearnPage> {
       );
     }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      color: const Color(0xFFD2691E),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -349,7 +366,8 @@ class _LearnPageState extends State<LearnPage> {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
 

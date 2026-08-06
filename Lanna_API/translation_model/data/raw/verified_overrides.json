@@ -1,0 +1,58 @@
+[
+  {
+    "thai": "สวัสดี",
+    "lanna": "ᩈ᩠ᩅᩢᩈ᩠ᨯᩦ",
+    "pronunciation": "[สะ-วัด-ดี]",
+    "definition": "คำทักทาย ใช้เมื่อพบกันหรือกล่าวเริ่มต้นการสนทนา",
+    "verification": "confirmed_by_project_owner_2026-08-02",
+    "note": "Corrected ordering: initial SA + SAKOT + WA + MAI SAT"
+  },
+  {
+    "thai": "ข้าว",
+    "lanna": "ᨡ᩶ᩣ",
+    "pronunciation": "[เข้า]",
+    "definition": "เมล็ดข้าวสีขาวที่เอาไว้กิน",
+    "verification": "confirmed_by_project_owner_2026-08-04",
+    "note": "Corrected spelling: eating rice grain (เข้า)"
+  },
+  {
+    "thai": "เข้า",
+    "lanna": "ᨡ᩶ᩣ",
+    "pronunciation": "[เข้า]",
+    "definition": "ข้าว, พืชที่ใช้เมล็ดบริโภคเป็นอาหารหลัก",
+    "verification": "confirmed_by_project_owner_2026-08-04",
+    "note": "Corrected spelling: removed leading Sakot"
+  },
+  {
+    "thai": "ขนม",
+    "lanna": "ᨡ᩶ᩣᩉ᩠ᨶᨾ",
+    "pronunciation": "[เข้า-หนม]",
+    "definition": "ของหวาน ของกินเล่น (เข้าหนม)",
+    "verification": "confirmed_by_project_owner_2026-08-04",
+    "note": "Corrected spelling: removed leading Sakot, added Sakot between Ha and Na"
+  },
+  {
+    "thai": "เข้าหนม",
+    "lanna": "ᨡ᩶ᩣᩉ᩠ᨶᨾ",
+    "pronunciation": "[เข้า-หนม]",
+    "definition": "ขนม",
+    "verification": "confirmed_by_project_owner_2026-08-04",
+    "note": "Corrected spelling: removed leading Sakot, added Sakot between Ha and Na"
+  },
+  {
+    "thai": "วัด",
+    "lanna": "ᩅ᩠ᨯ",
+    "pronunciation": "[วัด]",
+    "definition": "ศาสนสถานของชาวพุทธ",
+    "verification": "confirmed_by_project_owner_2026-08-04",
+    "note": "Corrected spelling: stacked layout (Wa + Sakot + Da)"
+  },
+  {
+    "thai": "วัดพระสิงห์",
+    "lanna": "ᩅ᩠ᨯᨻᩕᩈᩥᨦ᩠ᨻ᩺",
+    "pronunciation": "[วัด-พระ-สิงห์]",
+    "definition": "วัดพระสิงห์วรมหาวิหาร พระอารามหลวงชั้นเอก จังหวัดเชียงใหม่",
+    "verification": "confirmed_by_project_owner_2026-08-04",
+    "note": "Corrected spelling: Wat Phra Singh stacked layout (Wa + Sakot + Da + Phra + Si + Nga + Sakot + Pha + Karan)"
+  }
+]

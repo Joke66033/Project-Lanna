@@ -2,7 +2,13 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/image/logo.png";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
 
 export default function Login() {
   const navigate = useNavigate();

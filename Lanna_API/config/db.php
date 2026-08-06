@@ -92,6 +92,7 @@ function getPrimaryKeyField(string $table): string {
         case 'translate_logs': return 'log_id';
         case 'users': return 'user_id';
         case 'vocabulary': return 'vocab_id';
+        case 'character_strokes': return 'stroke_id';
         default: return 'id';
     }
 }
@@ -162,6 +163,18 @@ function parseFilters(string $table, array $filters, array &$params): string {
                 if ($op === 'eq') {
                     $whereParts[] = "$cleanColName = :$paramName";
                     $params[$paramName] = $val;
+                } else if ($op === 'in') {
+                    $rawVals = trim($val, '()');
+                    $valArray = array_map('trim', explode(',', $rawVals));
+                    $inParams = [];
+                    foreach ($valArray as $idx => $v) {
+                        $pName = $paramName . '_in_' . $idx;
+                        $inParams[] = ":$pName";
+                        $params[$pName] = $v;
+                    }
+                    if (!empty($inParams)) {
+                        $whereParts[] = "$cleanColName IN (" . implode(', ', $inParams) . ")";
+                    }
                 } else if ($op === 'ilike') {
                     $whereParts[] = "$cleanColName LIKE :$paramName";
                     $params[$paramName] = str_replace('*', '%', $val);

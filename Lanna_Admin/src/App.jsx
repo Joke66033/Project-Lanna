@@ -17,6 +17,7 @@ import AdminProfile from "./pages/adminProfile.jsx";
 import CategoryAlphabet from "./pages/categoryAlphabet.jsx";
 import CategoryLannaChar from "./pages/categoryLannaChar.jsx";
 import CategoryLearning from "./pages/categoryLearning.jsx";
+import CharacterStrokesPage from "./pages/characterStrokes.jsx";
 
 /* ================= PROTECTED ROUTE ================= */
 function ProtectedRoute({ children }) {
@@ -64,6 +65,7 @@ export default function App() {
         <Route path="/categoryLearning" element={<CategoryLearning />} />
         <Route path="/categoryLannaChar" element={<CategoryLannaChar />} />
         <Route path="/alphabet" element={<Alphabet />} />
+        <Route path="/characterStrokes" element={<CharacterStrokesPage />} />
         <Route path="/articles" element={<Articles />} />
         <Route path="/users" element={<Users />} />
       </Route>

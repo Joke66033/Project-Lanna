@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
@@ -12,6 +11,7 @@ import '../services/vocabulary_service.dart';
 import '../services/translate_log_service.dart';
 import '../services/auth_provider.dart';
 import '../widgets/app_header.dart';
+
 const Color kPrimaryOrange = Color(0xFF924E19);
 
 /// ================= MODEL =================
@@ -45,7 +45,6 @@ class TranslatePage extends StatefulWidget {
 class _TranslatePageState extends State<TranslatePage> {
   final _conv = LannaTransliterator();
   final _inputCtrl = TextEditingController();
-  final _dictSearchCtrl = TextEditingController();
 
   late final stt.SpeechToText _speech;
   final FlutterTts _tts = FlutterTts();
@@ -56,22 +55,14 @@ class _TranslatePageState extends State<TranslatePage> {
   bool _isFavorite = false;
 
   String _resultText = '';
-  String _selectedCategory = 'ทั้งหมด';
   LannaDictItem? _matchingDictItem;
+  bool _isTranslating = false;
 
-  // ⭐ เพิ่มสำหรับ pagination
-  int _currentPage = 1;
-  static const int _itemsPerPage = 10;
-
-  // Dictionary dynamic data
+  // Dictionary data — ใช้เพื่อ match ผลแปลการใน result section
   List<LannaDictItem> _dictItems = [];
-  List<String> _categories = ['ทั้งหมด'];
-  bool _isDictLoading = true;
 
   final _vocabService = VocabularyService();
   final _translateLogService = TranslateLogService();
-  Timer? _debounceTimer;
-
   @override
   void initState() {
     super.initState();
@@ -79,43 +70,33 @@ class _TranslatePageState extends State<TranslatePage> {
 
     _initSpeech();
     _initTts();
-    _inputCtrl.addListener(() {
-      setState(() {});
-    });
-
-    _inputCtrl.addListener(_onInputChanged);
+    _inputCtrl.addListener(_onInputEdited);
     _loadDictionaryData();
   }
 
+  /// โหลดข้อมูลพจนานุกรมเพื่อใช้ match ผลการแปล
   Future<void> _loadDictionaryData() async {
     if (!mounted) return;
-    setState(() => _isDictLoading = true);
     try {
-      final dbCategories = await _vocabService.getAllCategories();
-      final catNames = dbCategories.map((c) => c.name).toList();
-
       final dbVocabs = await _vocabService.getAllVocabulary();
 
       if (!mounted) return;
       setState(() {
-        _categories = ['ทั้งหมด', ...catNames];
-        _dictItems = dbVocabs.map((v) => LannaDictItem(
-          vocabId: v.vocabId,
-          category: v.category ?? 'อื่น ๆ',
-          lanna: v.lannaWord,
-          reading: v.reading,
-          thaiSound: v.thaiWord,
-          meaning: v.meaning,
-        )).toList();
+        _dictItems = dbVocabs
+            .map(
+              (v) => LannaDictItem(
+                vocabId: v.vocabId,
+                category: v.category ?? 'คำศัพท์ทั่วไป',
+                lanna: v.lannaWord,
+                reading: v.reading,
+                thaiSound: v.thaiWord,
+                meaning: v.meaning,
+              ),
+            )
+            .toList();
       });
-      // Try resolving initial input if any
-      _onInputChanged();
     } catch (e) {
       debugPrint('Error loading dictionary: $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isDictLoading = false);
-      }
     }
   }
 
@@ -150,15 +131,22 @@ class _TranslatePageState extends State<TranslatePage> {
   @override
   void dispose() {
     _inputCtrl.dispose();
-    _dictSearchCtrl.dispose();
     _speech.stop();
     _tts.stop();
-    _debounceTimer?.cancel();
     super.dispose();
   }
 
   // ================= TRANSLATE =================
-  void _onInputChanged() {
+  void _onInputEdited() {
+    if (!mounted) return;
+    setState(() {
+      _resultText = '';
+      _matchingDictItem = null;
+      _isFavorite = false;
+    });
+  }
+
+  Future<void> _translate() async {
     final input = _inputCtrl.text.trim();
 
     if (input.isEmpty) {
@@ -170,20 +158,90 @@ class _TranslatePageState extends State<TranslatePage> {
       return;
     }
 
-    final result = _translateCharByChar(input);
-    final store = context.read<FavoriteStore>();
-    final key = _thaiToLanna ? input : result;
-
-    // Search in dictionary
     LannaDictItem? matchedItem;
-    final normalizedInput = input.toLowerCase();
+    final normalizedInput = input.trim().toLowerCase();
+
+    // ตรวจสอบชนิดตัวอักษรของข้อมูลที่ป้อนเข้ามา
+    final hasLannaChar = RegExp(r'[\u1A20-\u1AAF]').hasMatch(normalizedInput);
+    final hasThaiChar = RegExp(r'[\u0E00-\u0E7F]').hasMatch(normalizedInput);
+
+    // 1. ค้นหาคำตรงในพจนานุกรม
     for (var item in _dictItems) {
-      if (item.thaiSound.trim().toLowerCase() == normalizedInput ||
-          item.lanna.trim().toLowerCase() == normalizedInput) {
+      final primaryCandidate = _thaiToLanna ? item.thaiSound : item.lanna;
+      final secondaryCandidate = _thaiToLanna ? item.lanna : item.thaiSound;
+      if (primaryCandidate.trim().toLowerCase() == normalizedInput) {
+        matchedItem = item;
+        break;
+      } else if (secondaryCandidate.trim().toLowerCase() == normalizedInput) {
         matchedItem = item;
         break;
       }
     }
+
+    // 2. ค้นหาจากความหมาย
+    if (matchedItem == null) {
+      final directDefPattern = RegExp(
+        r'^([a-zA-Zก-ฮ]+\.\s*)?' + RegExp.escape(normalizedInput) + r'(\s*|;|,|$)',
+        caseSensitive: false,
+      );
+
+      for (var item in _dictItems) {
+        if (directDefPattern.hasMatch(item.meaning.trim()) ||
+            item.meaning.trim().toLowerCase() == normalizedInput) {
+          matchedItem = item;
+          break;
+        }
+      }
+    }
+
+    String result;
+    if (matchedItem != null) {
+      if (_thaiToLanna) {
+        result = matchedItem.lanna;
+      } else {
+        result = matchedItem.thaiSound;
+      }
+    } else {
+      if (_thaiToLanna) {
+        result = _translateCharByChar(input);
+      } else {
+        // หากผู้ใช้พิมพ์ภาษาไทยเข้ามาขณะอยู่ในโหมด ล้านนา -> ไทย
+        if (!hasLannaChar && hasThaiChar) {
+          result = input;
+        } else {
+          result = _conv.lannaToThai(input);
+        }
+      }
+    }
+    var needsReview = matchedItem == null;
+
+    // Only call remote translation API if we don't have a verified dictionary match
+    if (_thaiToLanna && needsReview) {
+      setState(() => _isTranslating = true);
+      try {
+        final apiResult = await _vocabService.translate(input);
+        if (!mounted) return;
+        result = apiResult['lanna_word']?.toString() ?? result;
+        needsReview = apiResult['needs_review'] as bool? ?? needsReview;
+        matchedItem = LannaDictItem(
+          category: needsReview ? 'ผลลัพธ์อัตโนมัติ' : 'พจนานุกรม',
+          lanna: result,
+          reading: apiResult['reading']?.toString() ?? '[$input]',
+          thaiSound: input,
+          meaning:
+              apiResult['meaning']?.toString() ??
+              (needsReview ? 'ผลถอดอักษรอัตโนมัติ โปรดตรวจสอบ' : ''),
+        );
+      } catch (error) {
+        debugPrint(
+          'Hybrid translation API unavailable; using local fallback: $error',
+        );
+      } finally {
+        if (mounted) setState(() => _isTranslating = false);
+      }
+    }
+    final store = context.read<FavoriteStore>();
+    final key = _thaiToLanna ? input : result;
 
     setState(() {
       _resultText = result;
@@ -191,16 +249,10 @@ class _TranslatePageState extends State<TranslatePage> {
       _isFavorite = store.contains(key);
     });
 
-    // Debounce translation log creation
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 1500), () {
-      _saveTranslateLog();
-    });
+    _saveTranslateLog(input, result);
   }
 
-  Future<void> _saveTranslateLog() async {
-    final input = _inputCtrl.text.trim();
-    final output = _resultText.trim();
+  Future<void> _saveTranslateLog(String input, String output) async {
     if (input.isEmpty || output.isEmpty) return;
 
     try {
@@ -213,8 +265,13 @@ class _TranslatePageState extends State<TranslatePage> {
         final user = await ApiService.getCachedUser();
         userId = user?.userId ?? 'user';
       }
-      
-      await _translateLogService.createLog(userId, input, output);
+
+      await _translateLogService.createLog(
+        userId,
+        input,
+        output,
+        categoryVocabId: _matchingDictItem?.category,
+      );
       debugPrint('Logged translation: $input -> $output for user: $userId');
     } catch (e) {
       debugPrint('Failed to create translation log: $e');
@@ -222,14 +279,7 @@ class _TranslatePageState extends State<TranslatePage> {
   }
 
   String _translateCharByChar(String text) {
-    final buffer = StringBuffer();
-    for (final rune in text.runes) {
-      final char = String.fromCharCode(rune);
-      buffer.write(
-        _thaiToLanna ? _conv.thaiToLanna(char) : _conv.lannaToThai(char),
-      );
-    }
-    return buffer.toString();
+    return _thaiToLanna ? _conv.thaiToLanna(text) : _conv.lannaToThai(text);
   }
 
   // ================= MIC =================
@@ -311,18 +361,24 @@ class _TranslatePageState extends State<TranslatePage> {
 
     final store = context.read<FavoriteStore>();
     final thai = _thaiToLanna ? input : _resultText;
-    final lanna = _thaiToLanna ? _resultText : input;
 
     LannaDictItem? matchingDictItem;
     final normalizedThai = thai.trim().toLowerCase();
-    final normalizedLanna = lanna.trim().toLowerCase();
+    final normalizedInput = input.toLowerCase();
     for (var item in _dictItems) {
       if (item.thaiSound.trim().toLowerCase() == normalizedThai ||
-          item.lanna.trim().toLowerCase() == normalizedLanna) {
+          item.lanna.trim().toLowerCase() == normalizedInput) {
         matchingDictItem = item;
         break;
       }
     }
+
+    final lanna = _thaiToLanna
+        ? _resultText
+        : (matchingDictItem?.lanna ??
+            (RegExp(r'[\u0E00-\u0E7F]').hasMatch(input)
+                ? _conv.thaiToLanna(input)
+                : input));
 
     if (_isFavorite) {
       store.remove(thai);
@@ -345,15 +401,10 @@ class _TranslatePageState extends State<TranslatePage> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text(
           'กรุณาเข้าสู่ระบบ',
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-          ),
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
         ),
         content: const Text(
           'คุณต้องเข้าสู่ระบบหรือสมัครสมาชิกก่อน จึงจะสามารถใช้งานระบบรายการโปรดได้',
@@ -368,16 +419,13 @@ class _TranslatePageState extends State<TranslatePage> {
             onPressed: () => Navigator.pop(ctx),
             child: const Text(
               'ยกเลิก',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
             ),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              Navigator.pushNamed(context, '/login');
+              Navigator.of(context, rootNavigator: true).pushNamed('/login');
             },
             child: const Text(
               'เข้าสู่ระบบ',
@@ -393,41 +441,6 @@ class _TranslatePageState extends State<TranslatePage> {
     );
   }
 
-  // ================= FILTER =================
-  List<LannaDictItem> get _filteredDictItems {
-    final keyword = _dictSearchCtrl.text.trim();
-
-    final filtered = _dictItems.where((item) {
-      final matchCategory =
-          _selectedCategory == 'ทั้งหมด' || item.category == _selectedCategory;
-
-      final matchText =
-          keyword.isEmpty ||
-          item.lanna.contains(keyword) ||
-          item.reading.contains(keyword) ||
-          item.thaiSound.contains(keyword) ||
-          item.meaning.contains(keyword);
-
-      return matchCategory && matchText;
-    }).toList();
-
-    if (_selectedCategory != 'ทั้งหมด') {
-      return filtered;
-    }
-
-    int start = (_currentPage - 1) * _itemsPerPage;
-    if (start < 0) start = 0;
-    if (start >= filtered.length) {
-      start = 0;
-    }
-    final end = start + _itemsPerPage;
-    final safeEnd = end > filtered.length ? filtered.length : end;
-    if (start > safeEnd) {
-      return [];
-    }
-    return filtered.sublist(start, safeEnd);
-  }
-
   // ================= UI =================
   @override
   Widget build(BuildContext context) {
@@ -440,40 +453,33 @@ class _TranslatePageState extends State<TranslatePage> {
             const AppHeader(title: 'แปลภาษาล้านนา'),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _languageToggle(),
-          const SizedBox(height: 16),
-          _inputBox(),
-          const SizedBox(height: 24),
-
-          _resultSection(),
-
-          const SizedBox(height: 48),
-
-          Row(
-            children: [
-              const Expanded(child: Divider(thickness: 1.5, color: Color(0xFFF0E5D8))),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  'พจนานุกรม',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D1A00),
-                  ),
-                ),
-              ),
-              const Expanded(child: Divider(thickness: 1.5, color: Color(0xFFF0E5D8))),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          _dictionarySection(),
+                    const SizedBox(height: 16),
+                    _inputBox(),
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
+                      onPressed: _inputCtrl.text.trim().isEmpty
+                          ? null
+                          : _translate,
+                      icon: const Icon(Icons.translate_rounded),
+                      label: const Text('แปล'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: kPrimaryOrange,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: const Color(0xFFEADBC8),
+                        minimumSize: const Size.fromHeight(48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    _resultSection(),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -526,8 +532,13 @@ class _TranslatePageState extends State<TranslatePage> {
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () {
-                        setState(() => _thaiToLanna = true);
-                        _onInputChanged();
+                        if (_thaiToLanna) return;
+                        setState(() {
+                          _thaiToLanna = true;
+                          _resultText = '';
+                          _matchingDictItem = null;
+                          _isFavorite = false;
+                        });
                       },
                       child: Center(
                         child: AnimatedDefaultTextStyle(
@@ -535,7 +546,9 @@ class _TranslatePageState extends State<TranslatePage> {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: _thaiToLanna ? Colors.white : const Color(0xFF7A5C3A),
+                            color: _thaiToLanna
+                                ? Colors.white
+                                : const Color(0xFF7A5C3A),
                           ),
                           child: const Text('ไทย → ล้านนา'),
                         ),
@@ -546,8 +559,13 @@ class _TranslatePageState extends State<TranslatePage> {
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () {
-                        setState(() => _thaiToLanna = false);
-                        _onInputChanged();
+                        if (!_thaiToLanna) return;
+                        setState(() {
+                          _thaiToLanna = false;
+                          _resultText = '';
+                          _matchingDictItem = null;
+                          _isFavorite = false;
+                        });
                       },
                       child: Center(
                         child: AnimatedDefaultTextStyle(
@@ -555,7 +573,9 @@ class _TranslatePageState extends State<TranslatePage> {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: !_thaiToLanna ? Colors.white : const Color(0xFF7A5C3A),
+                            color: !_thaiToLanna
+                                ? Colors.white
+                                : const Color(0xFF7A5C3A),
                           ),
                           child: const Text('ล้านนา → ไทย'),
                         ),
@@ -588,11 +608,7 @@ class _TranslatePageState extends State<TranslatePage> {
           width: 42,
           height: 42,
           alignment: Alignment.center,
-          child: Icon(
-            icon,
-            size: 20,
-            color: color,
-          ),
+          child: Icon(icon, size: 20, color: color),
         ),
       ),
     );
@@ -606,12 +622,16 @@ class _TranslatePageState extends State<TranslatePage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: hasText ? kPrimaryOrange.withValues(alpha: 0.6) : const Color(0xFFEADBC8),
+          color: hasText
+              ? kPrimaryOrange.withValues(alpha: 0.6)
+              : const Color(0xFFEADBC8),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: hasText ? kPrimaryOrange.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.02),
+            color: hasText
+                ? kPrimaryOrange.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.02),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -640,18 +660,25 @@ class _TranslatePageState extends State<TranslatePage> {
                   maxLines: null,
                   minLines: 1,
                   style: TextStyle(
-                    fontSize: 16,
-                    height: 1.4,
+                    fontSize: _thaiToLanna ? 16 : 22,
+                    height: _thaiToLanna ? 1.4 : 1.6,
                     color: const Color(0xFF2D1A00),
-                    fontFamily: _thaiToLanna ? null : 'LannaAkkhara',
+                    fontFamily: _thaiToLanna ? null : 'PayapLanna',
+                    fontFamilyFallback: _thaiToLanna
+                        ? null
+                        : const ['PayapLanna', 'PayapLanna'],
                   ),
                   decoration: InputDecoration(
                     hintText: _thaiToLanna
                         ? 'พิมพ์ข้อความภาษาไทยที่นี่...'
-                        : 'พิมพ์ข้อความภาษาล้านนา...',
+                        : 'พิมพ์ข้อความภาษาไทย หรือ อักขระล้านนา...',
                     hintStyle: TextStyle(
-                      fontSize: 14,
+                      fontSize: _thaiToLanna ? 14 : 18,
                       fontWeight: FontWeight.w400,
+                      fontFamily: _thaiToLanna ? null : 'PayapLanna',
+                      fontFamilyFallback: _thaiToLanna
+                          ? null
+                          : const ['PayapLanna', 'PayapLanna'],
                       color: const Color(0xFF7A5C3A).withValues(alpha: 0.5),
                     ),
                     border: InputBorder.none,
@@ -681,7 +708,9 @@ class _TranslatePageState extends State<TranslatePage> {
                   _circularActionButton(
                     icon: _isListening ? Icons.mic : Icons.mic_none_rounded,
                     color: _isListening ? Colors.white : kPrimaryOrange,
-                    bgColor: _isListening ? kPrimaryOrange : const Color(0xFFFFF3E0),
+                    bgColor: _isListening
+                        ? kPrimaryOrange
+                        : const Color(0xFFFFF3E0),
                     onTap: _toggleMic,
                   ),
                 ],
@@ -716,72 +745,213 @@ class _TranslatePageState extends State<TranslatePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            _thaiToLanna ? 'ผลลัพธ์ภาษาล้านนา' : 'ผลลัพธ์ภาษาไทย',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF7A5C3A),
+          if (_isTranslating) ...[
+            const LinearProgressIndicator(
+              color: Color(0xFF924E19),
+              backgroundColor: Color(0xFFFFF3E0),
             ),
-          ),
-          const SizedBox(height: 12),
-          
-          if (dictItem != null) ...[
+            const SizedBox(height: 12),
+          ],
+          if (_thaiToLanna)
+            Row(
+              children: [
+                const Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'ผลลัพธ์อักขระล้านนา (ตั๋วเมือง)',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF7A5C3A),
+                      ),
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: _showTransliterationInfo,
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF924E19),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    minimumSize: const Size(0, 32),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text(
+                    'ถอดอักษรตามหลักวิธี',
+                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            )
+          else
+            const Text(
+              'ผลลัพธ์ภาษาไทย',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF7A5C3A),
+              ),
+            ),
+          const SizedBox(height: 20),
+
+          if (_thaiToLanna && hasText) ...[
             Center(
-              child: Text(
-                dictItem.lanna,
-                style: const TextStyle(
-                  fontSize: 52,
-                  height: 1.2,
-                  fontFamily: 'LannaAkkhara',
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 90),
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      dictItem?.lanna ?? _resultText,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 46,
+                        height: 1.35,
+                        fontFamily: 'PayapLanna',
+                        color: Color(0xFFE16905),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            const Divider(color: Color(0xFFF0E1D0), height: 1),
+            const SizedBox(height: 18),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.record_voice_over_rounded,
+                  size: 18,
                   color: Color(0xFF924E19),
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            if (dictItem.reading.isNotEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Text(
-                    '(คำอ่าน: ${dictItem.reading})',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF7A5C3A),
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
+                SizedBox(width: 7),
+                Text(
+                  'คำอ่าน (Pronunciation)',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF7A5C3A),
                   ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                dictItem == null || dictItem.reading.isEmpty
+                    ? _inputCtrl.text.trim()
+                    : dictItem.reading,
+                textAlign: TextAlign.center,
+                softWrap: true,
+                style: const TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                  color: Color(0xFFE16905),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            if (dictItem.meaning.isNotEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
+            ),
+            const SizedBox(height: 20),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.menu_book_rounded,
+                  size: 18,
+                  color: Color(0xFF924E19),
+                ),
+                SizedBox(width: 7),
+                Text(
+                  'ความหมาย',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF7A5C3A),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                dictItem == null || dictItem.meaning.isEmpty
+                    ? 'ไม่พบความหมายในพจนานุกรม'
+                    : dictItem.meaning,
+                textAlign: TextAlign.center,
+                softWrap: true,
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                  color: Color(0xFF2D1A00),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ] else ...[
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 60),
+                child: Center(
                   child: Text(
-                    'ความหมาย: ${dictItem.meaning}',
+                    _resultText.isEmpty ? '—' : _resultText,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF2D1A00),
+                      fontSize: 32,
+                      height: 1.35,
+                      color: Color(0xFFE16905),
                       fontWeight: FontWeight.bold,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
-          ] else ...[
-            Text(
-              _resultText.isEmpty ? '—' : _resultText,
-              style: TextStyle(
-                fontSize: 18,
-                height: 1.4,
-                fontFamily: _thaiToLanna ? 'LannaAkkhara' : null,
-                color: const Color(0xFFE16905),
-                fontWeight: _thaiToLanna ? FontWeight.normal : FontWeight.bold,
-              ),
             ),
+            if (hasText && dictItem != null && dictItem.meaning.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              const Divider(color: Color(0xFFF0E1D0), height: 1),
+              const SizedBox(height: 18),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.menu_book_rounded,
+                    size: 18,
+                    color: Color(0xFF924E19),
+                  ),
+                  SizedBox(width: 7),
+                  Text(
+                    'ความหมาย',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF7A5C3A),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: Text(
+                  dictItem.meaning,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                    color: Color(0xFF2D1A00),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
           ],
-          
+
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -789,7 +959,9 @@ class _TranslatePageState extends State<TranslatePage> {
               _circularActionButton(
                 icon: Icons.volume_up_rounded,
                 color: hasText ? const Color(0xFFE16905) : Colors.grey.shade400,
-                bgColor: hasText ? const Color(0xFFFFF3E0) : Colors.grey.shade100,
+                bgColor: hasText
+                    ? const Color(0xFFFFF3E0)
+                    : Colors.grey.shade100,
                 onTap: hasText
                     ? () {
                         if (dictItem != null && dictItem.reading.isNotEmpty) {
@@ -802,11 +974,17 @@ class _TranslatePageState extends State<TranslatePage> {
               ),
               const SizedBox(width: 12),
               _circularActionButton(
-                icon: _isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+                icon: _isFavorite
+                    ? Icons.star_rounded
+                    : Icons.star_border_rounded,
                 color: hasText
-                    ? (_isFavorite ? const Color(0xFFFFB300) : const Color(0xFFE16905))
+                    ? (_isFavorite
+                          ? const Color(0xFFFFB300)
+                          : const Color(0xFFE16905))
                     : Colors.grey.shade400,
-                bgColor: hasText ? const Color(0xFFFFF3E0) : Colors.grey.shade100,
+                bgColor: hasText
+                    ? const Color(0xFFFFF3E0)
+                    : Colors.grey.shade100,
                 onTap: hasText ? _toggleFavorite : () {},
               ),
             ],
@@ -816,387 +994,25 @@ class _TranslatePageState extends State<TranslatePage> {
     );
   }
 
-  // ================= DICTIONARY SECTION =================
-  Widget _dictionarySection() {
-    final categories = _categories;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'ค้นหาคำศัพท์ภาษาล้านนา',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D1A00),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'เรียนรู้คำศัพท์ล้านนา คำอ่าน และความหมาย',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 8,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF7A5C3A).withValues(alpha: 0.8),
-                  height: 1.4,
-                ),
-              ),
-            ],
-          ),
+  void _showTransliterationInfo() {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'ถอดอักษรตามหลักวิธี',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
-
-        const SizedBox(height: 16),
-
-        Center(
-          child: Container(height: 1, width: 150, color: const Color(0xFFEADBC8)),
+        content: const Text(
+          'ระบบเลือกใช้รูปคำจากพจนานุกรมล้านนาก่อน '
+          'และใช้กฎอักขรวิทยาล้านนาสำหรับคำที่ไม่พบในพจนานุกรม',
+          style: TextStyle(fontSize: 11, height: 1.5),
         ),
-
-        const SizedBox(height: 24),
-
-        if (_isDictLoading)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40),
-            child: const Center(
-              child: CircularProgressIndicator(
-                color: kPrimaryOrange,
-              ),
-            ),
-          )
-        else ...[
-          // 🔍 ช่องค้นหา
-          Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: TextField(
-              controller: _dictSearchCtrl,
-              onChanged: (_) {
-                setState(() => _currentPage = 1);
-              },
-              style: const TextStyle(fontSize: 14, color: Color(0xFF2D1A00)),
-              decoration: InputDecoration(
-                hintText: 'ค้นหาคำศัพท์...',
-                hintStyle: TextStyle(
-                  fontSize: 12,
-                  color: const Color(0xFF7A5C3A).withValues(alpha: 0.5),
-                ),
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF7A5C3A)),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 16,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFFEADBC8), width: 1.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: kPrimaryOrange, width: 1.5),
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // 🏷 หมวดหมู่
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: categories.map((c) {
-                final active = _selectedCategory == c;
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    selected: active,
-                    showCheckmark: false,
-                    selectedColor: kPrimaryOrange,
-                    backgroundColor: const Color(0xFFFFFBF7),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      side: BorderSide(
-                        color: active ? kPrimaryOrange : const Color(0xFFEADBC8),
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    label: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (active) ...[
-                          const Icon(Icons.check, size: 14, color: Colors.white),
-                          const SizedBox(width: 6),
-                        ],
-                        Text(
-                          c,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                            color: active ? Colors.white : const Color(0xFF7A5C3A),
-                          ),
-                        ),
-                      ],
-                    ),
-                    onSelected: (_) {
-                      setState(() {
-                        _selectedCategory = c;
-                        _currentPage = 1;
-                      });
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          if (_filteredDictItems.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 40),
-              child: Center(
-                child: Text(
-                  'ไม่พบคำศัพท์ที่ต้องการ',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            )
-          else ...[
-            ..._filteredDictItems.map((item) => _dictionaryCard(item)),
-            const SizedBox(height: 12),
-            _paginationControls(),
-          ],
-        ],
-      ],
-    );
-  }
-
-  Widget _dictionaryCard(LannaDictItem item) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEADBC8), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('ตกลง'),
           ),
         ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Row 1: Category Tag & Speaker Icon
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (item.thaiSound.isNotEmpty)
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFF7F2),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: const Color(0xFFEADBC8), width: 0.8),
-                      ),
-                      child: Text(
-                        item.thaiSound,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF7A5C3A),
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              else
-                const Spacer(),
-              const SizedBox(width: 12),
-              GestureDetector(
-                onTap: () => _speakReading(item.reading),
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF7F2),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFFEADBC8), width: 1),
-                  ),
-                  child: const Icon(
-                    Icons.volume_up_rounded,
-                    size: 18,
-                    color: Color(0xFF924E19),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          
-          // Row 2: Lanna Script (Full width!)
-          Text(
-            item.lanna,
-            style: const TextStyle(
-              fontFamily: 'LannaAkkhara',
-              fontSize: 20,
-              color: Color(0xFF924E19),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Divider(color: Color(0xFFEADBC8), height: 1, thickness: 1),
-          const SizedBox(height: 12),
-          
-          // Row 3: Translation Details (Full width!)
-          Text(
-            'คำอ่าน: ${item.reading}',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2D1A00),
-            ),
-          ),
-          if (item.meaning.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text(
-              item.meaning,
-              style: const TextStyle(
-                fontSize: 10,
-                color: Color(0xFF7A5C3A),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-
-  Widget _paginationControls() {
-    if (_selectedCategory != 'ทั้งหมด') return const SizedBox();
-
-    final keyword = _dictSearchCtrl.text.trim();
-    final totalItems = _dictItems.where((item) {
-      final matchCategory =
-          _selectedCategory == 'ทั้งหมด' || item.category == _selectedCategory;
-
-      final matchText =
-          keyword.isEmpty ||
-          item.lanna.contains(keyword) ||
-          item.reading.contains(keyword) ||
-          item.thaiSound.contains(keyword) ||
-          item.meaning.contains(keyword);
-
-      return matchCategory && matchText;
-    }).length;
-
-    final totalPages = (totalItems / _itemsPerPage).ceil();
-    if (totalPages <= 1) return const SizedBox();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF3E0),
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(
-              color: const Color(0xFFFFE0B2),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: kPrimaryOrange.withValues(alpha: 0.08),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: _currentPage > 1
-                      ? () => setState(() => _currentPage--)
-                      : null,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _currentPage > 1 ? Colors.white : Colors.transparent,
-                    ),
-                    child: Icon(
-                      Icons.chevron_left_rounded,
-                      color: _currentPage > 1 ? kPrimaryOrange : const Color(0xFFBCAAA4),
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Text(
-                'หน้า $_currentPage จาก $totalPages',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF7A5C3A),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: _currentPage < totalPages
-                      ? () => setState(() => _currentPage++)
-                      : null,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _currentPage < totalPages ? Colors.white : Colors.transparent,
-                    ),
-                    child: Icon(
-                      Icons.chevron_right_rounded,
-                      color: _currentPage < totalPages ? kPrimaryOrange : const Color(0xFFBCAAA4),
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

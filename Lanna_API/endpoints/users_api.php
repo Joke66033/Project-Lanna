@@ -129,10 +129,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 break;
             }
             $projectRoot = dirname(__DIR__, 2);
-            $filePath = $projectRoot . '/lanna/assets/images/profile/' . $filename;
-            $filePath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $filePath);
             
-            if (file_exists($filePath) && !is_dir($filePath)) {
+            // Check admin directory first if filename looks like admin or if file exists there
+            $adminFilePath = $projectRoot . '/Lanna_Admin/src/assets/image/profile/' . $filename;
+            $userFilePath = $projectRoot . '/lanna/assets/images/profile/' . $filename;
+            
+            $adminFilePath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $adminFilePath);
+            $userFilePath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $userFilePath);
+            
+            $filePath = '';
+            if (file_exists($adminFilePath) && !is_dir($adminFilePath)) {
+                $filePath = $adminFilePath;
+            } elseif (file_exists($userFilePath) && !is_dir($userFilePath)) {
+                $filePath = $userFilePath;
+            }
+            
+            if ($filePath !== '') {
                 $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
                 $mimeTypes = [
                     'jpg'  => 'image/jpeg',

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lanna/services/auth_provider.dart';
+import '../learning_navigation.dart';
 
-import 'writing_consonant.dart';
-import 'writing_vowel.dart';
-import 'writing_tone.dart';
-import 'writing_number.dart';
+import 'writing_mode.dart';
+import 'writing_data.dart';
+import 'writing_custom_word_page.dart';
 
 class WritingSelectPage extends StatelessWidget {
   const WritingSelectPage({super.key});
@@ -71,7 +71,7 @@ class WritingSelectPage extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.only(bottom: 24),
@@ -82,7 +82,11 @@ class WritingSelectPage extends StatelessWidget {
                     subtitle: 'เรียนรู้วิธีการลากเส้นพยัญชนะล้านนา',
                     icon: Icons.text_fields_rounded,
                     accentColor: const Color(0xFFD35400),
-                    page: const WritingConsonantPage(),
+                    page: const WritingCategoryLoaderPage(
+                      title: 'ฝึกเขียนพยัญชนะ',
+                      categoryCharIds: 'CL0001,CL0002,CL0003',
+                      writingType: WritingType.consonant,
+                    ),
                   ),
                   _cardItem(
                     context,
@@ -90,7 +94,11 @@ class WritingSelectPage extends StatelessWidget {
                     subtitle: 'ฝึกเขียนรูปแบบสระจมและสระลอย',
                     icon: Icons.translate_rounded,
                     accentColor: const Color(0xFFE67E22),
-                    page: const WritingVowelPage(),
+                    page: const WritingCategoryLoaderPage(
+                      title: 'ฝึกเขียนสระ',
+                      categoryCharIds: 'CL0004,CL0005',
+                      writingType: WritingType.vowel,
+                    ),
                   ),
                   _cardItem(
                     context,
@@ -98,7 +106,11 @@ class WritingSelectPage extends StatelessWidget {
                     subtitle: 'ลากเส้นรูปวรรณยุกต์ล้านนาแต่ละตั๋ว',
                     icon: Icons.graphic_eq_rounded,
                     accentColor: const Color(0xFFC87A53),
-                    page: const WritingTonePage(),
+                    page: const WritingCategoryLoaderPage(
+                      title: 'ฝึกเขียนวรรณยุกต์',
+                      categoryCharIds: 'CL0006',
+                      writingType: WritingType.tone,
+                    ),
                   ),
                   _cardItem(
                     context,
@@ -106,7 +118,118 @@ class WritingSelectPage extends StatelessWidget {
                     subtitle: 'การเขียนนับจำนวนเลขตั๋วเมือง',
                     icon: Icons.calculate_rounded,
                     accentColor: const Color(0xFFE29C1D),
-                    page: const WritingNumberPage(),
+                    page: const WritingCategoryLoaderPage(
+                      title: 'ฝึกเขียนตัวเลข',
+                      categoryCharIds: 'CL0007',
+                      writingType: WritingType.number,
+                    ),
+                  ),
+                  // ―― การ์ดฝึกเขียนคำที่กำหนดเอง ――
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFE8C4A0),
+                        width: 1.0,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(
+                            0xFF924E19,
+                          ).withValues(alpha: 0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        pushLearningPage(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const WritingCustomWordPage(),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            // Left accent bar
+                            Container(
+                              width: 4,
+                              height: 56,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFE16905),
+                                    Color(0xFFB8560A),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            // Icon container with soft gradient background
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE16905).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.auto_awesome_rounded,
+                                size: 24,
+                                color: Color(0xFFE16905),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            // Text block
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'ฝึกเขียนคำที่กำหนดเอง',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF2C1A04),
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'พิมพ์คำภาษาไทยเพื่อฝึกผสมคำล้านนา',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF7A5C3A),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Small arrow
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: Color(0xFF7A5C3A),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -117,7 +240,6 @@ class WritingSelectPage extends StatelessWidget {
     );
   }
 
-  // ================= CARD ITEM =================
   Widget _cardItem(
     BuildContext context, {
     required String title,
@@ -128,135 +250,82 @@ class WritingSelectPage extends StatelessWidget {
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      width: double.infinity,
-      height: 98,
-      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFE8C4A0),
-          width: 1.0,
+          color: const Color(0xFFEADBC8).withValues(alpha: 0.8),
+          width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFD2691E).withValues(alpha: 0.08),
-            blurRadius: 12,
+            color: accentColor.withValues(alpha: 0.06),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: InkWell(
+      child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => page));
-        },
-        child: Stack(
-          children: [
-            // Left accent bar
-            Positioned(
-              left: 0,
-              top: 0,
-              bottom: 0,
-              child: Container(
-                width: 4,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      accentColor,
-                      accentColor.withValues(alpha: 0.8),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            pushLearningPage(
+              context,
+              MaterialPageRoute(builder: (_) => page),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Icon
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: accentColor, size: 24),
+                ),
+                const SizedBox(width: 14),
+
+                // Text
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2C1A04),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF7A5C3A),
+                        ),
+                      ),
                     ],
                   ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                  ),
                 ),
-              ),
+
+                // Arrow
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFF7A5C3A),
+                  size: 20,
+                ),
+              ],
             ),
-            
-            // Content
-            Padding(
-              padding: const EdgeInsets.only(left: 18, top: 14, bottom: 14, right: 14),
-              child: Row(
-                children: [
-                  // Icon container (70x70)
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          accentColor,
-                          accentColor.withValues(alpha: 0.8),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      icon,
-                      color: Colors.white,
-                      size: 32,
-                    ),
-                  ),
-                  
-                  const SizedBox(width: 12),
-                  
-                  // Text details
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D1A00),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          style: const TextStyle(
-                            fontSize: 8,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF7A5C3A),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // Chevron right
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color(0xFFFFF3E8),
-                      border: Border.all(color: const Color(0xFFE8C4A0), width: 1),
-                    ),
-                    child: const Icon(
-                      Icons.chevron_right_rounded,
-                      color: Color(0xFFB8560A),
-                      size: 18,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

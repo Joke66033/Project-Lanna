@@ -373,7 +373,12 @@ class LannaAIServerHandler(BaseHTTPRequestHandler):
             "reading": reading,
             "meaning": meaning,
             "is_valid_unicode": res.get("is_valid_lanna_unicode", True),
-            "details": details
+            "details": details,
+            "segments": res.get("segments", []),
+            "confidence": res.get("confidence", 0.0),
+            "needs_review": res.get("needs_review", True),
+            "result_label": res.get("result_label", "คำแนะนำอัตโนมัติ"),
+            "engine": res.get("transliteration_engine", "dictionary+aksharamukha")
         }
 
         self._send_json(200, response_payload)

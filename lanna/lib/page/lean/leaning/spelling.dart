@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import '../learning_navigation.dart';
+import 'lanna_glyph_card.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lanna/services/lanna_char_service.dart';
 import 'package:lanna/services/article_service.dart';
 import 'package:lanna/models/article_model.dart';
 import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
-import '../train/stroke_data.dart' as sd;
+import 'package:lanna/services/character_stroke_service.dart' as sd;
+import '../train/stroke_order_model.dart';
+import 'char_detail_page.dart';
 
 /// ============================================================================
 /// MODEL : LANNA SPELLING MODEL
@@ -48,7 +52,8 @@ class SpellingPage extends StatefulWidget {
   State<SpellingPage> createState() => _SpellingPageState();
 }
 
-class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderStateMixin {
+class _SpellingPageState extends State<SpellingPage>
+    with SingleTickerProviderStateMixin {
   late final FlutterTts _tts;
   TabController? _tabController;
 
@@ -111,7 +116,9 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
     });
     try {
       // 1. ดึงบทความอธิบายตัวสะกดทั้งหมด (CL0008, CL0009, CL0010, CL0011)
-      final apiArticles = await _articleService.getAllArticles(categoryCharId: 'CL0008,CL0009,CL0010,CL0011');
+      final apiArticles = await _articleService.getAllArticles(
+        categoryCharId: 'CL0008,CL0009,CL0010,CL0011',
+      );
       _articlesMap.clear();
       for (var art in apiArticles) {
         if (art.categoryCharId != null && art.content.trim().isNotEmpty) {
@@ -120,12 +127,14 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
       }
 
       // 2. ดึงอักขระตัวสะกดทั้งหมดจาก API
-      final apiSpellings = await _charService.getAllCharacters(categoryCharId: 'CL0008,CL0009,CL0010,CL0011');
+      final apiSpellings = await _charService.getAllCharacters(
+        categoryCharId: 'CL0008,CL0009,CL0010,CL0011',
+      );
 
       // ดึงข้อมูลหมวดหมู่เพื่อเอาชื่อแสดงเป็นแท็บย่อย
-      final categories = await _charService.getAllCategories();
+      final categories = await _charService.getCategoriesByLearningCode('LC005');
       final Map<String, String> catNames = {
-        for (var c in categories) c.categoryCharId: c.name
+        for (var c in categories) c.categoryCharId: c.name,
       };
 
       final List<LannaSpelling> listHN = [];
@@ -137,9 +146,12 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
         final String rawThai = c.thaiEquivalent;
         String parsedReading = rawThai;
         if (rawThai.contains('(') && rawThai.contains(')')) {
-          parsedReading = rawThai.substring(rawThai.indexOf('(') + 1, rawThai.indexOf(')'));
+          parsedReading = rawThai.substring(
+            rawThai.indexOf('(') + 1,
+            rawThai.indexOf(')'),
+          );
         }
-        
+
         final spelling = LannaSpelling(
           char: c.lannaChar,
           reading: parsedReading,
@@ -165,15 +177,31 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
 
       setState(() {
         _groups = [
-          SpellingGroup(name: catNames['CL0008'] ?? 'ห นำ', categoryCharId: 'CL0008', spellings: listHN),
-          SpellingGroup(name: catNames['CL0009'] ?? 'ระวง (กล้ำ)', categoryCharId: 'CL0009', spellings: listRW),
-          SpellingGroup(name: catNames['CL0010'] ?? 'ตัวห้อย (สะกด)', categoryCharId: 'CL0010', spellings: listHoy),
-          SpellingGroup(name: catNames['CL0011'] ?? 'เครื่องหมายพิเศษ', categoryCharId: 'CL0011', spellings: listSpecial),
+          SpellingGroup(
+            name: catNames['CL0008'] ?? 'ห นำ',
+            categoryCharId: 'CL0008',
+            spellings: listHN,
+          ),
+          SpellingGroup(
+            name: catNames['CL0009'] ?? 'ระวง (กล้ำ)',
+            categoryCharId: 'CL0009',
+            spellings: listRW,
+          ),
+          SpellingGroup(
+            name: catNames['CL0010'] ?? 'ตัวห้อย (สะกด)',
+            categoryCharId: 'CL0010',
+            spellings: listHoy,
+          ),
+          SpellingGroup(
+            name: catNames['CL0011'] ?? 'เครื่องหมายพิเศษ',
+            categoryCharId: 'CL0011',
+            spellings: listSpecial,
+          ),
         ].where((g) => g.spellings.isNotEmpty).toList();
 
         _tabController = TabController(length: _groups.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
-        
+
         if (_groups.isNotEmpty) {
           _currentCategoryId = _groups.first.categoryCharId;
         }
@@ -197,7 +225,10 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
             children: [
               CircularProgressIndicator(color: Color(0xFFD2691E)),
               SizedBox(height: 16),
-              Text('กำลังโหลดตัวสะกดล้านนา...', style: TextStyle(fontSize: 10, color: Color(0xFF7A5C3A))),
+              Text(
+                'กำลังโหลดตัวสะกดล้านนา...',
+                style: TextStyle(fontSize: 10, color: Color(0xFF7A5C3A)),
+              ),
             ],
           ),
         ),
@@ -214,12 +245,21 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
               children: [
                 const Icon(Icons.cloud_off, size: 60, color: Colors.redAccent),
                 const SizedBox(height: 16),
-                Text('ไม่สามารถโหลดข้อมูลได้\n$_errorMsg', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10)),
+                Text(
+                  'ไม่สามารถโหลดข้อมูลได้\n$_errorMsg',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 10),
+                ),
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _loadData,
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFA0522D)),
-                  child: const Text('ลองอีกครั้ง', style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFA0522D),
+                  ),
+                  child: const Text(
+                    'ลองอีกครั้ง',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -228,7 +268,9 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
       );
     }
 
-    final List<LannaSpelling> allSpellingsForTrain = _groups.expand((g) => g.spellings).toList();
+    final List<LannaSpelling> allSpellingsForTrain = _groups
+        .expand((g) => g.spellings)
+        .toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF7),
@@ -245,7 +287,10 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
             }
           },
         ),
-        bottom: PreferredSize(preferredSize: const Size.fromHeight(1.5), child: Container(color: const Color(0xFFEADBC8), height: 1.5)),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.5),
+          child: Container(color: const Color(0xFFEADBC8), height: 1.5),
+        ),
         centerTitle: true,
         title: const Text(
           'ตัวสะกดล้านนา',
@@ -270,20 +315,21 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
               delegate: _SliverTabBarDelegate(
                 TabBar(
                   controller: _tabController,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
                   indicatorColor: const Color(0xFFE16905),
                   indicatorWeight: 3.5,
                   indicatorSize: TabBarIndicatorSize.label,
                   labelColor: const Color(0xFFE16905),
-                  labelStyle: const TextStyle(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w400,
-                  ),
                   unselectedLabelColor: const Color(0xFF7A5C3A),
-                  unselectedLabelStyle: const TextStyle(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  tabs: _groups.map((g) => Tab(text: g.name)).toList(),
+                  tabs: List.generate(_groups.length, (index) {
+                    return Tab(
+                      child: AutoScrollingTabLabel(
+                        text: _groups[index].name,
+                        isSelected: _tabController?.index == index,
+                      ),
+                    );
+                  }),
                 ),
               ),
             ),
@@ -292,47 +338,38 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
         body: TabBarView(
           controller: _tabController,
           children: _groups.map((group) {
-            return ListView.builder(
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 80),
-              itemCount: group.spellings.length,
-              itemBuilder: (context, index) {
-                final spelling = group.spellings[index];
-                return _SpellingCard(
-                  spelling: spelling,
-                  onPlaySound: () => _speak(spelling.reading),
-                  onTapStrokeOrder: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      barrierColor: Colors.black.withValues(alpha: 0.5),
-                      builder: (context) => _StrokeOrderBottomSheet(spelling: spelling),
-                    );
-                  },
-                  onTapPractice: () {
-                    if (widget.isGuest) {
-                      _showLoginRequiredAlert(context);
-                      return;
-                    }
-                    final allWritingItems = allSpellingsForTrain.map((s) => WritingItem(
-                      char: s.char,
-                      label: s.reading,
-                      type: WritingType.consonant,
-                    )).toList();
-
-                    final initialIndex = allSpellingsForTrain.indexWhere((s) => s.char == spelling.char);
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => WritingModePage(
-                          items: allWritingItems,
-                          title: 'ฝึกเขียนตัวสะกด',
-                          initialIndex: initialIndex >= 0 ? initialIndex : 0,
-                        ),
+            return PaginatedLannaGrid<LannaSpelling>(
+              items: group.spellings,
+              pageSize: 16,
+              itemBuilder: (context, spelling, globalIndex) {
+                final initialIndex = allSpellingsForTrain.indexWhere(
+                  (s) => s.char == spelling.char,
+                );
+                return GestureDetector(
+                  onTap: () => pushLearningPage(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CharDetailPage(
+                        char: spelling.char,
+                        reading: spelling.reading,
+                        thai: spelling.thai,
+                        description: spelling.description,
+                        isGuest: widget.isGuest,
+                        writingType: WritingType.consonant,
+                        allChars: allSpellingsForTrain
+                            .map((s) => {'char': s.char, 'label': s.reading})
+                            .toList(),
+                        initialWritingIndex: initialIndex >= 0
+                            ? initialIndex
+                            : 0,
+                        categoryName: group.name,
                       ),
-                    );
-                  },
+                    ),
+                  ),
+                  child: LannaGlyphCard(
+                    glyph: spelling.char,
+                    thaiEquivalent: spelling.thai,
+                  ),
                 );
               },
             );
@@ -382,7 +419,7 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
                         spelling.char,
                         style: const TextStyle(
                           fontSize: 100,
-                          fontFamily: 'LannaAkkhara',
+                          fontFamily: 'PayapLanna',
                           color: Color(0xFFD2691E),
                           fontWeight: FontWeight.bold,
                         ),
@@ -391,7 +428,11 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
                     Align(
                       alignment: Alignment.centerRight,
                       child: IconButton(
-                        icon: const Icon(Icons.volume_up, color: Color(0xFFCD853F), size: 36),
+                        icon: const Icon(
+                          Icons.volume_up,
+                          color: Color(0xFFCD853F),
+                          size: 36,
+                        ),
                         onPressed: () => _speak(spelling.reading),
                       ),
                     ),
@@ -428,7 +469,8 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
                             context: context,
                             backgroundColor: Colors.transparent,
                             isScrollControlled: true,
-                            builder: (context) => _StrokeOrderBottomSheet(spelling: spelling),
+                            builder: (context) =>
+                                _StrokeOrderBottomSheet(spelling: spelling),
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -460,28 +502,40 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
                           }
                           Navigator.pop(context);
                           // แปลงข้อมูลไปฝึกเขียน
-                          final allWritingItems = allSpellings.map((s) => WritingItem(
-                            char: s.char,
-                            label: s.reading,
-                            type: WritingType.consonant, // ใช้โมเดลพยัญชนะสำหรับการลอนเส้น
-                          )).toList();
+                          final allWritingItems = allSpellings
+                              .map(
+                                (s) => WritingItem(
+                                  char: s.char,
+                                  label: s.reading,
+                                  type: WritingType
+                                      .consonant, // ใช้โมเดลพยัญชนะสำหรับการลอนเส้น
+                                ),
+                              )
+                              .toList();
 
-                          final initialIndex = allSpellings.indexWhere((s) => s.char == spelling.char);
+                          final initialIndex = allSpellings.indexWhere(
+                            (s) => s.char == spelling.char,
+                          );
 
-                          Navigator.push(
+                          pushLearningPage(
                             context,
                             MaterialPageRoute(
                               builder: (_) => WritingModePage(
                                 items: allWritingItems,
                                 title: 'ฝึกเขียนตัวสะกด',
-                                initialIndex: initialIndex >= 0 ? initialIndex : 0,
+                                initialIndex: initialIndex >= 0
+                                    ? initialIndex
+                                    : 0,
                               ),
                             ),
                           );
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFFA0522D),
-                          side: const BorderSide(color: Color(0xFFA0522D), width: 2),
+                          side: const BorderSide(
+                            color: Color(0xFFA0522D),
+                            width: 2,
+                          ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -506,15 +560,13 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
     );
   }
 
-      void _showLoginRequiredAlert(BuildContext context) {
+  void _showLoginRequiredAlert(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext ctx) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         contentPadding: EdgeInsets.zero,
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -548,7 +600,7 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
             InkWell(
               onTap: () {
                 Navigator.pop(ctx);
-                Navigator.pushNamed(context, '/login');
+                Navigator.of(context, rootNavigator: true).pushNamed('/login');
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
@@ -567,7 +619,10 @@ class _SpellingPageState extends State<SpellingPage> with SingleTickerProviderSt
             InkWell(
               onTap: () {
                 Navigator.pop(ctx);
-                Navigator.pushNamed(context, '/register');
+                Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pushNamed('/register');
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
@@ -620,13 +675,13 @@ class _IntroCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF3E0),
+        color: const Color(0xFFF1F8F0),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF6B3A2A).withValues(alpha: 0.3)),
+        border: Border.all(color: const Color(0xFFC7DCC7)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6B3A2A).withValues(alpha: 0.08),
-            blurRadius: 12,
+            color: const Color(0xFF2E6B34).withValues(alpha: 0.06),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
@@ -636,14 +691,18 @@ class _IntroCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.info_outline, color: Color(0xFF6B3A2A), size: 22),
+              const Icon(
+                Icons.help_outline_rounded,
+                color: Color(0xFF1B4D20),
+                size: 22,
+              ),
               const SizedBox(width: 8),
               Text(
                 article!.title,
                 style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF6B3A2A),
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1B4D20),
                 ),
               ),
             ],
@@ -652,9 +711,9 @@ class _IntroCard extends StatelessWidget {
           Text(
             article!.content,
             style: const TextStyle(
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF5C3D1E),
+              color: Color(0xFF224424),
               height: 1.5,
             ),
           ),
@@ -716,14 +775,14 @@ class _SpellingCard extends StatelessWidget {
                     spelling.char,
                     style: const TextStyle(
                       fontSize: 28,
-                      fontFamily: 'LannaAkkhara',
+                      fontFamily: 'PayapLanna',
                       color: Color(0xFF924E19),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 const SizedBox(width: 16),
-                
+
                 // Reading and Thai equivalent
                 Expanded(
                   child: Column(
@@ -748,7 +807,7 @@ class _SpellingCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 // Pronunciation Button (Small warm circle)
                 Material(
                   color: const Color(0xFFF5EAE1),
@@ -771,7 +830,7 @@ class _SpellingCard extends StatelessWidget {
             const SizedBox(height: 12),
             const Divider(color: Color(0xFFEADBC8), thickness: 1),
             const SizedBox(height: 8),
-            
+
             // Description
             Text(
               spelling.description,
@@ -782,7 +841,7 @@ class _SpellingCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Buttons: Stroke Order and Practice
             Row(
               children: [
@@ -825,8 +884,8 @@ class _SpellingCard extends StatelessWidget {
         ),
       ),
     );
-  }}
-
+  }
+}
 
 // ============================================================================
 // STROKE ORDER BOTTOM SHEET FOR LANNASPELLING
@@ -836,7 +895,8 @@ class _StrokeOrderBottomSheet extends StatefulWidget {
   const _StrokeOrderBottomSheet({required this.spelling});
 
   @override
-  State<_StrokeOrderBottomSheet> createState() => __StrokeOrderBottomSheetState();
+  State<_StrokeOrderBottomSheet> createState() =>
+      __StrokeOrderBottomSheetState();
 }
 
 class __StrokeOrderBottomSheetState extends State<_StrokeOrderBottomSheet>
@@ -854,11 +914,12 @@ class __StrokeOrderBottomSheetState extends State<_StrokeOrderBottomSheet>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    )..addListener(() {
-        setState(() {});
-      });
+    _animation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+        )..addListener(() {
+          setState(() {});
+        });
     _controller.forward();
   }
 
@@ -938,7 +999,7 @@ class __StrokeOrderBottomSheetState extends State<_StrokeOrderBottomSheet>
             widget.spelling.char,
             style: const TextStyle(
               fontSize: 27,
-              fontFamily: 'LannaAkkhara',
+              fontFamily: 'PayapLanna',
               color: Color(0xFF924E19),
               fontWeight: FontWeight.bold,
             ),
@@ -1003,7 +1064,9 @@ class __StrokeOrderBottomSheetState extends State<_StrokeOrderBottomSheet>
             children: [
               IconButton(
                 icon: const Icon(Icons.skip_previous_rounded, size: 36),
-                color: _currentStrokeIndex > 0 ? const Color(0xFF924E19) : Colors.grey[300],
+                color: _currentStrokeIndex > 0
+                    ? const Color(0xFF924E19)
+                    : Colors.grey[300],
                 onPressed: _currentStrokeIndex > 0 ? _prev : null,
               ),
               const SizedBox(width: 24),
@@ -1012,24 +1075,30 @@ class __StrokeOrderBottomSheetState extends State<_StrokeOrderBottomSheet>
                 icon: const Icon(Icons.refresh),
                 label: const Text(
                   'เล่นใหม่',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF924E19),
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
               ),
               const SizedBox(width: 24),
               IconButton(
                 icon: const Icon(Icons.skip_next_rounded, size: 36),
-                color: _currentStrokeIndex < _strokes.length - 1 ? const Color(0xFF924E19) : Colors.grey[300],
-                onPressed: _currentStrokeIndex < _strokes.length - 1 ? _next : null,
+                color: _currentStrokeIndex < _strokes.length - 1
+                    ? const Color(0xFF924E19)
+                    : Colors.grey[300],
+                onPressed: _currentStrokeIndex < _strokes.length - 1
+                    ? _next
+                    : null,
               ),
             ],
           ),
@@ -1075,7 +1144,10 @@ class _StrokePainter extends CustomPainter {
       final scaled = pts.map(scaler).toList();
       path.moveTo(scaled[0].dx, scaled[0].dy);
       if (scaled.length == 1) return path;
-      if (scaled.length == 2) { path.lineTo(scaled[1].dx, scaled[1].dy); return path; }
+      if (scaled.length == 2) {
+        path.lineTo(scaled[1].dx, scaled[1].dy);
+        return path;
+      }
       for (int i = 0; i < scaled.length - 1; i++) {
         final p0 = scaled[(i - 1).clamp(0, scaled.length - 1)];
         final p1 = scaled[i];
@@ -1100,6 +1172,8 @@ class _StrokePainter extends CustomPainter {
     for (int i = 0; i < strokes.length; i++) {
       final pts = strokes[i];
       if (pts.isEmpty) continue;
+      paintGuide.color = strokeOrderColors[i % strokeOrderColors.length]
+          .withValues(alpha: 0.18);
       canvas.drawPath(catmullRomPath(pts, scale), paintGuide);
     }
 
@@ -1132,14 +1206,18 @@ class _StrokePainter extends CustomPainter {
         final currentProgressSegment = progress * totalSegments;
         final fullSegments = currentProgressSegment.floor();
         final partialProgress = currentProgressSegment - fullSegments;
-        final partialPoints = currentPoints.sublist(0, fullSegments + 1).toList();
+        final partialPoints = currentPoints
+            .sublist(0, fullSegments + 1)
+            .toList();
         if (fullSegments < totalSegments) {
           final p1 = currentPoints[fullSegments];
           final p2 = currentPoints[fullSegments + 1];
-          partialPoints.add(Offset(
-            p1.dx + (p2.dx - p1.dx) * partialProgress,
-            p1.dy + (p2.dy - p1.dy) * partialProgress,
-          ));
+          partialPoints.add(
+            Offset(
+              p1.dx + (p2.dx - p1.dx) * partialProgress,
+              p1.dy + (p2.dy - p1.dy) * partialProgress,
+            ),
+          );
         }
         canvas.drawPath(catmullRomPath(partialPoints, scale), paintCurrent);
       }
@@ -1153,10 +1231,15 @@ class _StrokePainter extends CustomPainter {
       if (strokes[i].isEmpty) continue;
       final startPt = scale(strokes[i][0]);
       final isCurrentOrCompleted = i <= currentIndex;
+      final isFirst = i == 0;
       canvas.drawCircle(
         startPt,
         10,
-        isCurrentOrCompleted ? paintStartActive : paintStartInactive,
+        isFirst
+            ? (Paint()..color = const Color(0xFFFF9800))
+            : isCurrentOrCompleted
+            ? paintStartActive
+            : paintStartInactive,
       );
       final textPainterNum = TextPainter(
         text: TextSpan(
@@ -1173,7 +1256,21 @@ class _StrokePainter extends CustomPainter {
       textPainterNum.layout();
       textPainterNum.paint(
         canvas,
-        Offset(startPt.dx - textPainterNum.width / 2, startPt.dy - textPainterNum.height / 2),
+        Offset(
+          startPt.dx - textPainterNum.width / 2,
+          startPt.dy - textPainterNum.height / 2,
+        ),
+      );
+    }
+
+    if (strokes.isNotEmpty && strokes.last.isNotEmpty) {
+      canvas.drawCircle(
+        scale(strokes.last.last),
+        6,
+        Paint()
+          ..color = const Color(0xFF924E19)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
       );
     }
   }
@@ -1186,7 +1283,6 @@ List<List<Offset>> getStrokePaths(String char) {
   return sd.getStrokeData(char);
 }
 
-
 class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar tabBar;
   _SliverTabBarDelegate(this.tabBar);
@@ -1197,15 +1293,100 @@ class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => tabBar.preferredSize.height;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: const Color(0xFFFFFBF7),
-      child: tabBar,
-    );
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(color: const Color(0xFFFFFBF7), child: tabBar);
   }
 
   @override
   bool shouldRebuild(_SliverTabBarDelegate oldDelegate) {
     return false;
+  }
+}
+
+
+class AutoScrollingTabLabel extends StatefulWidget {
+  final String text;
+  final bool isSelected;
+
+  const AutoScrollingTabLabel({
+    super.key,
+    required this.text,
+    this.isSelected = false,
+  });
+
+  @override
+  State<AutoScrollingTabLabel> createState() => _AutoScrollingTabLabelState();
+}
+
+class _AutoScrollingTabLabelState extends State<AutoScrollingTabLabel> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    if (widget.isSelected) {
+      _startAutoScroll();
+    }
+  }
+
+  @override
+  void didUpdateWidget(AutoScrollingTabLabel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isSelected && !oldWidget.isSelected) {
+      _startAutoScroll();
+    }
+  }
+
+  void _startAutoScroll() async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    if (!mounted || !_scrollController.hasClients) return;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    if (maxScroll <= 0) return;
+
+    await _scrollController.animateTo(
+      maxScroll,
+      duration: Duration(milliseconds: (maxScroll * 35).toInt() + 1200),
+      curve: Curves.easeInOutCubic,
+    );
+    await Future.delayed(const Duration(milliseconds: 600));
+    if (!mounted || !_scrollController.hasClients) return;
+    await _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 240),
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
+          child: Text(
+            widget.text,
+            style: TextStyle(
+              fontSize: 13.5,
+              fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

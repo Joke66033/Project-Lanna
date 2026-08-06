@@ -1,34 +1,41 @@
-export const trackRecentActivity = (tableName, id) => {
+export function trackRecentActivity(type, id) {
   try {
-    if (!id) return;
-    const key = `recent_${tableName}`;
-    const recent = JSON.parse(localStorage.getItem(key) || "{}");
-    recent[id] = Date.now();
-    localStorage.setItem(key, JSON.stringify(recent));
+    const key = `recent_${type}`;
+    const existing = JSON.parse(localStorage.getItem(key) || "[]");
+    const updated = [id, ...existing.filter((item) => item !== id)].slice(0, 20);
+    localStorage.setItem(key, JSON.stringify(updated));
   } catch (e) {
-    console.error("Failed to track recent activity:", e);
+    // Ignore storage errors
   }
-};
+}
 
-export const sortRecentData = (data, tableName, idField) => {
+export function sortRecentData(dataList, type, idField = "id") {
   try {
-    const key = `recent_${tableName}`;
-    const recent = JSON.parse(localStorage.getItem(key) || "{}");
-    return [...data].sort((a, b) => {
-      const idA = a[idField];
-      const idB = b[idField];
-      const timeA = recent[idA] || 0;
-      const timeB = recent[idB] || 0;
-      if (timeA !== timeB) {
-        return timeB - timeA; // Newest activity first
+    const key = `recent_${type}`;
+    const recentIds = JSON.parse(localStorage.getItem(key) || "[]");
+    if (!recentIds.length) return dataList;
+
+    const recentSet = new Set(recentIds);
+    const recentItems = [];
+    const otherItems = [];
+
+    dataList.forEach((item) => {
+      const itemId = item[idField] || item.id;
+      if (recentSet.has(itemId)) {
+        recentItems.push(item);
+      } else {
+        otherItems.push(item);
       }
-      // Fallback to standard sorting (numeric or string ID descending)
-      if (typeof idA === 'number' && typeof idB === 'number') {
-        return idB - idA;
-      }
-      return String(idB).localeCompare(String(idA), undefined, { numeric: true });
     });
+
+    recentItems.sort((a, b) => {
+      const idA = a[idField] || a.id;
+      const idB = b[idField] || b.id;
+      return recentIds.indexOf(idA) - recentIds.indexOf(idB);
+    });
+
+    return [...recentItems, ...otherItems];
   } catch (e) {
-    return data;
+    return dataList;
   }
-};
+}

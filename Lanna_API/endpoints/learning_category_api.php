@@ -147,7 +147,22 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
 
-            // ทำการ DELETE ข้อมูลออกจากฐานข้อมูล
+            // 1. Fetch child category_lanna_char records linked to this learning category
+            $subCatsRes = dbSelect('category_lanna_char', 'category_char_id', ['learning_category_code' => 'eq.' . rawurlencode($id)]);
+            if (!$subCatsRes['error'] && !empty($subCatsRes['data'])) {
+                foreach ($subCatsRes['data'] as $subCat) {
+                    $subId = $subCat['category_char_id'] ?? '';
+                    if ($subId !== '') {
+                        // Delete associated lanna characters under each sub-category
+                        dbDelete('lanna_char', ['category_char_id' => 'eq.' . rawurlencode($subId)]);
+                    }
+                }
+            }
+
+            // 2. Cascade delete associated sub-categories in category_lanna_char
+            dbDelete('category_lanna_char', ['learning_category_code' => 'eq.' . rawurlencode($id)]);
+
+            // 3. Delete the main learning category record
             $res = dbDelete('learning_category', ['category_code' => 'eq.' . rawurlencode($id)]);
             if ($res['error']) {
                 jsonError($res['error']['message']);

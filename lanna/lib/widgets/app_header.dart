@@ -38,24 +38,35 @@ class AppHeader extends StatelessWidget {
               ),
 
             // ===== ชื่อด้านบน (กึ่งกลาง) =====
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  'assets/images/logo.png',
-                  height: 40,
-                  filterQuality: FilterQuality.high,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF5C3A21),
+            Positioned(
+              left: onBack != null ? 48 : 52,
+              right: 52,
+              top: 0,
+              bottom: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    height: 40,
+                    filterQuality: FilterQuality.high,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5C3A21),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             // ===== โลโก้ CMRU หรือ รูปโปรไฟล์ถ้าล็อกอินแล้ว =====

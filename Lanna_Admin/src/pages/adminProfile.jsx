@@ -4,7 +4,13 @@ import Swal from "sweetalert2";
 import logo from "../assets/image/logo.png";
 import { supabase } from "../lib/supabaseClient";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
 
 export default function AdminProfile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -285,11 +291,23 @@ export default function AdminProfile() {
         if (!currentAvatarUrl) throw new Error('ไม่ได้รับ URL รูปโปรไฟล์จาก server');
       }
 
+      // ใส่ cache buster ใน URL รูปภาพเพื่อบังคับเบราว์เซอร์ดาวน์โหลดภาพใหม่แทนการใช้ cache เดิม
+      let cacheBustedAvatar = null;
+      if (currentAvatarUrl) {
+        try {
+          const urlObj = new URL(currentAvatarUrl, window.location.origin);
+          urlObj.searchParams.set('t', Date.now());
+          cacheBustedAvatar = urlObj.toString();
+        } catch (e) {
+          cacheBustedAvatar = currentAvatarUrl;
+        }
+      }
+
       // 2. อัปเดตข้อมูลผู้ดูแลระบบ
       const updatePayload = {
         name: profile.name,
         email: profile.email,
-        avatar: currentAvatarUrl || '',
+        avatar: cacheBustedAvatar || currentAvatarUrl || '',
       };
       if (newPass !== "") {
         updatePayload.newPassword = newPass;
@@ -318,12 +336,9 @@ export default function AdminProfile() {
         delete baseUser.newPassword;
       }
 
-      // ใส่ cache buster ใน URL รูปภาพเพื่อบังคับเบราว์เซอร์ดาวน์โหลดภาพใหม่แทนการใช้ cache เดิม
-      const cacheBustedAvatar = baseUser.avatar ? `${baseUser.avatar.split('?')[0]}?t=${Date.now()}` : null;
-
       const updatedUser = {
         ...baseUser,
-        avatar: cacheBustedAvatar
+        avatar: cacheBustedAvatar || currentAvatarUrl || ''
       };
 
       // อัปเดตข้อมูลลงใน storage ของเบราว์เซอร์

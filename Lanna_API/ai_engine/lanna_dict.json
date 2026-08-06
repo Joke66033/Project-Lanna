@@ -1,5 +1,11 @@
 [
   {
+    "thai": "ล้านนา",
+    "pronunciation": "[ล้าน-นา]",
+    "lanna": "ᩃ᩶ᩣᨶᨶᩣ",
+    "definition": "น. ดินแดนทางภาคเหนือของไทย เดิมเป็นอาณาจักรใหญ่"
+  },
+  {
     "thai": "ต่อ",
     "pronunciation": "[ต่อ]",
     "lanna": "ᨲᩬ᩵",
@@ -560,13 +566,13 @@
   {
     "thai": "อยู่",
     "pronunciation": "[อยู่]",
-    "lanna": "᩠ᨿᩪ᩵",
+    "lanna": "ᨿᩪ᩵",
     "definition": "อยู่อาศัย พักอยู่"
   },
   {
     "thai": "อย่า",
     "pronunciation": "[อย่า]",
-    "lanna": "᩠ᨿ᩵ᩣ",
+    "lanna": "ᨿ᩵ᩣ",
     "definition": "ห้าม อย่าทำ"
   },
   {

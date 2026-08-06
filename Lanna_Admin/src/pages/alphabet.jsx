@@ -10,7 +10,13 @@ import LannaText from "../components/LannaText.jsx";
 import { loadLannaMap, convertThaiToLanna } from "../lib/thaiToLanna.js";
 import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
 import { categoryColors, getCategoryBadgeStyle } from "../lib/categoryColors";
 
 /* ===== THAI → LANNA (จาก data เดิม) =====
@@ -110,13 +116,27 @@ export default function AlphabetPage() {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchCharCategories = async () => {
     try {
+      const { data: learnData } = await supabase
+        .from("learning_category")
+        .select("category_code, is_active");
+
+      const activeCodes = new Set(
+        (learnData || [])
+          .filter((c) => c.is_active !== false && c.is_active !== "0" && c.is_active !== 0)
+          .map((c) => c.category_code)
+      );
+
       const { data: catData, error: catError } = await supabase
         .from("category_lanna_char")
-        .select("category_char_id, name");
+        .select("category_char_id, name, learning_category_code");
       if (catError) throw catError;
-      setCategories(catData || []);
+
+      const activeCats = (catData || []).filter(
+        (c) => !c.learning_category_code || activeCodes.has(c.learning_category_code)
+      );
+      setCategories(activeCats);
     } catch (err) {
       console.error("Error fetching categories:", err);
     }
@@ -137,7 +157,7 @@ export default function AlphabetPage() {
   }, [currentPage, selectedCategory, search]);
 
   useEffect(() => {
-    fetchCategories()
+    fetchCharCategories();
     
     const fetchLannaMap = async () => {
       const map = await loadLannaMap();

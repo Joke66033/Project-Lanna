@@ -3,9 +3,12 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lanna/services/lanna_char_service.dart';
 import 'package:lanna/services/article_service.dart';
 import 'package:lanna/models/article_model.dart';
+import '../learning_navigation.dart';
+import 'lanna_glyph_card.dart';
+import 'char_detail_page.dart';
 import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
-import '../train/stroke_data.dart' as sd;
+import 'package:lanna/services/character_stroke_service.dart';
 
 /// ============================================================================
 /// MODEL : LANNA NUMBER
@@ -208,56 +211,50 @@ class _NumberPageState extends State<NumberPage> {
       ),
       body: _groups.isEmpty
           ? const SizedBox.shrink()
-          : ListView.builder(
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 80),
-              itemCount: _groups.first.numbers.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    child: _IntroCard(article: _article),
+          : NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  if (_article != null)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: _IntroCard(article: _article),
+                      ),
+                    ),
+                ];
+              },
+              body: PaginatedLannaGrid<LannaNumber>(
+                items: _groups.first.numbers,
+                pageSize: 16,
+                itemBuilder: (context, number, globalIndex) {
+                  final initialIndex = allNumbersForTrain.indexWhere((n) => n.char == number.char);
+                  return GestureDetector(
+                    onTap: () => pushLearningPage(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CharDetailPage(
+                          char: number.char,
+                          reading: number.reading,
+                          thai: number.thai,
+                          description: number.description,
+                          isGuest: widget.isGuest,
+                          writingType: WritingType.number,
+                          allChars: allNumbersForTrain
+                              .map((n) => {'char': n.char, 'label': n.reading})
+                              .toList(),
+                          initialWritingIndex: initialIndex >= 0 ? initialIndex : 0,
+                          categoryName: 'ตัวเลขล้านนา',
+                        ),
+                      ),
+                    ),
+                    child: LannaGlyphCard(
+                      glyph: number.char,
+                      thaiEquivalent: number.thai,
+                    ),
                   );
-                }
-                final number = _groups.first.numbers[index - 1];
-                      return _NumberCard(
-                        number: number,
-                        onPlaySound: () => _speak(number.reading),
-                        onTapStrokeOrder: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            barrierColor: Colors.black.withValues(alpha: 0.5),
-                            builder: (_) => NumberStrokeOrderBottomSheet(number: number),
-                          );
-                        },
-                        onTapPractice: () {
-                          if (widget.isGuest) {
-                            _showLoginRequiredAlert(context);
-                            return;
-                          }
-                          final allWritingItems = allNumbersForTrain.map((n) => WritingItem(
-                            char: n.char,
-                            label: n.reading,
-                            type: WritingType.number,
-                          )).toList();
-
-                          final initialIndex = allNumbersForTrain.indexWhere((n) => n.char == number.char);
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => WritingModePage(
-                                items: allWritingItems,
-                                title: 'ฝึกเขียนตัวเลข',
-                                initialIndex: initialIndex >= 0 ? initialIndex : 0,
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+                },
+              ),
+            ),
     );
   }
 
@@ -473,7 +470,7 @@ class _NumberCard extends StatelessWidget {
                     number.char,
                     style: const TextStyle(
                       fontSize: 28,
-                      fontFamily: 'LannaAkkhara',
+                      fontFamily: 'PayapLanna',
                       color: Color(0xFF924E19),
                       fontWeight: FontWeight.bold,
                     ),
@@ -695,7 +692,7 @@ class _NumberStrokeOrderBottomSheetState extends State<NumberStrokeOrderBottomSh
             widget.number.char,
             style: const TextStyle(
               fontSize: 27,
-              fontFamily: 'LannaAkkhara',
+              fontFamily: 'PayapLanna',
               color: Color(0xFF924E19),
               fontWeight: FontWeight.bold,
             ),
@@ -940,5 +937,5 @@ class NumberStrokePainter extends CustomPainter {
 }
 
 List<List<Offset>> getStrokePaths(String char) {
-  return sd.getStrokeData(char);
+  return getStrokeData(char);
 }

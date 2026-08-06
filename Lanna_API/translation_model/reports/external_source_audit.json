@@ -1,0 +1,110 @@
+{
+  "pdf_files": [
+    {
+      "path": "C:\\tmp\\lanna_dictionary_drive.pdf",
+      "bytes": 9124900,
+      "sha256": "292b27975da43716c4588e3ee08f9af5ef53983e000e42c95267c7f3075fa6cb",
+      "page_count": 672,
+      "sampled_pages": [
+        {
+          "page": 1,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 30,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 59,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 89,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 118,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 147,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 176,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 205,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 234,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 264,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 293,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 322,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 351,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 380,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 409,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 439,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 468,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 497,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 526,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 555,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 584,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 614,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 643,
+          "embedded_text_characters": 0
+        },
+        {
+          "page": 672,
+          "embedded_text_characters": 0
+        }
+      ],
+      "sampled_pages_with_embedded_text": 0,
+      "image_only_likely": true
+    }
+  ]
+}

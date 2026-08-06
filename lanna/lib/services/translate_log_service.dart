@@ -18,14 +18,14 @@ class TranslateLogService {
   }
 
   /// Create new log entry
-  Future<TranslateLogModel> createLog(String userId, String inputText, String outputText) async {
+  Future<void> createLog(String userId, String inputText, String outputText, {String? categoryVocabId, String? translateType}) async {
     final body = {
-      'user_id': userId,
+      'category_vocab_id': categoryVocabId ?? 'CV0001',
+      'translate_type': translateType ?? 'text',
       'input_text': inputText,
       'output_text': outputText,
     };
-    final data = await ApiService.post('${ApiConfig.translateLogs}?action=create', body);
-    return TranslateLogModel.fromJson(data);
+    await ApiService.post('${ApiConfig.translateLogs}?action=create', body);
   }
 
   /// Delete log entry

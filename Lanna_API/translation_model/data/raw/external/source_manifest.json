@@ -1,0 +1,28 @@
+{
+  "rights_confirmation": {
+    "status": "user_confirmed",
+    "confirmed_on": "2026-08-02",
+    "scope": "use both supplied sources to prepare and train the user's private Lanna translation model"
+  },
+  "sources": [
+    {
+      "source_id": "lanna_dictionary_drive_672",
+      "title": "พจนานุกรมภาษาล้านนา (The Lanna Dictionary)",
+      "url": "https://drive.google.com/file/d/1vU2y-5V0uRyY0FKQ74m4h2fJVScwwHJL/view?usp=sharing",
+      "pages": 672,
+      "format": "scanned_pdf",
+      "embedded_text": false,
+      "ingestion_status": "ocr_and_human_review_required"
+    },
+    {
+      "source_id": "wanchai_lanna_thai_anyflip_421",
+      "title": "พจนานุกรมล้านนา-ไทย",
+      "author": "รองศาสตราจารย์ ดร.วันชัย พลเมืองดี",
+      "url": "https://anyflip.com/bvgql/goim/basic",
+      "pages": 421,
+      "format": "web_flipbook_images_with_legacy_text_layer",
+      "embedded_text": "legacy_non_unicode_lanna",
+      "ingestion_status": "legacy_conversion_or_ocr_and_human_review_required"
+    }
+  ]
+}

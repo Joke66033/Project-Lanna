@@ -38,7 +38,11 @@ class _LoginPageState extends State<LoginPage> {
       await authProvider.loginAsUser(email, password);
 
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home-user');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeShell(isGuest: false)),
+          (route) => false,
+        );
       }
     } catch (e) {
       String msg = e.toString();

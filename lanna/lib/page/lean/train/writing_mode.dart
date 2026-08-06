@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lanna/services/lanna_char_service.dart';
+import 'glyph_layout.dart';
 import 'writing_data.dart';
 import 'writing_canvas.dart';
-
-import 'package:lanna/widgets/bottom.dart';
 
 class WritingModePage extends StatefulWidget {
   final List<WritingItem> items;
@@ -66,11 +66,7 @@ class _WritingModePageState extends State<WritingModePage> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.edit_outlined,
-              size: 24,
-              color: Color(0xFF924E19),
-            ),
+            const Icon(Icons.edit_outlined, size: 24, color: Color(0xFF924E19)),
             const SizedBox(width: 8),
             Text(
               widget.title,
@@ -89,17 +85,21 @@ class _WritingModePageState extends State<WritingModePage> {
         bottom: false,
         child: Column(
           children: [
-            const SizedBox(height: 4),
+            const SizedBox(height: 10),
 
             // ================= ตัวอักษร (Carousel) =================
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 children: [
-                  const Icon(Icons.school_outlined, color: Color(0xFFBCAAA4), size: 26),
+                  const Icon(
+                    Icons.school_outlined,
+                    color: Color(0xFFBCAAA4),
+                    size: 26,
+                  ),
                   Expanded(
                     child: SizedBox(
-                      height: 50,
+                      height: 82,
                       child: PageView.builder(
                         controller: _pageController,
                         itemCount: widget.items.length,
@@ -111,24 +111,26 @@ class _WritingModePageState extends State<WritingModePage> {
                         },
                         itemBuilder: (_, i) {
                           final active = i == _index;
+                          final previewSizeFactor =
+                              widget.items[i].type == WritingType.consonant
+                              ? 0.55
+                              : widget.items[i].type == WritingType.number
+                              ? 0.45
+                              : 0.35;
                           return AnimatedScale(
-                            scale: active ? 1.2 : 0.9,
+                            scale: active ? 1.0 : 0.82,
                             duration: const Duration(milliseconds: 250),
                             child: AnimatedOpacity(
-                              opacity: active ? 1 : 0.4,
+                              opacity: active ? 1 : 0.6,
                               duration: const Duration(milliseconds: 250),
-                              child: Center(
-                                child: Text(
-                                  widget.items[i].char,
-                                  style: TextStyle(
-                                    fontSize: 44,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'LannaAkkhara',
-                                    color: active
-                                        ? const Color(0xFF924E19)
-                                        : const Color(0xFFDCC8B8),
-                                  ),
-                                ),
+                              child: CenteredWritingGlyph(
+                                character: widget.items[i].char,
+                                fontFamily: 'PayapLanna',
+                                color: active
+                                    ? const Color(0xFF924E19)
+                                    : const Color(0xFFB99B83),
+                                padding: 8,
+                                sizeFactor: previewSizeFactor,
                               ),
                             ),
                           );
@@ -136,31 +138,50 @@ class _WritingModePageState extends State<WritingModePage> {
                       ),
                     ),
                   ),
-                  const Icon(Icons.rate_review_outlined, color: Color(0xFFBCAAA4), size: 26),
+                  const Icon(
+                    Icons.rate_review_outlined,
+                    color: Color(0xFFBCAAA4),
+                    size: 26,
+                  ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
 
             // ================= ชื่อตัวอักษร =================
+            // แสดงตัวอักษรล้านนาด้วยฟอนต์ LannaAkkhara และ label ด้วยฟอนต์ปกติ
             Column(
               children: [
-                Text(
-                  '${item.char} (${item.label})',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2C1A04),
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: item.char,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'PayapLanna',
+                          fontFamilyFallback: ['PayapLanna', 'PayapLanna'],
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF924E19),
+                        ),
+                      ),
+                      TextSpan(
+                        text: '  (${item.label})',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2C1A04),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   '• ${_typeLabel(item.type)}',
-                  style: const TextStyle(
-                    fontSize: 8,
-                    color: Color(0xFF7A5C3A),
-                  ),
+                  style: const TextStyle(fontSize: 8, color: Color(0xFF7A5C3A)),
                 ),
               ],
             ),
@@ -206,7 +227,10 @@ class _WritingModePageState extends State<WritingModePage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: const Color(0xFFEADBC8), width: 1.2),
+                    border: Border.all(
+                      color: const Color(0xFFEADBC8),
+                      width: 1.2,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0xFF7A5C3A).withValues(alpha: 0.05),
@@ -221,25 +245,25 @@ class _WritingModePageState extends State<WritingModePage> {
                       key: _canvasKey,
                       guideChar: item.char,
                       character: item.char,
-                      fontFamily: 'LannaAkkhara',
+                      fontFamily: 'PayapLanna',
+                      maxGlyphExtent: item.type == WritingType.consonant
+                          ? 280
+                          : item.type == WritingType.number
+                          ? 220
+                          : 150,
+                      targetGlyphInkArea: item.type == WritingType.consonant
+                          ? 16000
+                          : item.type == WritingType.number
+                          ? 9000
+                          : 3500,
                       onChanged: (points) {},
                     ),
                   ),
                 ),
               ),
             ),
-
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNav(
-        index: 2, // เรียนรู้
-        isGuest: false,
-        onLoginTap: () {},
-        onTap: (i) {
-          if (i == 2) return; // อยู่หน้าเรียนรู้แล้ว
-          Navigator.pop(context, i);
-        },
       ),
     );
   }
@@ -265,7 +289,11 @@ class _WritingModePageState extends State<WritingModePage> {
           boxShadow: enabled
               ? [
                   BoxShadow(
-                    color: (isPrimary ? const Color(0xFF924E19) : const Color(0xFFF3EAE1)).withValues(alpha: 0.2),
+                    color:
+                        (isPrimary
+                                ? const Color(0xFF924E19)
+                                : const Color(0xFFF3EAE1))
+                            .withValues(alpha: 0.2),
                     blurRadius: 6,
                     offset: const Offset(0, 3),
                   ),
@@ -294,5 +322,79 @@ class _WritingModePageState extends State<WritingModePage> {
       case WritingType.number:
         return 'ตัวเลข';
     }
+  }
+}
+
+class WritingCategoryLoaderPage extends StatefulWidget {
+  final String title;
+  final String categoryCharIds;
+  final WritingType writingType;
+
+  const WritingCategoryLoaderPage({
+    super.key,
+    required this.title,
+    required this.categoryCharIds,
+    required this.writingType,
+  });
+
+  @override
+  State<WritingCategoryLoaderPage> createState() => _WritingCategoryLoaderPageState();
+}
+
+class _WritingCategoryLoaderPageState extends State<WritingCategoryLoaderPage> {
+  final LannaCharService _charService = LannaCharService();
+  List<WritingItem> _items = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final chars = await _charService.getAllCharacters(categoryCharId: widget.categoryCharIds);
+      if (mounted) {
+        setState(() {
+          _items = chars.map((c) => WritingItem(
+            char: c.lannaChar,
+            label: c.thaiEquivalent.split(' ').first,
+            type: widget.writingType,
+          )).toList();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_items.isEmpty) {
+      return const Scaffold(
+        body: Center(
+          child: Text('ไม่มีข้อมูล'),
+        ),
+      );
+    }
+
+    return WritingModePage(
+      title: widget.title,
+      items: _items,
+    );
   }
 }

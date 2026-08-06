@@ -405,19 +405,23 @@ class _ProfileContentState extends State<ProfileContent>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('ยืนยันการลบบัญชี ⚠️'),
+        title: const Text(
+          'ยืนยันการลบบัญชี ⚠️',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        ),
         content: const Text(
           'การดำเนินการนี้ไม่สามารถย้อนกลับได้\nคุณต้องการลบบัญชีของคุณอย่างถาวรใช่หรือไม่?',
+          style: TextStyle(fontSize: 12, height: 1.6),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('ยกเลิก'),
+            child: const Text('ยกเลิก', style: TextStyle(fontSize: 11)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('ลบบัญชี', style: TextStyle(color: Colors.white)),
+            child: const Text('ลบบัญชี', style: TextStyle(color: Colors.white, fontSize: 11)),
           ),
         ],
       ),

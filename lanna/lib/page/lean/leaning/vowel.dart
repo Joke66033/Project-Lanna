@@ -3,9 +3,12 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lanna/services/lanna_char_service.dart';
 import 'package:lanna/services/article_service.dart';
 import 'package:lanna/models/article_model.dart';
+import '../learning_navigation.dart';
+import 'lanna_glyph_card.dart';
+import 'char_detail_page.dart';
 import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
-import '../train/stroke_data.dart' as sd;
+import 'package:lanna/services/character_stroke_service.dart';
 
 /// ============================================================================
 /// MODEL : LANNA VOWEL
@@ -282,47 +285,34 @@ class _VowelPageState extends State<VowelPage> with SingleTickerProviderStateMix
         body: TabBarView(
           controller: _tabController,
           children: _groups.map((group) {
-            return ListView.builder(
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 80),
-              itemCount: group.vowels.length,
-              itemBuilder: (context, index) {
-                final vowel = group.vowels[index];
-                return _VowelCard(
-                  vowel: vowel,
-                  onPlaySound: () => _speak(vowel.reading),
-                  onTapStrokeOrder: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      barrierColor: Colors.black.withValues(alpha: 0.5),
-                      builder: (_) => VowelStrokeOrderBottomSheet(vowel: vowel),
-                    );
-                  },
-                  onTapPractice: () {
-                    if (widget.isGuest) {
-                      _showLoginRequiredAlert(context);
-                      return;
-                    }
-                    final allWritingItems = allVowelsForTrain.map((v) => WritingItem(
-                      char: v.char,
-                      label: v.reading,
-                      type: WritingType.vowel,
-                    )).toList();
-
-                    final initialIndex = allVowelsForTrain.indexWhere((v) => v.char == vowel.char);
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => WritingModePage(
-                          items: allWritingItems,
-                          title: 'ฝึกเขียนสระ',
-                          initialIndex: initialIndex >= 0 ? initialIndex : 0,
-                        ),
+            return PaginatedLannaGrid<LannaVowel>(
+              items: group.vowels,
+              pageSize: 16,
+              itemBuilder: (context, vowel, globalIndex) {
+                final initialIndex = allVowelsForTrain.indexWhere((v) => v.char == vowel.char);
+                return GestureDetector(
+                  onTap: () => pushLearningPage(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CharDetailPage(
+                        char: vowel.char,
+                        reading: vowel.reading,
+                        thai: vowel.thai,
+                        description: vowel.description,
+                        isGuest: widget.isGuest,
+                        writingType: WritingType.vowel,
+                        allChars: allVowelsForTrain
+                            .map((v) => {'char': v.char, 'label': v.reading})
+                            .toList(),
+                        initialWritingIndex: initialIndex >= 0 ? initialIndex : 0,
+                        categoryName: group.name,
                       ),
-                    );
-                  },
+                    ),
+                  ),
+                  child: LannaGlyphCard(
+                    glyph: vowel.char,
+                    thaiEquivalent: vowel.thai,
+                  ),
                 );
               },
             );
@@ -544,7 +534,7 @@ class _VowelCard extends StatelessWidget {
                     vowel.char,
                     style: const TextStyle(
                       fontSize: 28,
-                      fontFamily: 'LannaAkkhara',
+                      fontFamily: 'PayapLanna',
                       color: Color(0xFF924E19),
                       fontWeight: FontWeight.bold,
                     ),
@@ -766,7 +756,7 @@ class _VowelStrokeOrderBottomSheetState extends State<VowelStrokeOrderBottomShee
             widget.vowel.char,
             style: const TextStyle(
               fontSize: 27,
-              fontFamily: 'LannaAkkhara',
+              fontFamily: 'PayapLanna',
               color: Color(0xFF924E19),
               fontWeight: FontWeight.bold,
             ),
@@ -1011,7 +1001,7 @@ class VowelStrokePainter extends CustomPainter {
 }
 
 List<List<Offset>> getStrokePaths(String char) {
-  return sd.getStrokeData(char);
+  return getStrokeData(char);
 }
 
 

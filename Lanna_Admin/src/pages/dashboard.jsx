@@ -12,16 +12,28 @@ import {
 import { useState, useEffect } from "react";
 import { CartesianGrid } from "recharts";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
 
 async function apiFetch(url) {
   const res = await fetch(url);
   return res.json();
 }
 
+const getInitDate = (daysAgo) => {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 export default function Dashboard() {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(getInitDate(7));
+  const [endDate, setEndDate] = useState(getInitDate(0));
 
   const [vocabularies, setVocabularies] = useState([]);
   const [users, setUsers] = useState([]);
@@ -136,6 +148,15 @@ export default function Dashboard() {
         count++;
         return;
       }
+      if (log.category_vocab_id) {
+        const cat = categoryVocabs.find(
+          (c) => (c.category_vocab_id || c.id) === log.category_vocab_id
+        );
+        if (cat && (cat.name || cat.category_name) === categoryName) {
+          count++;
+          return;
+        }
+      }
       if (log.vocab_id) {
         const vocab = vocabularies.find((v) => v.vocab_id === log.vocab_id);
         if (vocab && (vocab.category || "อื่น ๆ") === categoryName) {
@@ -144,6 +165,8 @@ export default function Dashboard() {
         }
       }
       const text = (
+        log.input_text ||
+        log.output_text ||
         log.text ||
         log.search_query ||
         log.thai_word ||
@@ -322,7 +345,7 @@ export default function Dashboard() {
           ["คำศัพท์ทั้งหมด", vocabularies.length.toLocaleString()],
           ["ผู้ใช้งานทั้งหมด", users.length.toLocaleString()],
           ["ยอดการแปลรวม", translateLogs.length.toLocaleString()],
-          ["บทความทั้งหมด", articles.length.toLocaleString()],
+          ["เนื้อหาการเรียนรู้", articles.length.toLocaleString()],
         ].map(([label, value], i) => (
           <div key={i} className="bg-white rounded-xl shadow-sm p-6 border-t-2 border-orange-500">
             <p className="text-gray-500 mb-1 text-sm font-medium">{label}</p>

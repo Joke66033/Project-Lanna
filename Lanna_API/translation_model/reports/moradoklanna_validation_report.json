@@ -1,0 +1,13 @@
+{
+  "input_records": 17781,
+  "accepted_records": 7176,
+  "rejected_records": 10605,
+  "rejection_reasons": {
+    "not_automatically_verified": 10565,
+    "missing_pronunciation": 16,
+    "missing_thai_source": 10,
+    "missing_tai_tham_unicode": 20,
+    "duplicate_pair": 35,
+    "missing_meaning": 1
+  }
+}

@@ -1,0 +1,470 @@
+import { useState, useEffect } from "react";
+import { Plus, Pencil, Trash2, Search, Activity, RefreshCw } from "lucide-react";
+import Pagination from "../components/Pagination.jsx";
+import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
+import Modal from "../components/Modal.jsx";
+
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
+
+export default function CharacterStrokesPage() {
+  const ITEMS_PER_PAGE = 10;
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [showAdd, setShowAdd] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+
+  const [editItem, setEditItem] = useState(null);
+  const [deleteItem, setDeleteItem] = useState(null);
+
+  const [form, setForm] = useState({
+    char_symbol: "",
+    char_name: "",
+    category: "consonant",
+    stroke_count: 1,
+    stroke_data: "[]"
+  });
+
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successText, setSuccessText] = useState("");
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      let url = `${BASE}/endpoints/character_strokes_api.php?action=getAll`;
+      if (categoryFilter !== "all") {
+        url += `&category=${categoryFilter}`;
+      }
+      const res = await fetch(url);
+      const result = await res.json();
+      if (result.error) {
+        setError(result.error.message);
+        setData([]);
+      } else {
+        setData(result.data || []);
+      }
+    } catch (err) {
+      console.error("Error fetching character strokes:", err);
+      setError("ไม่สามารถดึงข้อมูลเส้นทางการวาดอักขระได้");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [categoryFilter]);
+
+  // Search & Pagination filtering
+  const filteredData = data.filter((item) => {
+    const matchSearch =
+      (item.char_symbol || "").toLowerCase().includes(search.toLowerCase()) ||
+      (item.char_name || "").toLowerCase().includes(search.toLowerCase());
+    return matchSearch;
+  });
+
+  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE) || 1;
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handleOpenAdd = () => {
+    setForm({
+      char_symbol: "",
+      char_name: "",
+      category: "consonant",
+      stroke_count: 1,
+      stroke_data: "[\n  [\n    {\"x\": 20, \"y\": 50},\n    {\"x\": 80, \"y\": 50}\n  ]\n]"
+    });
+    setShowAdd(true);
+  };
+
+  const handleOpenEdit = (item) => {
+    setEditItem(item);
+    let strData = item.stroke_data;
+    if (typeof strData !== "string") {
+      strData = JSON.stringify(strData, null, 2);
+    }
+    setForm({
+      char_symbol: item.char_symbol || "",
+      char_name: item.char_name || "",
+      category: item.category || "consonant",
+      stroke_count: item.stroke_count || 1,
+      stroke_data: strData
+    });
+    setShowEdit(true);
+  };
+
+  const handleSaveAdd = async (e) => {
+    e.preventDefault();
+    try {
+      let parsedStrokes;
+      try {
+        parsedStrokes = JSON.parse(form.stroke_data);
+      } catch (err) {
+        alert("ข้อมูล stroke_data ต้องเป็น JSON ที่ถูกต้อง");
+        return;
+      }
+
+      const res = await fetch(`${BASE}/endpoints/character_strokes_api.php?action=create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          stroke_data: parsedStrokes
+        })
+      });
+      const result = await res.json();
+      if (result.error) {
+        alert(result.error.message);
+        return;
+      }
+      setShowAdd(false);
+      setSuccessText("เพิ่มข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
+      setShowSuccess(true);
+      fetchData();
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    }
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!editItem) return;
+    try {
+      let parsedStrokes;
+      try {
+        parsedStrokes = JSON.parse(form.stroke_data);
+      } catch (err) {
+        alert("ข้อมูล stroke_data ต้องเป็น JSON ที่ถูกต้อง");
+        return;
+      }
+
+      const res = await fetch(
+        `${BASE}/endpoints/character_strokes_api.php?action=update&id=${editItem.stroke_id}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...form,
+            stroke_data: parsedStrokes
+          })
+        }
+      );
+      const result = await res.json();
+      if (result.error) {
+        alert(result.error.message);
+        return;
+      }
+      setShowEdit(false);
+      setSuccessText("แก้ไขข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
+      setShowSuccess(true);
+      fetchData();
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการอัปเดตข้อมูล");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteItem) return;
+    try {
+      const res = await fetch(
+        `${BASE}/endpoints/character_strokes_api.php?action=delete&id=${deleteItem.stroke_id}`,
+        { method: "POST" }
+      );
+      const result = await res.json();
+      if (result.error) {
+        alert(result.error.message);
+        return;
+      }
+      setShowDelete(false);
+      setSuccessText("ลบข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
+      setShowSuccess(true);
+      fetchData();
+    } catch (err) {
+      alert("เกิดข้อผิดพลาดในการลบข้อมูล");
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-200 shadow-sm">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <Activity className="w-7 h-7 text-amber-600" />
+            จัดการเส้นทางการวาดอักขระล้านนา (Character Strokes)
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">
+            จัดเก็บและปรับแต่งพิกัดจุดลากเส้นของแต่ละตัวอักขระสำหรับระบบฝึกเขียน (100x100 Grid)
+          </p>
+        </div>
+        <button
+          onClick={handleOpenAdd}
+          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow-md transition"
+        >
+          <Plus className="w-5 h-5" />
+          เพิ่มข้อมูลเส้นการวาด
+        </button>
+      </div>
+
+      {/* Filters & Search */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
+          <input
+            type="text"
+            placeholder="ค้นหาอักขระ หรือชื่อ..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+          />
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <select
+            value={categoryFilter}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+          >
+            <option value="all">ทุกประเภท (All Categories)</option>
+            <option value="consonant">พยัญชนะ (consonant)</option>
+            <option value="vowel">สระ (vowel)</option>
+            <option value="tone">วรรณยุกต์ (tone)</option>
+            <option value="number">ตัวเลข (number)</option>
+            <option value="sequence">ตัวซ้อน/ลำดับ (sequence)</option>
+            <option value="other">อื่นๆ (other)</option>
+          </select>
+
+          <button
+            onClick={fetchData}
+            title="รีเฟรชข้อมูล"
+            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="p-12 text-center text-gray-500">กำลังโหลดข้อมูลเส้นทางการวาด...</div>
+        ) : error ? (
+          <div className="p-8 text-center text-red-500">{error}</div>
+        ) : paginatedData.length === 0 ? (
+          <div className="p-12 text-center text-gray-400">ไม่พบข้อมูลเส้นทางการวาด</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-600 uppercase">
+                  <th className="p-4">ID</th>
+                  <th className="p-4">ตัวอักขระ</th>
+                  <th className="p-4">ชื่ออักขระ</th>
+                  <th className="p-4">ประเภท</th>
+                  <th className="p-4 text-center">จำนวนเส้น (Strokes)</th>
+                  <th className="p-4 text-center">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 text-sm">
+                {paginatedData.map((item) => (
+                  <tr key={item.stroke_id} className="hover:bg-amber-50/40 transition">
+                    <td className="p-4 font-mono text-gray-500">#{item.stroke_id}</td>
+                    <td className="p-4 text-2xl font-bold text-amber-900 font-serif">
+                      {item.char_symbol}
+                    </td>
+                    <td className="p-4 font-medium text-gray-800">
+                      {item.char_name || "-"}
+                    </td>
+                    <td className="p-4">
+                      <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                        {item.category}
+                      </span>
+                    </td>
+                    <td className="p-4 text-center font-semibold text-gray-700">
+                      {item.stroke_count} เส้น
+                    </td>
+                    <td className="p-4 text-center space-x-2">
+                      <button
+                        onClick={() => handleOpenEdit(item)}
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"
+                        title="แก้ไข"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setDeleteItem(item);
+                          setShowDelete(true);
+                        }}
+                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
+                        title="ลบ"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        <div className="p-4 border-t border-gray-100">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </div>
+      </div>
+
+      {/* Modal Add / Edit */}
+      {(showAdd || showEdit) && (
+        <Modal
+          title={showAdd ? "เพิ่มข้อมูลเส้นทางการวาดอักขระ" : "แก้ไขข้อมูลเส้นทางการวาดอักขระ"}
+          onClose={() => {
+            setShowAdd(false);
+            setShowEdit(false);
+          }}
+        >
+          <form onSubmit={showAdd ? handleSaveAdd : handleSaveEdit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                ตัวอักขระ (Character Symbol) *
+              </label>
+              <input
+                type="text"
+                required
+                value={form.char_symbol}
+                onChange={(e) => setForm({ ...form, char_symbol: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-lg font-serif"
+                placeholder="เช่น ᨠ"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                ชื่ออักขระ (Character Name)
+              </label>
+              <input
+                type="text"
+                value={form.char_name}
+                onChange={(e) => setForm({ ...form, char_name: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                placeholder="เช่น พยัญชนะ กะ"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                  ประเภท (Category)
+                </label>
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="consonant">consonant (พยัญชนะ)</option>
+                  <option value="vowel">vowel (สระ)</option>
+                  <option value="tone">tone (วรรณยุกต์)</option>
+                  <option value="number">number (ตัวเลข)</option>
+                  <option value="sequence">sequence (ตัวซ้อน/ลำดับ)</option>
+                  <option value="other">other (อื่นๆ)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                  จำนวนเส้น (Stroke Count)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={form.stroke_count}
+                  onChange={(e) => setForm({ ...form, stroke_count: parseInt(e.target.value) || 1 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                พิกัดจุดลากเส้น (Stroke Data JSON Array) *
+              </label>
+              <textarea
+                rows={8}
+                required
+                value={form.stroke_data}
+                onChange={(e) => setForm({ ...form, stroke_data: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-xs"
+                placeholder='[ [ {"x": 20, "y": 50}, {"x": 80, "y": 50} ] ]'
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAdd(false);
+                  setShowEdit(false);
+                }}
+                className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-sm text-white bg-amber-600 rounded-lg hover:bg-amber-700 font-semibold"
+              >
+                บันทึกข้อมูล
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDelete && (
+        <ConfirmDeleteModal
+          title="ยืนยันการลบข้อมูลเส้นทางการวาด"
+          message={`คุณต้องการลบข้อมูลเส้นทางการวาดของ "${deleteItem?.char_symbol}" (${deleteItem?.char_name}) ใช่หรือไม่?`}
+          onConfirm={handleDelete}
+          onCancel={() => setShowDelete(false)}
+        />
+      )}
+
+      {/* Success Notification */}
+      {showSuccess && (
+        <SuccessModal
+          text={successText}
+          onClose={() => setShowSuccess(false)}
+        />
+      )}
+    </div>
+  );
+}

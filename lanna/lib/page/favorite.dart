@@ -66,74 +66,7 @@ class _FavoritePageState extends State<FavoritePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const AppHeader(title: 'รายการโปรด'),
-            // Header section
-            Container(
-              margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              height: 90,
-              decoration: BoxDecoration(
-                color: const Color(0xFF924E19),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: Stack(
-                  children: [
-                    // Dotted background grid inside card
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: DottedGridPainter(),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(
-                                Icons.star_rounded,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'รายการโปรด',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  'คำแปลที่คุณบันทึกไว้',
-                                  style: TextStyle(
-                                    fontSize: 8,
-                                    color: Colors.white70,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            const SizedBox(height: 8),
 
             if (_isLoggedIn) ...[
               Padding(
@@ -343,14 +276,14 @@ class _FavoritePageState extends State<FavoritePage> {
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: Column(
               children: [
-                const Text(
-                  'สิ้นสุดรายการ',
-                  style: TextStyle(
-                    fontSize: 8,
-                    color: Color(0xFF7A5C3A),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                // const Text(
+                //   'สิ้นสุดรายการ',
+                //   style: TextStyle(
+                //     fontSize: 8,
+                //     color: Color(0xFF7A5C3A),
+                //     fontWeight: FontWeight.w500,
+                //   ),
+                // ),
                 const SizedBox(height: 8),
                 Container(
                   width: 40,
@@ -493,7 +426,7 @@ class _FavoriteCardState extends State<FavoriteCard> {
                             style: const TextStyle(
                               fontSize: 10,
                               color: Color(0xFF924E19),
-                              fontFamily: 'LannaAkkhara',
+                              fontFamily: 'PayapLanna',
                               height: 1.2,
                             ),
                           ),

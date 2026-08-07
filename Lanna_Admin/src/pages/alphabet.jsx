@@ -72,45 +72,57 @@ export default function AlphabetPage() {
   const ITEMS_PER_PAGE = 10;
 
   const fetchData = async (page = currentPage, categoryId = selectedCategory, searchQuery = search) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      let query = supabase
-        .from("lanna_char")
-        .select(`
-          char_id, lanna_char, thai_equivalent, category_char_id,
-          category_lanna_char ( category_char_id, name, learning_category_code )
-        `, { count: "exact" });
+      let list = [];
+      try {
+        const res = await fetch(`${BASE}/endpoints/lanna_char_api.php?action=getAll`);
+        const json = await res.json();
+        list = json.data || [];
+      } catch (e) {
+        console.warn("MySQL PHP API fetch error, falling back to Supabase:", e);
+      }
 
+      if (!Array.isArray(list) || list.length === 0) {
+        const { data: resData } = await supabase
+          .from("lanna_char")
+          .select(`
+            char_id, lanna_char, thai_equivalent, category_char_id,
+            category_lanna_char ( category_char_id, name, learning_category_code )
+          `);
+        list = resData || [];
+      }
+
+      // Filter by category
       if (categoryId && categoryId !== "all") {
-        query = query.eq("category_char_id", categoryId);
+        list = list.filter((item) => String(item.category_char_id) === String(categoryId));
       }
 
+      // Filter by search query
       if (searchQuery.trim() !== "") {
-        query = query.or(`lanna_char.ilike.%${searchQuery}%,thai_equivalent.ilike.%${searchQuery}%`);
+        const q = searchQuery.trim().toLowerCase();
+        list = list.filter((item) => 
+          (item.lanna_char && item.lanna_char.toLowerCase().includes(q)) ||
+          (item.thai_equivalent && item.thai_equivalent.toLowerCase().includes(q)) ||
+          (item.char_id && item.char_id.toLowerCase().includes(q))
+        );
       }
 
-      query = query.order("char_id", { ascending: false });
+      setTotalCount(list.length);
 
       const from = (page - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-      query = query.range(from, to);
+      const paginated = list.slice(from, from + ITEMS_PER_PAGE);
 
-      const { data: resData, error: resError, count } = await query;
-
-      if (resError) {
-        setError(resError.message);
+      if (page > 1 && paginated.length === 0 && list.length > 0) {
+        setCurrentPage(page - 1);
       } else {
-        if (page > 1 && (!resData || resData.length === 0)) {
-          setCurrentPage(page - 1);
-        } else {
-          const sorted = sortRecentData(resData || [], "lanna_char", "char_id");
-          setData(sorted);
-          setTotalCount(count || 0);
-          setError(null);
-        }
+        const sorted = sortRecentData(paginated, "lanna_char", "char_id");
+        setData(sorted);
+        setError(null);
       }
     } catch (err) {
-      setError(err.message);
+      console.error("fetchData error:", err);
+      setError(err.message || "เกิดข้อผิดพลาดในการโหลดข้อมูลอักขระ");
     } finally {
       setLoading(false);
     }
@@ -118,25 +130,16 @@ export default function AlphabetPage() {
 
   const fetchCharCategories = async () => {
     try {
-      const { data: learnData } = await supabase
-        .from("learning_category")
-        .select("category_code, is_active");
-
-      const activeCodes = new Set(
-        (learnData || [])
-          .filter((c) => c.is_active !== false && c.is_active !== "0" && c.is_active !== 0)
-          .map((c) => c.category_code)
-      );
-
-      const { data: catData, error: catError } = await supabase
-        .from("category_lanna_char")
-        .select("category_char_id, name, learning_category_code");
-      if (catError) throw catError;
-
-      const activeCats = (catData || []).filter(
-        (c) => !c.learning_category_code || activeCodes.has(c.learning_category_code)
-      );
-      setCategories(activeCats);
+      const res = await fetch(`${BASE}/endpoints/category_lanna_char_api.php?action=getAll`);
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+        setCategories(json.data);
+      } else {
+        const { data: catData } = await supabase
+          .from("category_lanna_char")
+          .select("category_char_id, name, learning_category_code");
+        setCategories(catData || []);
+      }
     } catch (err) {
       console.error("Error fetching categories:", err);
     }

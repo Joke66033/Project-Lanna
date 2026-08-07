@@ -48,39 +48,48 @@ export default function CategoryLannaChar() {
   const [successText, setSuccessText] = useState("");
 
   const fetchData = async (page = currentPage, searchQuery = search, learningCat = selectedLearningCategory) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      let query = supabase
-        .from("category_lanna_char")
-        .select("category_char_id, name, learning_category_code, learning_category(title)", { count: "exact" });
+      let list = [];
+      try {
+        const res = await fetch(`${BASE}/endpoints/category_lanna_char_api.php?action=getAll`);
+        const json = await res.json();
+        list = json.data || [];
+      } catch (e) {
+        console.warn("MySQL PHP API fetch error, falling back to Supabase:", e);
+      }
+
+      if (!Array.isArray(list) || list.length === 0) {
+        const { data: resData } = await supabase
+          .from("category_lanna_char")
+          .select("category_char_id, name, learning_category_code, learning_category(title)");
+        list = resData || [];
+      }
 
       if (searchQuery.trim() !== "") {
-        query = query.ilike("name", `%${searchQuery}%`);
+        const q = searchQuery.trim().toLowerCase();
+        list = list.filter((item) => item.name && item.name.toLowerCase().includes(q));
       }
 
       if (learningCat !== "all") {
-        query = query.eq("learning_category_code", learningCat);
+        list = list.filter((item) => String(item.learning_category_code) === String(learningCat));
       }
 
-      query = query.order("category_char_id", { ascending: false });
+      setTotalCount(list.length);
 
       const from = (page - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-      query = query.range(from, to);
+      const paginated = list.slice(from, from + ITEMS_PER_PAGE);
 
-      const { data: resData, error: resError, count } = await query;
-      if (resError) throw resError;
-
-      if (page > 1 && (!resData || resData.length === 0)) {
+      if (page > 1 && paginated.length === 0 && list.length > 0) {
         setCurrentPage(page - 1);
       } else {
-        const sorted = sortRecentData(resData || [], "category_lanna_char", "category_char_id");
+        const sorted = sortRecentData(paginated, "category_lanna_char", "category_char_id");
         setData(sorted);
-        setTotalCount(count || 0);
         setError(null);
       }
     } catch (err) {
-      setError(err.message);
+      console.error("categoryLannaChar error:", err);
+      setError(err.message || "เกิดข้อผิดพลาดในการโหลดข้อมูลหมวดหมู่อักขระ");
     } finally {
       setLoading(false);
     }

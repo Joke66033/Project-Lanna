@@ -52,33 +52,42 @@ export default function CategoryLearning() {
   const fetchData = async (page = currentPage, searchQuery = search) => {
     setLoading(true);
     try {
-      let query = supabase
-        .from("learning_category")
-        .select("*", { count: "exact" });
-
-      if (searchQuery.trim() !== "") {
-        query = query.ilike("title", `%${searchQuery}%`);
+      let list = [];
+      try {
+        const res = await fetch(`${BASE}/endpoints/learning_category_api.php?action=getAll`);
+        const json = await res.json();
+        list = json.data || [];
+      } catch (e) {
+        console.warn("MySQL PHP API fetch error, falling back to Supabase:", e);
       }
 
-      query = query.order("category_code", { ascending: true });
+      if (!Array.isArray(list) || list.length === 0) {
+        const { data: resData } = await supabase
+          .from("learning_category")
+          .select("*");
+        list = resData || [];
+      }
+
+      if (searchQuery.trim() !== "") {
+        const q = searchQuery.trim().toLowerCase();
+        list = list.filter((item) => item.title && item.title.toLowerCase().includes(q));
+      }
+
+      setTotalCount(list.length);
 
       const from = (page - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-      query = query.range(from, to);
+      const paginated = list.slice(from, from + ITEMS_PER_PAGE);
 
-      const { data: resData, error: resError, count } = await query;
-      if (resError) throw resError;
-
-      if (page > 1 && (!resData || resData.length === 0)) {
+      if (page > 1 && paginated.length === 0 && list.length > 0) {
         setCurrentPage(page - 1);
       } else {
-        const sorted = sortRecentData(resData || [], "learning_category", "category_code");
+        const sorted = sortRecentData(paginated, "learning_category", "category_code");
         setData(sorted);
-        setTotalCount(count || 0);
         setError(null);
       }
     } catch (err) {
-      setError(err.message);
+      console.error("categoryLearning error:", err);
+      setError(err.message || "เกิดข้อผิดพลาดในการโหลดข้อมูลหมวดหมู่การเรียนรู้");
     } finally {
       setLoading(false);
     }

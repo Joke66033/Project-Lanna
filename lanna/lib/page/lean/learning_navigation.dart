@@ -12,6 +12,11 @@ Future<T?> pushLearningPage<T>(
   BuildContext context,
   Route<T> route,
 ) {
-  final navigator = learningNavigatorKey.currentState ?? Navigator.of(context);
-  return navigator.push<T>(route);
+  try {
+    final navState = learningNavigatorKey.currentState;
+    if (navState != null && navState.mounted) {
+      return navState.push<T>(route);
+    }
+  } catch (_) {}
+  return Navigator.of(context, rootNavigator: true).push<T>(route);
 }

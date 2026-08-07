@@ -147,10 +147,13 @@ class LearnPageState extends State<LearnPage> {
   int _currentPage = -1;
 
   void resetToMenu() {
-    if (learningNavigatorKey.currentState?.canPop() ?? false) {
-      learningNavigatorKey.currentState?.popUntil((route) => route.isFirst);
-    }
-    if (_currentPage != -1) {
+    try {
+      final navState = learningNavigatorKey.currentState;
+      if (navState != null && navState.mounted && navState.canPop()) {
+        navState.popUntil((route) => route.isFirst);
+      }
+    } catch (_) {}
+    if (mounted && _currentPage != -1) {
       setState(() {
         _currentPage = -1;
       });

@@ -234,22 +234,24 @@ export default function CategoryLearning() {
       setLoading(true);
       const code = deleteItem.category_code;
 
-      // Call PHP SQL API endpoint to perform cascade delete on MySQL DB
       const res = await fetch(
         `${BASE}/endpoints/learning_category_api.php?action=delete&id=${encodeURIComponent(code)}`,
         { method: "POST" }
       );
       const resJson = await res.json();
-      if (resJson.error) throw new Error(resJson.error.message || resJson.error);
+      if (resJson.error) {
+        const errMsg = typeof resJson.error === 'string' ? resJson.error : (resJson.error.message || 'ไม่สามารถลบข้อมูลได้');
+        throw new Error(errMsg);
+      }
 
       setShowDelete(false);
-      setSuccessText("ลบหมวดหมู่การเรียนรู้และข้อมูลย่อยทั้งหมดเรียบร้อยแล้ว");
+      setSuccessText("ลบหมวดหมู่การเรียนรู้เรียบร้อยแล้ว");
       setShowSuccess(true);
 
       setData((prev) => prev.filter((item) => item.category_code !== code));
       fetchData();
     } catch (err) {
-      alert("ไม่สามารถลบข้อมูลได้: " + (err.message || err));
+      alert(err.message || err);
     } finally {
       setLoading(false);
       setDeleteItem(null);

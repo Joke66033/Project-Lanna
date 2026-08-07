@@ -181,28 +181,28 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
 
-            // 1. Fetch child category_lanna_char records linked to this learning category
-            $subCatsRes = dbSelect('category_lanna_char', 'category_char_id', ['learning_category_code' => 'eq.' . rawurlencode($id)]);
-            if (!$subCatsRes['error'] && !empty($subCatsRes['data'])) {
-                foreach ($subCatsRes['data'] as $subCat) {
-                    $subId = $subCat['category_char_id'] ?? '';
-                    if ($subId !== '') {
-                        // Delete associated lanna characters under each sub-category
-                        dbDelete('lanna_char', ['category_char_id' => 'eq.' . rawurlencode($subId)]);
-                    }
+            try {
+                $pdo = getPdo();
+                // 1. ตรวจสอบว่ามีการอ้างอิงรหัสหมวดหมู่นี้ในตารางหมวดหมู่ย่อย (category_lanna_char) หรือไม่
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM `category_lanna_char` WHERE `learning_category_code` = :id");
+                $stmt->execute(['id' => $id]);
+                $count = (int)$stmt->fetchColumn();
+
+                if ($count > 0) {
+                    jsonError('ไม่สามารถลบข้อมูลได้ เนื่องจากมีการใช้งานหมวดหมู่นี้อยู่');
+                    break;
                 }
-            }
 
-            // 2. Cascade delete associated sub-categories in category_lanna_char
-            dbDelete('category_lanna_char', ['learning_category_code' => 'eq.' . rawurlencode($id)]);
-
-            // 3. Delete the main learning category record
-            $res = dbDelete('learning_category', ['category_code' => 'eq.' . rawurlencode($id)]);
-            if ($res['error']) {
-                jsonError($res['error']['message']);
-                break;
+                // 2. หากไม่มีการอ้างอิง สามารถลบข้อมูลหมวดหมู่ได้
+                $res = dbDelete('learning_category', ['category_code' => 'eq.' . rawurlencode($id)]);
+                if ($res['error']) {
+                    jsonError($res['error']['message']);
+                    break;
+                }
+                jsonOk($res['data']);
+            } catch (Exception $e) {
+                jsonError('Database delete error: ' . $e->getMessage());
             }
-            jsonOk($res['data']);
             break;
 
         default:

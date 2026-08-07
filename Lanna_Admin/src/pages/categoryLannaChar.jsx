@@ -241,22 +241,24 @@ export default function CategoryLannaChar() {
       setLoading(true);
       const categoryId = deleteItem.category_char_id || deleteItem.id;
 
-      // Call PHP SQL API endpoint to perform cascade delete on MySQL DB
       const res = await fetch(
         `${BASE}/endpoints/category_lanna_char_api.php?action=delete&id=${encodeURIComponent(categoryId)}`,
         { method: "POST" }
       );
       const resJson = await res.json();
-      if (resJson.error) throw new Error(resJson.error.message || resJson.error);
+      if (resJson.error) {
+        const errMsg = typeof resJson.error === 'string' ? resJson.error : (resJson.error.message || 'ไม่สามารถลบข้อมูลได้');
+        throw new Error(errMsg);
+      }
 
       setShowDelete(false);
       setDeleteItem(null);
       setDeleteIndex(null);
-      setSuccessText("ลบหมวดหมู่การเรียนรู้และข้อมูลที่เกี่ยวข้องเรียบร้อยแล้ว");
+      setSuccessText("ลบหมวดหมู่อักขระเรียบร้อยแล้ว");
       setShowSuccess(true);
       fetchData();
     } catch (err) {
-      alert("Error deleting category: " + (err.message || err));
+      alert(err.message || err);
     } finally {
       setLoading(false);
     }

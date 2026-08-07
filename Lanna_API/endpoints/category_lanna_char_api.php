@@ -98,18 +98,26 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo = getPdo();
 
-                // 1. Delete all lanna_char entries linked to this category_char_id
-                $stmt1 = $pdo->prepare("DELETE FROM `lanna_char` WHERE `category_char_id` = :id");
+                // 1. ตรวจสอบว่ามีการใช้อักขระในหมวดหมู่นี้ในตาราง lanna_char หรือไม่
+                $stmt1 = $pdo->prepare("SELECT COUNT(*) FROM `lanna_char` WHERE `category_char_id` = :id");
                 $stmt1->execute(['id' => $id]);
+                $count1 = (int)$stmt1->fetchColumn();
 
-                // 2. Delete the category entry itself
-                $stmt2 = $pdo->prepare("DELETE FROM `category_lanna_char` WHERE `category_char_id` = :id");
+                // 2. ตรวจสอบว่ามีการใช้อักขระในหมวดหมู่นี้ในตาราง articles หรือไม่
+                $stmt2 = $pdo->prepare("SELECT COUNT(*) FROM `articles` WHERE `category_char_id` = :id");
                 $stmt2->execute(['id' => $id]);
+                $count2 = (int)$stmt2->fetchColumn();
 
-                // 3. Clean up any orphan lanna_char entries
-                $pdo->exec("DELETE FROM `lanna_char` WHERE `category_char_id` IS NULL OR `category_char_id` = '' OR `category_char_id` NOT IN (SELECT `category_char_id` FROM `category_lanna_char`)");
+                if ($count1 > 0 || $count2 > 0) {
+                    jsonError('ไม่สามารถลบข้อมูลได้ เนื่องจากมีการใช้งานหมวดหมู่นี้อยู่');
+                    break;
+                }
 
-                jsonOk(['message' => 'Deleted category and all linked Lanna characters successfully']);
+                // 3. หากไม่มีการอ้างอิง สามารถลบหมวดหมู่อักขระได้
+                $stmtDel = $pdo->prepare("DELETE FROM `category_lanna_char` WHERE `category_char_id` = :id");
+                $stmtDel->execute(['id' => $id]);
+
+                jsonOk(['message' => 'Deleted category successfully']);
             } catch (Exception $e) {
                 jsonError('Database delete error: ' . $e->getMessage());
             }

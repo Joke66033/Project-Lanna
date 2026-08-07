@@ -92,25 +92,26 @@ class _NumberPageState extends State<NumberPage> {
       _errorMsg = null;
     });
     try {
-      // 1. ดึงบทความอธิบายตัวเลข (CL0007)
-      final nArticles = await _articleService.getAllArticles(categoryCharId: 'CL0007');
+      // 1. ดึงหมวดหมู่ย่อยทั้งหมดของ LC004 จาก DB (CL0007 เลขในธัมม์, CL0014 เลขโหรา)
+      final subCategories = await _charService.getCategoriesByLearningCode('LC004');
+      final List<String> catIds = subCategories.map((c) => c.categoryCharId).toList();
+
+      // 2. ดึงบทความอธิบายตัวเลข
+      final nArticles = await _articleService.getAllArticles(
+        categoryCharId: catIds.isNotEmpty ? catIds.join(',') : 'CL0007,CL0014',
+      );
       if (nArticles.isNotEmpty && nArticles.first.content.trim().isNotEmpty) {
         _article = nArticles.first;
       } else {
         _article = null;
       }
 
-      // 2. ดึงตัวเลขทั้งหมดจาก API เฉพาะกลุ่ม CL0007
-      final apiNumbers = await _charService.getAllCharacters(categoryCharId: 'CL0007');
+      // 3. ดึงตัวเลขทั้งหมดจาก API
+      final apiNumbers = await _charService.getAllCharacters(
+        categoryCharId: catIds.isNotEmpty ? catIds.join(',') : null,
+      );
 
-      // ดึงข้อมูลหมวดหมู่เพื่อเอาชื่อแสดงเป็นแท็บย่อย
-      final categories = await _charService.getAllCategories();
-      final Map<String, String> catNames = {
-        for (var c in categories) c.categoryCharId: c.name
-      };
-
-      final List<LannaNumber> listDham = [];
-
+      final Map<String, List<LannaNumber>> dynamicMap = {};
       for (var c in apiNumbers) {
         final String rawThai = c.thaiEquivalent;
         String parsedReading = rawThai;
@@ -118,18 +119,38 @@ class _NumberPageState extends State<NumberPage> {
           parsedReading = rawThai.substring(rawThai.indexOf('(') + 1, rawThai.indexOf(')'));
         }
         
-        listDham.add(LannaNumber(
+        final numItem = LannaNumber(
           char: c.lannaChar,
           reading: parsedReading,
           thai: rawThai,
           description: 'ตัวเลขล้านนาตัว ${c.thaiEquivalent}',
-        ));
+        );
+
+        final catId = c.categoryCharId;
+        dynamicMap.putIfAbsent(catId, () => []).add(numItem);
+      }
+
+      final List<NumberGroup> groups = [];
+      for (var cat in subCategories) {
+        final list = dynamicMap[cat.categoryCharId] ?? [];
+        if (list.isNotEmpty) {
+          groups.add(NumberGroup(
+            name: cat.name,
+            numbers: list,
+          ));
+        }
+      }
+
+      // Fallback if subCategories is empty
+      if (groups.isEmpty) {
+        final allNums = dynamicMap.values.expand((element) => element).toList();
+        if (allNums.isNotEmpty) {
+          groups.add(NumberGroup(name: 'ตัวเลข', numbers: allNums));
+        }
       }
 
       setState(() {
-        _groups = [
-          NumberGroup(name: catNames['CL0007'] ?? 'ตัวเลข', numbers: listDham),
-        ].where((g) => g.numbers.isNotEmpty).toList();
+        _groups = groups;
         _isLoading = false;
       });
     } catch (e) {

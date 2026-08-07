@@ -23,7 +23,7 @@ class LearningCategoryService {
       title: 'วรรณยุกต์ล้านนา',
       description: 'เรียนรู้วรรณยุกต์และเครื่องหมายพิเศษ',
       isActive: true,
-      totalItems: 21,
+      totalItems: 7,
     ),
     CategoryModel(
       categoryCode: 'LC004',
@@ -35,23 +35,9 @@ class LearningCategoryService {
     CategoryModel(
       categoryCode: 'LC005',
       title: 'ตัวสะกดล้านนา',
-      description: 'ห นํา ตัวห้อยสะกด และแบบฝึกแจกลูก ๘ แม่',
+      description: 'เรียนรู้ตัวสะกด ห นำ ระวง อักขรวิธี และอักษรพิเศษ',
       isActive: true,
-      totalItems: 22,
-    ),
-    CategoryModel(
-      categoryCode: 'LC006',
-      title: 'อักษรควบกล้ำล้านนา',
-      description: 'ระวง ระโฮง และพยัญชนะควบกล้ำ',
-      isActive: true,
-      totalItems: 26,
-    ),
-    CategoryModel(
-      categoryCode: 'LC007',
-      title: 'อักขรวิธีล้านนา',
-      description: 'หลักการสะกดคำแบบบาลี ตัวสะกดตัวตาม และอักษรพิเศษ',
-      isActive: true,
-      totalItems: 6,
+      totalItems: 36,
     ),
   ];
 

@@ -16,7 +16,7 @@ class LearningCategoryService {
       title: 'สระล้านนา',
       description: 'เรียนรู้สระจมและสระลอย',
       isActive: true,
-      totalItems: 20,
+      totalItems: 19,
     ),
     CategoryModel(
       categoryCode: 'LC003',
@@ -37,7 +37,7 @@ class LearningCategoryService {
       title: 'ตัวสะกดล้านนา',
       description: 'เรียนรู้ตัวสะกดและ ห นำ',
       isActive: true,
-      totalItems: 46,
+      totalItems: 62,
     ),
   ];
 

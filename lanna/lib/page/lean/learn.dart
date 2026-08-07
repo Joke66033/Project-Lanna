@@ -125,7 +125,8 @@ const List<Color> kCardAccents = [
   Color(0xFFD2691E), // 2 วรรณยุกต์: Chocolate Orange
   Color(0xFF7A5C3A), // 3 ตัวเลข: Light Brown
   Color(0xFFBF360C), // 4 ตัวสะกด: Rust Orange
-  Color(0xFF5D4037), // 5 ฝึกเขียน: Dark Brown
+  Color(0xFF8E24AA), // 5 อักขรวิธี: Royal Purple
+  Color(0xFF5D4037), // 6 ฝึกเขียน: Dark Brown
 ];
 
 /// Muted shadow color for clean card presentation
@@ -156,6 +157,8 @@ class LearnPageState extends State<LearnPage> {
     }
     _loadData();
   }
+
+  void handleSystemBack() => resetToMenu();
   // API Integration states
   final LearningCategoryService _categoryService = LearningCategoryService();
   List<CategoryModel> _categories = [];
@@ -267,114 +270,77 @@ class LearnPageState extends State<LearnPage> {
       color: const Color(0xFFD2691E),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// ===== Header =====
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.auto_awesome, // ✅ เป็น icon ไม่ใช่ emoji
-                  size: 20,
-                  color: const Color(0xFFB8560A),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'หมวดหมู่การเรียนรู้',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF5C3A21),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 2),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'เลือกหมวดหมู่ที่ต้องการเรียนรู้',
-              style: TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF7A5C3A),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            /// ===== Grid of Cards (Modern 2-Column Design) =====
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(20),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 14,
+                childAspectRatio: 1.0, // perfect square
               ),
-            ),
-          ),
+              itemCount: _categories.length + 1,
+              itemBuilder: (context, index) {
+                if (index < _categories.length) {
+                  final category = _categories[index];
+                  
+                  int pageIndex = 0;
+                  IconData icon = Icons.text_fields;
+                  if (category.categoryCode == 'LC001') {
+                    pageIndex = 0;
+                    icon = Icons.text_fields;
+                  } else if (category.categoryCode == 'LC002') {
+                    pageIndex = 1;
+                    icon = Icons.translate;
+                  } else if (category.categoryCode == 'LC003') {
+                    pageIndex = 2;
+                    icon = Icons.multitrack_audio;
+                  } else if (category.categoryCode == 'LC004') {
+                    pageIndex = 3;
+                    icon = Icons.calculate;
+                  } else if (category.categoryCode == 'LC005') {
+                    pageIndex = 4;
+                    icon = Icons.spellcheck;
+                  } else if (category.categoryCode == 'LC006') {
+                    pageIndex = 5;
+                    icon = Icons.menu_book;
+                  } else {
+                    pageIndex = -99;
+                    icon = Icons.help_outline;
+                  }
 
-          const SizedBox(height: 12),
-
-          /// ===== List of Cards =====
-          /// ===== Grid of Cards (Modern 2-Column Design) =====
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 14,
-              crossAxisSpacing: 14,
-              childAspectRatio: 1.0, // perfect square
-            ),
-            itemCount: _categories.length + 1,
-            itemBuilder: (context, index) {
-              if (index < _categories.length) {
-                final category = _categories[index];
-                
-                int pageIndex = 0;
-                IconData icon = Icons.text_fields;
-                if (category.categoryCode == 'LC001') {
-                  pageIndex = 0;
-                  icon = Icons.text_fields;
-                } else if (category.categoryCode == 'LC002') {
-                  pageIndex = 1;
-                  icon = Icons.translate;
-                } else if (category.categoryCode == 'LC003') {
-                  pageIndex = 2;
-                  icon = Icons.multitrack_audio;
-                } else if (category.categoryCode == 'LC004') {
-                  pageIndex = 3;
-                  icon = Icons.calculate;
-                } else if (category.categoryCode == 'LC005') {
-                  pageIndex = 4;
-                  icon = Icons.spellcheck;
+                  return _gridItem(
+                    index: index,
+                    pageIndex: pageIndex,
+                    title: category.title,
+                    subtitle: category.description,
+                    icon: icon,
+                    badgeText: '${category.totalItems} ตัว',
+                    disabled: false,
+                    category: category,
+                  );
                 } else {
-                  pageIndex = -99;
-                  icon = Icons.help_outline;
+                  return _gridItem(
+                    index: _categories.length,
+                    pageIndex: 6,
+                    title: 'ฝึกเขียนล้านนา',
+                    subtitle: 'ฝึกเขียนด้วยนิ้วมือ',
+                    icon: Icons.gesture,
+                    badgeText: 'ฝึกฝน',
+                    disabled: widget.isGuest,
+                  );
                 }
-
-                return _gridItem(
-                  index: index,
-                  pageIndex: pageIndex,
-                  title: category.title,
-                  subtitle: category.description,
-                  icon: icon,
-                  badgeText: '${category.totalItems} ตัว',
-                  disabled: false,
-                  category: category,
-                );
-              } else {
-                return _gridItem(
-                  index: _categories.length,
-                  pageIndex: 5,
-                  title: 'ฝึกเขียนล้านนา',
-                  subtitle: 'ฝึกเขียนด้วยนิ้วมือ',
-                  icon: Icons.gesture,
-                  badgeText: 'ฝึกฝน',
-                  disabled: widget.isGuest,
-                );
-              }
-            },
-          ),
-        ],
+              },
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
   }
 
 
@@ -382,7 +348,7 @@ class LearnPageState extends State<LearnPage> {
   Widget _lessonContent() {
     return Column(
       children: [
-        if (_currentPage == 5)
+        if (_currentPage == 6)
           AppBar(
             backgroundColor: const Color(0xFFFFFBF7),
             elevation: 0,
@@ -420,6 +386,18 @@ class LearnPageState extends State<LearnPage> {
               TonePage(isGuest: widget.isGuest, onBack: () => setState(() => _currentPage = -1)),
               NumberPage(isGuest: widget.isGuest, onBack: () => setState(() => _currentPage = -1)),
               SpellingPage(isGuest: widget.isGuest, onBack: () => setState(() => _currentPage = -1)),
+              GenericLessonPage(
+                category: _categories.firstWhere(
+                  (c) => c.categoryCode == 'LC006',
+                  orElse: () => CategoryModel(
+                    categoryCode: 'LC006',
+                    title: 'อักขรวิธีล้านนา',
+                    description: 'หลักการสะกด ตัวซ้อน ระวง อักขระพิเศษ และภาษาบาลี',
+                    isActive: true,
+                    totalItems: 46,
+                  ),
+                ),
+              ),
               const WritingSelectPage(),
             ],
           ),

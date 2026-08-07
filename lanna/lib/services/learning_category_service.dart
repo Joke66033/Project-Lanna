@@ -9,14 +9,14 @@ class LearningCategoryService {
       title: 'พยัญชนะล้านนา',
       description: 'เรียนรู้พยัญชนะตั๋วเมืองและเสียงอ่าน',
       isActive: true,
-      totalItems: 55,
+      totalItems: 45,
     ),
     CategoryModel(
       categoryCode: 'LC002',
       title: 'สระล้านนา',
       description: 'เรียนรู้สระจมและสระลอย',
       isActive: true,
-      totalItems: 19,
+      totalItems: 25,
     ),
     CategoryModel(
       categoryCode: 'LC003',
@@ -37,7 +37,14 @@ class LearningCategoryService {
       title: 'ตัวสะกดล้านนา',
       description: 'เรียนรู้ตัวสะกดและ ห นำ',
       isActive: true,
-      totalItems: 62,
+      totalItems: 22,
+    ),
+    CategoryModel(
+      categoryCode: 'LC006',
+      title: 'อักขรวิธีล้านนา',
+      description: 'หลักการสะกด ตัวซ้อน ระวง อักขระพิเศษ และภาษาบาลี',
+      isActive: true,
+      totalItems: 46,
     ),
   ];
 

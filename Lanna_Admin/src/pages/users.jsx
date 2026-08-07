@@ -42,39 +42,51 @@ export default function Users() {
   const fetchData = async (page = currentPage, searchQuery = search, sStatus = selectedStatus) => {
     setLoading(true);
     try {
-      let query = supabase
-        .from("users")
-        .select("*", { count: "exact" });
+      let list = [];
+      try {
+        const res = await fetch(`${BASE}/endpoints/users_api.php?action=getAll`);
+        const json = await res.json();
+        list = json.data || [];
+      } catch (e) {
+        console.warn("MySQL PHP API fetch error, falling back to Supabase:", e);
+      }
+
+      if (!Array.isArray(list) || list.length === 0) {
+        const { data: resData } = await supabase
+          .from("users")
+          .select("*");
+        list = resData || [];
+      }
 
       if (searchQuery.trim() !== "") {
-        query = query.or(`username.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`);
+        const q = searchQuery.trim().toLowerCase();
+        list = list.filter((item) => 
+          (item.username && item.username.toLowerCase().includes(q)) ||
+          (item.email && item.email.toLowerCase().includes(q))
+        );
       }
 
       if (sStatus === "active") {
-        query = query.eq("status", USER_STATUS.ACTIVE);
+        list = list.filter((item) => String(item.status) === String(USER_STATUS.ACTIVE));
       } else if (sStatus === "suspended") {
-        query = query.eq("status", USER_STATUS.SUSPENDED);
+        list = list.filter((item) => String(item.status) === String(USER_STATUS.SUSPENDED));
       }
 
-      query = query.order("user_id", { ascending: false });
+      setTotalCount(list.length);
 
       const from = (page - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-      query = query.range(from, to);
+      const paginated = list.slice(from, from + ITEMS_PER_PAGE);
 
-      const { data: resData, error: resError, count } = await query;
-      if (resError) throw resError;
-
-      if (page > 1 && (!resData || resData.length === 0)) {
+      if (page > 1 && paginated.length === 0 && list.length > 0) {
         setCurrentPage(page - 1);
       } else {
-        const sorted = sortRecentData(resData || [], "users", "user_id");
+        const sorted = sortRecentData(paginated, "users", "user_id");
         setData(sorted);
-        setTotalCount(count || 0);
         setError(null);
       }
     } catch (err) {
-      setError(err.message);
+      console.error("users fetchData error:", err);
+      setError(err.message || "เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
     } finally {
       setLoading(false);
     }

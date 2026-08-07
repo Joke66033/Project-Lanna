@@ -114,42 +114,56 @@ export default function Articles() {
   const fetchData = async (page = currentPage, searchQuery = search, categoryId = selectedCategory) => {
     setLoading(true);
     try {
-      let selectStr = "*, category_lanna_char(name, learning_category_code, learning_category(title, category_code))";
-      if (categoryId && categoryId !== "all") {
-        selectStr = "*, category_lanna_char!inner(name, learning_category_code, learning_category(title, category_code))";
+      let list = [];
+      try {
+        const res = await fetch(`${BASE}/endpoints/articles_api.php?action=getAll`);
+        const json = await res.json();
+        list = json.data || [];
+      } catch (e) {
+        console.warn("MySQL PHP API fetch error, falling back to Supabase:", e);
       }
 
-      let query = supabase
-        .from("articles")
-        .select(selectStr, { count: "exact" });
+      if (!Array.isArray(list) || list.length === 0) {
+        let selectStr = "*, category_lanna_char(name, learning_category_code, learning_category(title, category_code))";
+        if (categoryId && categoryId !== "all") {
+          selectStr = "*, category_lanna_char!inner(name, learning_category_code, learning_category(title, category_code))";
+        }
+        const { data: resData } = await supabase
+          .from("articles")
+          .select(selectStr);
+        list = resData || [];
+      }
 
       if (categoryId && categoryId !== "all") {
-        query = query.eq("category_lanna_char.learning_category_code", categoryId);
+        list = list.filter((item) => {
+          const lCode = item.learning_category_code || item.category_lanna_char?.learning_category_code;
+          return String(lCode) === String(categoryId);
+        });
       }
 
       if (searchQuery.trim() !== "") {
-        query = query.or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`);
+        const q = searchQuery.trim().toLowerCase();
+        list = list.filter((item) => 
+          (item.title && item.title.toLowerCase().includes(q)) ||
+          (item.content && item.content.toLowerCase().includes(q))
+        );
       }
 
-      query = query.order("article_id", { ascending: false });
+      setTotalCount(list.length);
 
       const from = (page - 1) * itemsPerPage;
-      const to = from + itemsPerPage - 1;
-      query = query.range(from, to);
+      const paginated = list.slice(from, from + itemsPerPage);
 
-      const { data: resData, error: resError, count } = await query;
-      if (resError) throw resError;
-
-      if (page > 1 && (!resData || resData.length === 0)) {
+      if (page > 1 && paginated.length === 0 && list.length > 0) {
         setCurrentPage(page - 1);
       } else {
-        const sorted = sortRecentData(resData || [], "articles", "article_id");
+        const sorted = sortRecentData(paginated, "articles", "article_id");
         setData(sorted);
-        setTotalCount(count || 0);
         setError(null);
       }
     } catch (err) {
-      setError(err.message);
+      console.error("articles fetchData error:", err);
+      setError(err.message || "เกิดข้อผิดพลาดในการโหลดข้อมูลบทเรียน");
     } finally {
       setLoading(false);
     }

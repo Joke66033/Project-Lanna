@@ -44,35 +44,44 @@ export default function CategoryAlphabet() {
   const [successText, setSuccessText] = useState("");
 
   const fetchData = async (page = currentPage, searchQuery = search) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      let query = supabase
-        .from("category_vocab")
-        .select("category_vocab_id, name", { count: "exact" });
-
-      if (searchQuery.trim() !== "") {
-        query = query.ilike("name", `%${searchQuery}%`);
+      let list = [];
+      try {
+        const res = await fetch(`${BASE}/endpoints/category_vocab_api.php?action=getAll`);
+        const json = await res.json();
+        list = json.data || [];
+      } catch (e) {
+        console.warn("MySQL PHP API fetch error, falling back to Supabase:", e);
       }
 
-      query = query.order("category_vocab_id", { ascending: false });
+      if (!Array.isArray(list) || list.length === 0) {
+        const { data: resData } = await supabase
+          .from("category_vocab")
+          .select("category_vocab_id, name");
+        list = resData || [];
+      }
+
+      if (searchQuery.trim() !== "") {
+        const q = searchQuery.trim().toLowerCase();
+        list = list.filter((item) => item.name && item.name.toLowerCase().includes(q));
+      }
+
+      setTotalCount(list.length);
 
       const from = (page - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-      query = query.range(from, to);
+      const paginated = list.slice(from, from + ITEMS_PER_PAGE);
 
-      const { data: resData, error: resError, count } = await query;
-      if (resError) throw resError;
-
-      if (page > 1 && (!resData || resData.length === 0)) {
+      if (page > 1 && paginated.length === 0 && list.length > 0) {
         setCurrentPage(page - 1);
       } else {
-        const sorted = sortRecentData(resData || [], "category_vocab", "category_vocab_id");
+        const sorted = sortRecentData(paginated, "category_vocab", "category_vocab_id");
         setData(sorted);
-        setTotalCount(count || 0);
         setError(null);
       }
     } catch (err) {
-      setError(err.message);
+      console.error("categoryAlphabet error:", err);
+      setError(err.message || "เกิดข้อผิดพลาดในการโหลดข้อมูลหมวดหมู่คำศัพท์");
     } finally {
       setLoading(false);
     }

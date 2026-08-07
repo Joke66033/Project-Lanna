@@ -48,93 +48,75 @@ export default function VocabularyPage() {
   const ITEMS_PER_PAGE = 10;
 
   const fetchData = async (page = currentPage, categoryId = selectedCategory, searchQuery = search) => {
-    console.log('กำลังดึงข้อมูล...');
     setLoading(true);
     setError(null);
     try {
       // 1. Fetch valid active categories
-      const { data: catData } = await supabase
-        .from("category_vocab")
-        .select("category_vocab_id, name")
-        .order("category_vocab_id", { ascending: true });
-      
-      setCategories(catData || []);
-      const validCatMap = new Map((catData || []).map((c) => [c.category_vocab_id, c.name]));
+      let catData = [];
+      try {
+        const resCat = await fetch(`${BASE}/endpoints/category_vocab_api.php?action=getAll`);
+        const jsonCat = await resCat.json();
+        catData = jsonCat.data || [];
+      } catch (e) {}
 
-      // 2. Fetch vocabulary with pagination and category
-      let query = supabase
-        .from("vocabulary")
-        .select("*, category_vocab(name)", { count: "exact" });
+      if (!Array.isArray(catData) || catData.length === 0) {
+        const { data: resC } = await supabase
+          .from("category_vocab")
+          .select("category_vocab_id, name");
+        catData = resC || [];
+      }
+      setCategories(catData);
+
+      // 2. Fetch vocabulary
+      let list = [];
+      try {
+        const resV = await fetch(`${BASE}/endpoints/vocabulary_api.php?action=getAll`);
+        const jsonV = await resV.json();
+        list = jsonV.data || [];
+      } catch (e) {}
+
+      if (!Array.isArray(list) || list.length === 0) {
+        const { data: resData } = await supabase
+          .from("vocabulary")
+          .select("*, category_vocab(name)");
+        list = resData || [];
+      }
 
       if (categoryId && categoryId !== "all") {
-        query = query.eq("category_vocab_id", categoryId);
+        list = list.filter((item) => String(item.category_vocab_id) === String(categoryId));
       }
 
       if (searchQuery.trim() !== "") {
-        query = query.or(
-          `thai_word.ilike.%${searchQuery}%,lanna_word.ilike.%${searchQuery}%,reading.ilike.%${searchQuery}%,meaning.ilike.%${searchQuery}%`
+        const q = searchQuery.trim().toLowerCase();
+        list = list.filter((item) => 
+          (item.thai_word && item.thai_word.toLowerCase().includes(q)) ||
+          (item.lanna_word && item.lanna_word.toLowerCase().includes(q)) ||
+          (item.reading && item.reading.toLowerCase().includes(q)) ||
+          (item.meaning && item.meaning.toLowerCase().includes(q))
         );
       }
 
-      query = query.order("vocab_id", { ascending: false });
+      setTotalCount(list.length);
 
       const from = (page - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-      query = query.range(from, to);
+      const paginated = list.slice(from, from + ITEMS_PER_PAGE);
 
-      const { data: resData, error: resError } = await query;
-      if (resError) throw resError;
-
-      // 3. Filter out orphan vocabulary items whose category was deleted & delete them
-      const orphanIds = [];
-      const validItems = [];
-
-      for (const item of resData || []) {
-        const catName = validCatMap.get(item.category_vocab_id) || (item.category_vocab && item.category_vocab.name);
-        if (catName) {
-          validItems.push({
-            ...item,
-            category: catName,
-          });
-        } else {
-          // Category no longer exists in DB!
-          orphanIds.push(item.vocab_id);
-          try {
-            fetch(`${BASE}/endpoints/vocabulary_api.php?action=delete&id=${encodeURIComponent(item.vocab_id)}`, { method: "POST" });
-          } catch (e) {}
-        }
-      }
-
-      if (orphanIds.length > 0) {
-        try {
-          await supabase.from("vocabulary").delete().in("vocab_id", orphanIds);
-        } catch (cleanErr) {
-          console.warn("Supabase orphan cleanup notice:", cleanErr);
-        }
-      }
-
-      // Explicitly delete any vocabulary rows where category_vocab_id is null or empty
-      try {
-        await supabase.from("vocabulary").delete().is("category_vocab_id", null);
-      } catch (cleanNullErr) {
-        console.warn("Supabase null category cleanup notice:", cleanNullErr);
-      }
-
-      if (page > 1 && validItems.length === 0) {
+      if (page > 1 && paginated.length === 0 && list.length > 0) {
         setCurrentPage(page - 1);
       } else {
-        const sorted = sortRecentData(validItems, "vocabulary", "vocab_id");
+        const sorted = sortRecentData(paginated, "vocabulary", "vocab_id");
         setData(sorted);
-        setTotalCount(validItems.length);
         setError(null);
       }
     } catch (err) {
-      console.error("Error fetching data inside VocabularyPage:", err);
-      setError(err.message || "เกิดข้อผิดพลาดในการโหลดข้อมูล");
+      console.error("VocabularyPage error:", err);
+      setError(err.message || "เกิดข้อผิดพลาดในการโหลดข้อมูลคำศัพท์");
     } finally {
       setLoading(false);
     }
   };
+
+
 
   // Reset page when category changes
   useEffect(() => {

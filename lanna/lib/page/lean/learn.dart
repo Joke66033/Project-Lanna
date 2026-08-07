@@ -191,17 +191,24 @@ class LearnPageState extends State<LearnPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFFBF7),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            if (_currentPage == -1) const AppHeader(title: 'เรียนรู้ภาษาล้านนา'),
-            Expanded(child: _currentPage == -1 ? _menu() : _lessonContent()),
-          ],
-        ),
-      ),
+    return Navigator(
+      key: learningNavigatorKey,
+      onGenerateRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (context) => Scaffold(
+            backgroundColor: const Color(0xFFFFFBF7),
+            body: SafeArea(
+              bottom: false,
+              child: Column(
+                children: [
+                  if (_currentPage == -1) const AppHeader(title: 'เรียนรู้ภาษาล้านนา'),
+                  Expanded(child: _currentPage == -1 ? _menu() : _lessonContent()),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -454,7 +461,7 @@ class LearnPageState extends State<LearnPage> {
           }
           
           if (pageIndex == -99 && category != null) {
-            Navigator.push(
+            pushLearningPage(
               context,
               MaterialPageRoute(
                 builder: (context) => GenericLessonPage(category: category),

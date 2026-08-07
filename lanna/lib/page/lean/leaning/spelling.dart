@@ -115,9 +115,14 @@ class _SpellingPageState extends State<SpellingPage>
       _errorMsg = null;
     });
     try {
-      // 1. ดึงบทความอธิบายตัวสะกดทั้งหมด (CL0008, CL0009, CL0010, CL0011)
+      // 1. ดึงหมวดหมู่ย่อยทั้งหมดที่สังกัด LC005 จาก API
+      final subCategories = await _charService.getCategoriesByLearningCode('LC005');
+      final List<String> catIds = subCategories.map((c) => c.categoryCharId).toList();
+
+      // 2. ดึงบทความอธิบายตามรหัสหมวดหมู่ย่อย
+      final String catIdQuery = catIds.join(',');
       final apiArticles = await _articleService.getAllArticles(
-        categoryCharId: 'CL0008,CL0009,CL0010,CL0011',
+        categoryCharId: catIdQuery.isNotEmpty ? catIdQuery : 'CL0008,CL0009,CL0010,CL0011,CL0012,CL0013',
       );
       _articlesMap.clear();
       for (var art in apiArticles) {
@@ -126,22 +131,12 @@ class _SpellingPageState extends State<SpellingPage>
         }
       }
 
-      // 2. ดึงอักขระตัวสะกดทั้งหมดจาก API
+      // 3. ดึงอักขระตัวสะกดทั้งหมดจาก API
       final apiSpellings = await _charService.getAllCharacters(
-        categoryCharId: 'CL0008,CL0009,CL0010,CL0011',
+        categoryCharId: catIdQuery.isNotEmpty ? catIdQuery : null,
       );
 
-      // ดึงข้อมูลหมวดหมู่เพื่อเอาชื่อแสดงเป็นแท็บย่อย
-      final categories = await _charService.getCategoriesByLearningCode('LC005');
-      final Map<String, String> catNames = {
-        for (var c in categories) c.categoryCharId: c.name,
-      };
-
-      final List<LannaSpelling> listHN = [];
-      final List<LannaSpelling> listRW = [];
-      final List<LannaSpelling> listHoy = [];
-      final List<LannaSpelling> listSpecial = [];
-
+      final Map<String, List<LannaSpelling>> dynamicMap = {};
       for (var c in apiSpellings) {
         final String rawThai = c.thaiEquivalent;
         String parsedReading = rawThai;
@@ -159,46 +154,27 @@ class _SpellingPageState extends State<SpellingPage>
           description: 'ตัวสะกดล้านนาตัว ${c.thaiEquivalent}',
         );
 
-        if (c.categoryCharId == 'CL0008') {
-          listHN.add(spelling);
-        } else if (c.categoryCharId == 'CL0009') {
-          listRW.add(spelling);
-        } else if (c.categoryCharId == 'CL0010') {
-          listHoy.add(spelling);
-        } else if (c.categoryCharId == 'CL0011') {
-          listSpecial.add(spelling);
+        final catId = c.categoryCharId;
+        dynamicMap.putIfAbsent(catId, () => []).add(spelling);
+      }
+
+      _spellingsMap.clear();
+      _spellingsMap.addAll(dynamicMap);
+
+      final List<SpellingGroup> groups = [];
+      for (var cat in subCategories) {
+        final list = dynamicMap[cat.categoryCharId] ?? [];
+        if (list.isNotEmpty) {
+          groups.add(SpellingGroup(
+            name: cat.name,
+            categoryCharId: cat.categoryCharId,
+            spellings: list,
+          ));
         }
       }
 
-      _spellingsMap['CL0008'] = listHN;
-      _spellingsMap['CL0009'] = listRW;
-      _spellingsMap['CL0010'] = listHoy;
-      _spellingsMap['CL0011'] = listSpecial;
-
       setState(() {
-        _groups = [
-          SpellingGroup(
-            name: catNames['CL0008'] ?? 'ห นำ',
-            categoryCharId: 'CL0008',
-            spellings: listHN,
-          ),
-          SpellingGroup(
-            name: catNames['CL0009'] ?? 'ระวง (กล้ำ)',
-            categoryCharId: 'CL0009',
-            spellings: listRW,
-          ),
-          SpellingGroup(
-            name: catNames['CL0010'] ?? 'ตัวห้อย (สะกด)',
-            categoryCharId: 'CL0010',
-            spellings: listHoy,
-          ),
-          SpellingGroup(
-            name: catNames['CL0011'] ?? 'เครื่องหมายพิเศษ',
-            categoryCharId: 'CL0011',
-            spellings: listSpecial,
-          ),
-        ].where((g) => g.spellings.isNotEmpty).toList();
-
+        _groups = groups;
         _tabController = TabController(length: _groups.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
 

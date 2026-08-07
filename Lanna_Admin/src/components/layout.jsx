@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 export default function Layout() {
   return (
-    <div className="flex min-h-screen bg-gray-50/30">
+    <div className="flex min-h-screen bg-slate-100 text-slate-900">
       {/* เมนูด้านข้าง */}
       <Sidebar />
 

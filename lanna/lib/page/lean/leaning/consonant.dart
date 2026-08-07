@@ -254,7 +254,10 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: _IntroCard(article: _articlesMap[_currentCategoryId]),
+                child: _IntroCard(
+                  article: _articlesMap[_currentCategoryId],
+                  categoryId: _currentCategoryId,
+                ),
               ),
             ),
             SliverPersistentHeader(
@@ -428,12 +431,51 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
 /// ============================================================================
 class _IntroCard extends StatelessWidget {
   final ArticleModel? article;
-  const _IntroCard({this.article});
+  final String categoryId;
+  const _IntroCard({this.article, required this.categoryId});
+
+  String _getFallbackTitle() {
+    switch (categoryId) {
+      case 'CL0001':
+        return 'กลุ่มอักขระในวรรค (๒๕ ตัวเดิม)';
+      case 'CL0002':
+        return 'กลุ่มอักขระนอกวรรค (๘ ตัวเดิม & ๑๑ ตัวใหม่)';
+      case 'CL0003':
+        return 'อักขระ ห นํา (๖ ตัวหลัก) & หมายเหตุการเทียบอักษร';
+      default:
+        return 'คู่มือเรียนภาษาล้านนา (ตัวเมือง)';
+    }
+  }
+
+  String _getFallbackContent() {
+    switch (categoryId) {
+      case 'CL0001':
+        return 'พยัญชนะในวรรคมี ๒๕ ตัว แบ่งเป็น ๕ วรรคตามฐานกรณ์:\n'
+            '• วรรคก๋ะ: ก (ก๋ะ), ข (ข๋ะ), ค (ก๊ะ), ฆ (คะ), ง (งะ)\n'
+            '• วรรคจ๋ะ: จ (จ๋ะ), ฉ (ฉะ), ช (จ๊ะ), ฌ (ซะ), ญ (ญะ)\n'
+            '• วรรคระต๋ะ: ฏ (ระต๊ะ), ฐ (ระถะ), ฑ (ระทะ), ฒ (ระทะ), ณ (ระนะ)\n'
+            '• วรรคต๋ะ: ต (ต๋ะ), ถ (ถ๋ะ), ท (ต๊ะ), ธ (ทะ), น (นะ)\n'
+            '• วรรคป๋ะ: บ (บ๋ะ), ป (ป๋ะ), ผ (ผ๋ะ), พ (ป๊ะ), ม (มะ)';
+      case 'CL0002':
+        return 'อักขระนอกวรรคเดิมมี ๘ ตัว (ย, ร, ล, ว, ส, ห, ฬ, อ) และประดิษฐ์อักขระเพิ่มเติมอีก ๑๑ ตัว (ฃ, ฅ, ซ, บ, ป, ฝ, ฟ, ศ, ษ, อย/หย, ะ) เพื่อให้ครบถ้วนกับการปริวรรตภาษาไทยกลางและภาษาถิ่นล้านนา';
+      case 'CL0003':
+        return 'อักขระ ห นํา มี ๖ ตัวหลัก ได้แก่:\n'
+            '• หงะ (ᩉ᩠ᨦ), หนะ (ᩉ᩠ᨶ), หมะ (ᩉ᩠ᨾ), หยะ (ᩉ᩠ᨿ), หละ (ᩉ᩠ᩃ), หวะ (ᩉ᩠ᩅ)\n'
+            'หมายเหตุการเทียบอักษร: บ/ป (บ/ป), ด (ฏ/ฑ/ด), อย (ย/อย)';
+      default:
+        return 'อักขระพยัญชนะล้านนา ๕๓ รูปแบ่งเป็นอักขระในวรรค นอกวรรค และอักขระเพิ่มเติมตามหลักตำราล้านนา';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (article == null) return const SizedBox.shrink();
-    
+    final title = article != null && article!.title.trim().isNotEmpty
+        ? article!.title
+        : _getFallbackTitle();
+    final content = article != null && article!.content.trim().isNotEmpty
+        ? article!.content
+        : _getFallbackContent();
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -454,21 +496,23 @@ class _IntroCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.info_outline, color: Color(0xFF6B3A2A), size: 22),
+              const Icon(Icons.menu_book_rounded, color: Color(0xFF6B3A2A), size: 20),
               const SizedBox(width: 8),
-              Text(
-                article!.title,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF6B3A2A),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF6B3A2A),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            article!.content,
+            content,
             style: const TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w500,

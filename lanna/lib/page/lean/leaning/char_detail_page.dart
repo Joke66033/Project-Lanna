@@ -227,7 +227,7 @@ class _CharDetailPageState extends State<CharDetailPage>
       backgroundColor: const Color(0xFFFFFBF7),
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 95),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

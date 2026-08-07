@@ -315,7 +315,7 @@ class _WritingCustomWordPageState extends State<WritingCustomWordPage> {
 
             // Bottom hint — accuracy badge อยู่ใน canvas เรียบร้อยแล้ว
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

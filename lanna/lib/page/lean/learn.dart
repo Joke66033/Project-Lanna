@@ -308,6 +308,9 @@ class LearnPageState extends State<LearnPage> {
                     icon = Icons.spellcheck;
                   } else if (category.categoryCode == 'LC006') {
                     pageIndex = 5;
+                    icon = Icons.merge_type;
+                  } else if (category.categoryCode == 'LC007') {
+                    pageIndex = 6;
                     icon = Icons.menu_book;
                   } else {
                     pageIndex = -99;
@@ -327,7 +330,7 @@ class LearnPageState extends State<LearnPage> {
                 } else {
                   return _gridItem(
                     index: _categories.length,
-                    pageIndex: 6,
+                    pageIndex: 7,
                     title: 'ฝึกเขียนล้านนา',
                     subtitle: 'ฝึกเขียนด้วยนิ้วมือ',
                     icon: Icons.gesture,
@@ -348,7 +351,7 @@ class LearnPageState extends State<LearnPage> {
   Widget _lessonContent() {
     return Column(
       children: [
-        if (_currentPage == 6)
+        if (_currentPage == 7)
           AppBar(
             backgroundColor: const Color(0xFFFFFBF7),
             elevation: 0,
@@ -391,10 +394,22 @@ class LearnPageState extends State<LearnPage> {
                   (c) => c.categoryCode == 'LC006',
                   orElse: () => CategoryModel(
                     categoryCode: 'LC006',
-                    title: 'อักขรวิธีล้านนา',
-                    description: 'หลักการสะกด ตัวซ้อน ระวง อักขระพิเศษ และภาษาบาลี',
+                    title: 'อักษรควบกล้ำล้านนา',
+                    description: 'ระวง ระโฮง และพยัญชนะควบกล้ำ',
                     isActive: true,
-                    totalItems: 46,
+                    totalItems: 26,
+                  ),
+                ),
+              ),
+              GenericLessonPage(
+                category: _categories.firstWhere(
+                  (c) => c.categoryCode == 'LC007',
+                  orElse: () => CategoryModel(
+                    categoryCode: 'LC007',
+                    title: 'อักขรวิธีล้านนา',
+                    description: 'หลักการสะกดคำแบบบาลี ตัวสะกดตัวตาม และอักษรพิเศษ',
+                    isActive: true,
+                    totalItems: 6,
                   ),
                 ),
               ),

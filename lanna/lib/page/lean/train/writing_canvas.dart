@@ -273,6 +273,14 @@ class _WritingPainter extends CustomPainter {
       size: size,
       padding: guidePadding,
     );
+
+    // 0.8 วาดตัวอักษรล้านนาสีน้ำตาลอ่อนเป็นโครงร่างแม่แบบ (Guiding Glyph Template)
+    // เพื่อให้เส้นลำดับขีดตรงกับรูปทรงของอักขระล้านนา 100%
+    glyphLayout.paint(
+      canvas,
+      const Color(0xFF8D6E63).withValues(alpha: 0.16),
+    );
+
     final orderData = getCharacterStrokeOrder(guideChar);
 
     if (showStrokeOrder && orderData != null) {

@@ -42,7 +42,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 jsonError($res['error']['message']);
                 break;
             }
-            jsonOk($res['data']);
+
+            $categories = $res['data'] ?? [];
+            // คำนวณจำนวนรายการ (total_items) แบบไดนามิกจากการนับอักขระในฐานข้อมูลจริง (COUNT)
+            for ($i = 0; $i < count($categories); $i++) {
+                $catCode = $categories[$i]['category_code'] ?? '';
+                if ($catCode !== '') {
+                    $subCatsRes = dbSelect('category_lanna_char', 'category_char_id', ['learning_category_code' => 'eq.' . rawurlencode($catCode)]);
+                    if (!$subCatsRes['error'] && !empty($subCatsRes['data'])) {
+                        $subIds = array_column($subCatsRes['data'], 'category_char_id');
+                        if (!empty($subIds)) {
+                            $subIdStrs = array_map(function($id) { return rawurlencode($id); }, $subIds);
+                            $inFilter = 'in.(' . implode(',', $subIdStrs) . ')';
+                            $charCountRes = dbSelect('lanna_char', 'char_id', ['category_char_id' => $inFilter]);
+                            if (!$charCountRes['error'] && is_array($charCountRes['data'])) {
+                                $categories[$i]['total_items'] = count($charCountRes['data']);
+                            }
+                        }
+                    }
+                }
+            }
+
+            jsonOk($categories);
             break;
 
         case 'getById':
@@ -56,7 +77,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 jsonError($res['error']['message']);
                 break;
             }
-            jsonOk($res['data']);
+            $catData = $res['data'];
+            if ($catData && isset($catData['category_code'])) {
+                $subCatsRes = dbSelect('category_lanna_char', 'category_char_id', ['learning_category_code' => 'eq.' . rawurlencode($catData['category_code'])]);
+                if (!$subCatsRes['error'] && !empty($subCatsRes['data'])) {
+                    $subIds = array_column($subCatsRes['data'], 'category_char_id');
+                    if (!empty($subIds)) {
+                        $subIdStrs = array_map(function($id) { return rawurlencode($id); }, $subIds);
+                        $inFilter = 'in.(' . implode(',', $subIdStrs) . ')';
+                        $charCountRes = dbSelect('lanna_char', 'char_id', ['category_char_id' => $inFilter]);
+                        if (!$charCountRes['error'] && is_array($charCountRes['data'])) {
+                            $catData['total_items'] = count($charCountRes['data']);
+                        }
+                    }
+                }
+            }
+            jsonOk($catData);
             break;
 
         default:
@@ -105,7 +141,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'title'         => $title,
                 'description'   => $body['description'] ?? '',
                 'is_active'     => isset($body['is_active']) ? (int)$body['is_active'] : 1,
-                'total_items'   => isset($body['total_items']) ? (int)$body['total_items'] : 0,
             ];
 
             // 3. ทำการ INSERT ข้อมูลลงตาราง learning_category
@@ -129,7 +164,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($body['title']))       $updateData['title'] = trim($body['title']);
             if (isset($body['description'])) $updateData['description'] = trim($body['description']);
             if (isset($body['is_active']))   $updateData['is_active'] = (int)$body['is_active'];
-            if (isset($body['total_items'])) $updateData['total_items'] = (int)$body['total_items'];
 
             // ทำการ UPDATE ข้อมูลลงในฐานข้อมูล
             $res = dbUpdate('learning_category', ['category_code' => 'eq.' . rawurlencode($id)], $updateData);

@@ -318,7 +318,6 @@ export default function CategoryLearning() {
                 <th className="th-num">#</th>
                 <th className="th-left">หัวข้อหลัก</th>
                 <th className="th-left">คำอธิบาย</th>
-                <th className="!text-center">จำนวนรายการ</th>
                 <th className="!text-center">สถานะ</th>
                 <th>จัดการ</th>
               </tr>
@@ -333,7 +332,6 @@ export default function CategoryLearning() {
                   </td>
                   <td className="lanna-cell-main">{item.title}</td>
                   <td className="text-gray-500 text-left">{item.description || "—"}</td>
-                  <td className="text-center text-gray-600 font-medium">{item.total_items}</td>
                   <td className="text-center">
                     <span
                       className={`px-3 py-1.5 rounded-full text-xs font-semibold ${
@@ -366,7 +364,7 @@ export default function CategoryLearning() {
               ))}
               {data.length === 0 && (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={5}>
                     <div className="lanna-empty">
                       <p>ยังไม่มีข้อมูลหมวดหมู่การเรียนรู้</p>
                     </div>
@@ -416,43 +414,16 @@ export default function CategoryLearning() {
                   placeholder="รายละเอียดคำอธิบายหมวดหมู่"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">จำนวนรายการเริ่มต้น</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={form.total_items}
-                    onFocus={(e) => {
-                      if (String(form.total_items) === '0') {
-                        setForm({ ...form, total_items: '' });
-                      }
-                    }}
-                    onBlur={(e) => {
-                      if (e.target.value === '') {
-                        setForm({ ...form, total_items: '0' });
-                      }
-                    }}
-                    onChange={(e) => {
-                      let val = e.target.value.replace(/[^0-9]/g, "");
-                      val = val.replace(/^0+(?=\d)/, "");
-                      setForm({ ...form, total_items: val });
-                    }}
-                    className="w-full border rounded-xl px-4 py-2.5 border-gray-300 focus:ring-2 focus:ring-orange-500 bg-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">สถานะใช้งาน</label>
-                  <select
-                    value={form.is_active}
-                    onChange={(e) => setForm({ ...form, is_active: parseInt(e.target.value) })}
-                    className="w-full border rounded-xl px-4 py-2.5 border-gray-300 focus:ring-2 focus:ring-orange-500 bg-white"
-                  >
-                    <option value={1}>เปิดใช้งาน</option>
-                    <option value={0}>ปิดใช้งาน</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">สถานะใช้งาน</label>
+                <select
+                  value={form.is_active}
+                  onChange={(e) => setForm({ ...form, is_active: parseInt(e.target.value) })}
+                  className="w-full border rounded-xl px-4 py-2.5 border-gray-300 focus:ring-2 focus:ring-orange-500 bg-white"
+                >
+                  <option value={1}>เปิดใช้งาน</option>
+                  <option value={0}>ปิดใช้งาน</option>
+                </select>
               </div>
             </div>
 
@@ -504,43 +475,16 @@ export default function CategoryLearning() {
                   placeholder="รายละเอียดคำอธิบายหมวดหมู่"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">จำนวนรายการ</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={form.total_items}
-                    onFocus={(e) => {
-                      if (String(form.total_items) === '0') {
-                        setForm({ ...form, total_items: '' });
-                      }
-                    }}
-                    onBlur={(e) => {
-                      if (e.target.value === '') {
-                        setForm({ ...form, total_items: '0' });
-                      }
-                    }}
-                    onChange={(e) => {
-                      let val = e.target.value.replace(/[^0-9]/g, "");
-                      val = val.replace(/^0+(?=\d)/, "");
-                      setForm({ ...form, total_items: val });
-                    }}
-                    className={`w-full border rounded-xl px-4 py-2.5 border-gray-300 focus:ring-2 ${colors.ringFocus} bg-white`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">สถานะใช้งาน</label>
-                  <select
-                    value={form.is_active}
-                    onChange={(e) => setForm({ ...form, is_active: parseInt(e.target.value) })}
-                    className={`w-full border rounded-xl px-4 py-2.5 border-gray-300 focus:ring-2 ${colors.ringFocus} bg-white`}
-                  >
-                    <option value={1}>เปิดใช้งาน</option>
-                    <option value={0}>ปิดใช้งาน</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">สถานะใช้งาน</label>
+                <select
+                  value={form.is_active}
+                  onChange={(e) => setForm({ ...form, is_active: parseInt(e.target.value) })}
+                  className={`w-full border rounded-xl px-4 py-2.5 border-gray-300 focus:ring-2 ${colors.ringFocus} bg-white`}
+                >
+                  <option value={1}>เปิดใช้งาน</option>
+                  <option value={0}>ปิดใช้งาน</option>
+                </select>
               </div>
             </div>
 

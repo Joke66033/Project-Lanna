@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:lanna/services/lanna_char_service.dart';
+import 'package:lanna/services/auth_provider.dart';
+import 'package:lanna/widgets/bottom.dart';
+import 'package:lanna/page/home_shell.dart';
+import 'package:lanna/page/auth/login.dart';
 import 'glyph_layout.dart';
 import 'writing_data.dart';
 import 'writing_canvas.dart';
@@ -265,6 +270,33 @@ class _WritingModePageState extends State<WritingModePage> {
           ],
         ),
       ),
+      bottomNavigationBar: MediaQuery.of(context).viewInsets.bottom > 0
+          ? null
+          : BottomNav(
+              index: 2,
+              isGuest: !context.watch<AuthProvider>().isLoggedIn,
+              onLoginTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                );
+              },
+              onTap: (tabIndex) {
+                if (tabIndex == 2) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                } else {
+                  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (_) => HomeShell(
+                        isGuest: !context.read<AuthProvider>().isLoggedIn,
+                        initialTab: tabIndex,
+                      ),
+                    ),
+                    (route) => false,
+                  );
+                }
+              },
+            ),
     );
   }
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lanna/services/auth_provider.dart';
+import 'package:lanna/widgets/bottom.dart';
+import 'package:lanna/page/home_shell.dart';
+import 'package:lanna/page/auth/login.dart';
 import '../learning_navigation.dart';
 
 import 'writing_mode.dart';
@@ -237,6 +240,33 @@ class WritingSelectPage extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: MediaQuery.of(context).viewInsets.bottom > 0
+          ? null
+          : BottomNav(
+              index: 2,
+              isGuest: !auth.isLoggedIn,
+              onLoginTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                );
+              },
+              onTap: (tabIndex) {
+                if (tabIndex == 2) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                } else {
+                  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (_) => HomeShell(
+                        isGuest: !auth.isLoggedIn,
+                        initialTab: tabIndex,
+                      ),
+                    ),
+                    (route) => false,
+                  );
+                }
+              },
+            ),
     );
   }
 

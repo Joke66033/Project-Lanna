@@ -8,6 +8,10 @@ import '../train/writing_data.dart';
 import '../train/stroke_order_model.dart';
 import '../train/glyph_layout.dart';
 import 'package:lanna/services/character_stroke_service.dart';
+import 'package:lanna/widgets/bottom.dart';
+import 'package:lanna/page/home_shell.dart';
+import 'package:lanna/page/auth/login.dart';
+
 // ============================================================================
 // CHAR DETAIL PAGE
 // แสดงรายละเอียดตัวอักษรล้านนา 1 ตัว: เสียงอ่าน, อักษรไทยเทียบ, วิธีเขียน,
@@ -222,6 +226,7 @@ class _CharDetailPageState extends State<CharDetailPage>
   @override
   Widget build(BuildContext context) {
     final hasStrokeData = _strokes.isNotEmpty;
+    final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF7),
@@ -248,6 +253,33 @@ class _CharDetailPageState extends State<CharDetailPage>
           ],
         ),
       ),
+      bottomNavigationBar: isKeyboardOpen
+          ? null
+          : BottomNav(
+              index: 2,
+              isGuest: widget.isGuest,
+              onLoginTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                );
+              },
+              onTap: (tabIndex) {
+                if (tabIndex == 2) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                } else {
+                  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (_) => HomeShell(
+                        isGuest: widget.isGuest,
+                        initialTab: tabIndex,
+                      ),
+                    ),
+                    (route) => false,
+                  );
+                }
+              },
+            ),
     );
   }
 

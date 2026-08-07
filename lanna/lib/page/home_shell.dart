@@ -22,15 +22,22 @@ import 'package:lanna/services/auth_provider.dart';
 
 class HomeShell extends StatefulWidget {
   final bool isGuest;
-  const HomeShell({super.key, required this.isGuest});
+  final int initialTab;
+  const HomeShell({super.key, required this.isGuest, this.initialTab = 0});
 
   @override
   State<HomeShell> createState() => _HomeShellState();
 }
 
 class _HomeShellState extends State<HomeShell> {
-  int _selectedTab = 0; // Default tab is Translate (index 0 in BottomNav)
+  late int _selectedTab;
   final GlobalKey<LearnPageState> _learnPageKey = GlobalKey<LearnPageState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedTab = widget.initialTab;
+  }
 
   // Map visual tab index directly to IndexedStack child index
   int get _stackIndex => _selectedTab;

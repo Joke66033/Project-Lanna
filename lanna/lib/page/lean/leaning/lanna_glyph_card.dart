@@ -230,43 +230,43 @@ class _PaginatedLannaGridState<T> extends State<PaginatedLannaGrid<T>> {
         '• ตำราอักขรวิธีตั๋วเมือง สำนักส่งเสริมศิลปวัฒนธรรม มหาวิทยาลัยเชียงใหม่';
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: const Color(0xFFFBF6EF),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFEADBC8), width: 1.0),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.menu_book_rounded,
-            size: 18,
-            color: Color(0xFF924E19),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(
+                Icons.menu_book_rounded,
+                size: 18,
+                color: Color(0xFF924E19),
+              ),
+              SizedBox(width: 8),
+              Text(
+                'แหล่งอ้างอิงข้อมูล',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF5C3A21),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'แหล่งอ้างอิงข้อมูล',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF5C3A21),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  textToShow,
-                  style: const TextStyle(
-                    fontSize: 9.5,
-                    color: Color(0xFF7A5C3A),
-                    height: 1.4,
-                  ),
-                ),
-              ],
+          const SizedBox(height: 6),
+          Text(
+            textToShow,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 9.5,
+              color: Color(0xFF7A5C3A),
+              height: 1.5,
             ),
           ),
         ],

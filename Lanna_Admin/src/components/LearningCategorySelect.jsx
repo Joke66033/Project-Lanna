@@ -12,6 +12,14 @@ import { supabase } from "../lib/supabaseClient";
  *   - className: string (คลาส CSS เพิ่มเติม)
  *   - disabled: boolean (เปิด/ปิดการใช้งาน)
  */
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
+
 export default function LearningCategorySelect({
   value,
   onChange,
@@ -25,14 +33,25 @@ export default function LearningCategorySelect({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data, error } = await supabase
-          .from("learning_category")
-          .select("category_code, title, is_active")
-          .order("category_code", { ascending: true });
+        let list = [];
+        try {
+          const res = await fetch(`${BASE}/endpoints/learning_category_api.php?action=getAll`);
+          const json = await res.json();
+          list = json.data || [];
+        } catch (e) {
+          console.warn("MySQL PHP API fetch error in LearningCategorySelect:", e);
+        }
 
-        if (error) throw error;
+        if (!Array.isArray(list) || list.length === 0) {
+          const { data, error } = await supabase
+            .from("learning_category")
+            .select("category_code, title, is_active")
+            .order("category_code", { ascending: true });
+          if (!error) list = data || [];
+        }
+
         // Filter out inactive categories (is_active === false / 0 / "0") unless it matches current value
-        const activeCategories = (data || []).filter(
+        const activeCategories = (list || []).filter(
           (c) => (c.is_active !== false && c.is_active !== "0" && c.is_active !== 0) || c.category_code === value
         );
         setCategories(activeCategories);

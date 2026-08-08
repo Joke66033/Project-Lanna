@@ -47,6 +47,35 @@ export default function CategoryLannaChar() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successText, setSuccessText] = useState("");
 
+  const [learningCatMap, setLearningCatMap] = useState({});
+
+  useEffect(() => {
+    const fetchLearningCats = async () => {
+      try {
+        let list = [];
+        try {
+          const res = await fetch(`${BASE}/endpoints/learning_category_api.php?action=getAll`);
+          const json = await res.json();
+          list = json.data || [];
+        } catch (e) {}
+
+        if (!Array.isArray(list) || list.length === 0) {
+          const { data } = await supabase.from("learning_category").select("category_code, title");
+          list = data || [];
+        }
+
+        const map = {};
+        list.forEach((c) => {
+          map[c.category_code] = c.title;
+        });
+        setLearningCatMap(map);
+      } catch (err) {
+        console.error("Error fetching learning category map:", err);
+      }
+    };
+    fetchLearningCats();
+  }, []);
+
   const fetchData = async (page = currentPage, searchQuery = search, learningCat = selectedLearningCategory) => {
     setLoading(true);
     try {
@@ -123,7 +152,7 @@ export default function CategoryLannaChar() {
     id: item.category_char_id,
     name: item.name || "",
     learning_category_code: item.learning_category_code || "",
-    learning_category_title: item.learning_category?.title || "—",
+    learning_category_title: item.learning_category?.title || learningCatMap[item.learning_category_code] || "—",
   }));
 
   /* ===== AUTO CLOSE SUCCESS ===== */

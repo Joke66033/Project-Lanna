@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Search,
   BookOpen,
+  RotateCcw,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
@@ -516,10 +517,10 @@ export default function Articles() {
         </button>
       </div>
 
-      {/* SEARCH & FILTER */}
-      <div className="flex flex-col md:flex-row md:items-end gap-3 mb-6">
+      {/* SEARCH & FILTER BAR (Image 1 Format) */}
+      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-center gap-3 mb-6">
         {/* SEARCH INPUT */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white text-sm"
@@ -532,11 +533,8 @@ export default function Articles() {
           />
         </div>
 
-        {/* DROPDOWN 1: หมวดหมู่การเรียนรู้ */}
-        <div className="w-full md:w-60">
-          <label className="block text-xs font-semibold text-gray-600 mb-1">
-            ค้นหาตามหมวดหมู่การเรียนรู้:
-          </label>
+        {/* DROPDOWN 1: หมวดหมู่การเรียนรู้ (Wider, no top label) */}
+        <div className="w-full md:w-72">
           <select
             className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white cursor-pointer text-sm text-gray-700 font-medium"
             value={selectedLearningCategory}
@@ -555,11 +553,8 @@ export default function Articles() {
           </select>
         </div>
 
-        {/* DROPDOWN 2: หมวดหมู่อักขระ */}
-        <div className="w-full md:w-60">
-          <label className="block text-xs font-semibold text-gray-600 mb-1">
-            ค้นหาตามหมวดหมู่อักขระ:
-          </label>
+        {/* DROPDOWN 2: หมวดหมู่อักขระ (Wider, no top label) */}
+        <div className="w-full md:w-72">
           <select
             className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white cursor-pointer text-sm text-gray-700 font-medium"
             value={selectedCharCategory}
@@ -578,6 +573,20 @@ export default function Articles() {
               ))}
           </select>
         </div>
+
+        {/* REFRESH / RESET BUTTON */}
+        <button
+          onClick={() => {
+            setSearch("");
+            setSelectedLearningCategory("all");
+            setSelectedCharCategory("all");
+            setCurrentPage(1);
+          }}
+          title="รีเซ็ตการค้นหา"
+          className="p-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-500 transition shrink-0"
+        >
+          <RotateCcw size={16} />
+        </button>
       </div>
 
       {/* TABLE */}

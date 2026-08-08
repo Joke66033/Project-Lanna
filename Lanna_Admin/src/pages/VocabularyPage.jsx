@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Plus, Pencil, Trash2, Search, BookOpen } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, BookOpen, RotateCcw } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 import Pagination from "../components/Pagination.jsx";
 import { normalizeLannaText } from "../lib/lannaNormalizer.js";
@@ -398,13 +398,13 @@ export default function VocabularyPage() {
         </button>
       </div>
 
-      {/* SEARCH & FILTER */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
+      {/* SEARCH & FILTER (Image 1 Format) */}
+      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center gap-3 mb-6">
+        <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
-            className="w-full pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white text-sm"
-            placeholder="ค้นหาคำศัพท์..."
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white text-sm"
+            placeholder="ค้นหาคำศัพท์ คำอ่าน หรือความหมาย..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -414,14 +414,14 @@ export default function VocabularyPage() {
         </div>
         <div className="w-full sm:w-64">
           <select
-            className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white cursor-pointer text-sm"
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white cursor-pointer text-sm"
             value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);
               setCurrentPage(1);
             }}
           >
-            <option value="all">ทั้งหมด</option>
+            <option value="all">ทุกประเภท</option>
             {categories.map((cat) => (
               <option key={cat.category_vocab_id} value={cat.category_vocab_id}>
                 {cat.name}
@@ -429,6 +429,17 @@ export default function VocabularyPage() {
             ))}
           </select>
         </div>
+        <button
+          onClick={() => {
+            setSearch("");
+            setSelectedCategory("all");
+            setCurrentPage(1);
+          }}
+          title="รีเซ็ตการค้นหา"
+          className="p-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-500 transition shrink-0"
+        >
+          <RotateCcw size={16} />
+        </button>
       </div>
 
       {/* TABLE */}

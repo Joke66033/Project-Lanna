@@ -223,9 +223,9 @@ export default function CharacterStrokesPage() {
         </button>
       </div>
 
-      {/* Filters & Search */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-        <div className="relative w-full sm:w-80">
+      {/* Filters & Search (Image 1 Format) */}
+      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center gap-3 mb-6">
+        <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
@@ -235,18 +235,18 @@ export default function CharacterStrokesPage() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none bg-white"
           />
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="w-full sm:w-64">
           <select
             value={categoryFilter}
             onChange={(e) => {
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="px-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none cursor-pointer bg-white"
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none cursor-pointer bg-white"
           >
             <option value="all">ทุกประเภท</option>
             <option value="consonant">พยัญชนะ</option>
@@ -256,15 +256,20 @@ export default function CharacterStrokesPage() {
             <option value="sequence">ตัวซ้อน/ลำดับ</option>
             <option value="other">อื่นๆ</option>
           </select>
-
-          <button
-            onClick={fetchData}
-            title="รีเฟรชข้อมูล"
-            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600"
-          >
-            <RefreshCw className="w-5 h-5" />
-          </button>
         </div>
+
+        <button
+          onClick={() => {
+            setSearch("");
+            setCategoryFilter("all");
+            setCurrentPage(1);
+            fetchData();
+          }}
+          title="รีเซ็ตการค้นหา"
+          className="p-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-500 transition shrink-0"
+        >
+          <RefreshCw className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Table */}

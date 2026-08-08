@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { RotateCcw } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
@@ -204,8 +205,8 @@ export default function Users() {
       </div>
 
       {/* ===== SEARCH & FILTER ===== */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
+      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center gap-3 mb-6">
+        <div className="relative flex-1 w-full">
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -233,6 +234,17 @@ export default function Users() {
             <option value="suspended">ถูกระงับ</option>
           </select>
         </div>
+        <button
+          onClick={() => {
+            setSearch("");
+            setSelectedStatus("all");
+            setCurrentPage(1);
+          }}
+          title="รีเซ็ตการค้นหา"
+          className="p-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-500 transition shrink-0"
+        >
+          <RotateCcw size={16} />
+        </button>
       </div>
 
       {/* ===== TABLE ===== */}
@@ -257,6 +269,7 @@ export default function Users() {
             <thead className="bg-rose-50">
               <tr className="text-rose-700 border-b-2 border-rose-200" style={{ background: 'none' }}>
                 <th className="th-num">#</th>
+                <th className="!text-center" style={{ width: '90px' }}>รูปโปรไฟล์</th>
                 <th className="th-left">ชื่อผู้ใช้งาน</th>
                 <th className="th-left">อีเมล</th>
                 <th className="!text-center">สถานะ</th>
@@ -276,25 +289,29 @@ export default function Users() {
                       </span>
                     </td>
 
-                    {/* ชื่อผู้ใช้ */}
-                    <td>
-                      <div className="flex items-center gap-3">
+                    {/* รูปโปรไฟล์ */}
+                    <td className="text-center">
+                      <div className="flex justify-center items-center">
                         {user.avatar ? (
                           <img
                             src={user.avatar}
                             alt={user.name}
-                            className="w-9 h-9 rounded-full object-cover border border-rose-100 shrink-0"
+                            className="w-10 h-10 rounded-full object-cover border border-rose-200 shadow-sm"
                             onError={(e) => { e.target.style.display = 'none'; }}
                           />
                         ) : (
-                          <div className="w-9 h-9 rounded-full bg-rose-100 text-rose-700 font-semibold flex items-center justify-center text-sm shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-700 font-semibold flex items-center justify-center text-sm border border-rose-200 shadow-sm">
                             {user.name ? user.name.charAt(0) : "U"}
                           </div>
                         )}
-                        <div>
-                          <p className="lanna-cell-main font-semibold text-gray-900">{user.name}</p>
-                          <p className="text-xs text-gray-400 font-mono">ID: {user.id}</p>
-                        </div>
+                      </div>
+                    </td>
+
+                    {/* ชื่อผู้ใช้ */}
+                    <td>
+                      <div>
+                        <p className="lanna-cell-main font-semibold text-gray-900">{user.name}</p>
+                        <p className="text-xs text-gray-400 font-mono">ID: {user.id}</p>
                       </div>
                     </td>
 

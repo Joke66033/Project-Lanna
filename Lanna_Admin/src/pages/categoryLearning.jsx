@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, RotateCcw } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
@@ -321,9 +321,9 @@ export default function CategoryLearning() {
         </button>
       </div>
 
-      {/* SEARCH & FILTER */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
+      {/* SEARCH & FILTER (Image 1 Format) */}
+      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center gap-3 mb-6">
+        <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white text-sm"
@@ -349,6 +349,17 @@ export default function CategoryLearning() {
             <option value="0">ปิดใช้งาน</option>
           </select>
         </div>
+        <button
+          onClick={() => {
+            setSearch("");
+            setSelectedStatus("all");
+            setCurrentPage(1);
+          }}
+          title="รีเซ็ตการค้นหา"
+          className="p-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-500 transition shrink-0"
+        >
+          <RotateCcw size={16} />
+        </button>
       </div>
 
       {/* LOADING / ERROR / TABLE */}

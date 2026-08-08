@@ -176,7 +176,8 @@ export default function CategoryLearning() {
         trackRecentActivity("learning_category", insertedItem.category_code);
         setData((prev) => sortRecentData([insertedItem, ...prev], "learning_category", "category_code"));
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่: " + (err.message || err));
     } finally {
@@ -232,7 +233,8 @@ export default function CategoryLearning() {
           return sortRecentData([updatedItem, ...filtered], "learning_category", "category_code");
         });
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่: " + err.message);
     } finally {

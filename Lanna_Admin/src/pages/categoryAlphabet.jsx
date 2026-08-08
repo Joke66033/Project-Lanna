@@ -166,7 +166,8 @@ export default function CategoryAlphabet() {
         trackRecentActivity("category_vocab", insertedItem.category_vocab_id);
         setData((prev) => sortRecentData([insertedItem, ...prev], "category_vocab", "category_vocab_id"));
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("Error adding category: " + err.message);
     } finally {
@@ -212,7 +213,8 @@ export default function CategoryAlphabet() {
           return sortRecentData([updatedItem, ...filtered], "category_vocab", "category_vocab_id");
         });
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("Error updating category: " + err.message);
     } finally {

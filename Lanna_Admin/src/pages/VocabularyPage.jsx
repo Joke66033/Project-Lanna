@@ -260,7 +260,8 @@ export default function VocabularyPage() {
         trackRecentActivity("vocabulary", insertedItem.vocab_id);
         setData((prev) => sortRecentData([insertedItem, ...prev], "vocabulary", "vocab_id"));
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("Error adding vocabulary: " + err.message);
     } finally {
@@ -315,7 +316,8 @@ export default function VocabularyPage() {
           return sortRecentData([updatedItem, ...filtered], "vocabulary", "vocab_id");
         });
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("Error updating vocabulary: " + err.message);
     } finally {

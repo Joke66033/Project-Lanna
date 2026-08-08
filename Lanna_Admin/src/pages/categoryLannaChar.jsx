@@ -208,7 +208,8 @@ export default function CategoryLannaChar() {
         trackRecentActivity("category_lanna_char", insertedItem.category_char_id);
         setData((prev) => sortRecentData([insertedItem, ...prev], "category_lanna_char", "category_char_id"));
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("Error adding category: " + err.message);
     } finally {
@@ -261,7 +262,8 @@ export default function CategoryLannaChar() {
           return sortRecentData([updatedItem, ...filtered], "category_lanna_char", "category_char_id");
         });
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("Error updating category: " + err.message);
     } finally {

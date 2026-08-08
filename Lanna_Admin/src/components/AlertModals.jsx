@@ -84,8 +84,15 @@ export function ConfirmDeleteModal({
     onClose();
   };
 
-  const handleFirstStepConfirm = () => {
-    setShowSecondConfirm(true);
+  const handleFirstStepClick = () => {
+    if (usageWarningText) {
+      // Only show 2nd step confirmation popup when category is in active use!
+      setShowSecondConfirm(true);
+    } else {
+      // Normal deletion: execute delete immediately!
+      setShowSecondConfirm(false);
+      onConfirm();
+    }
   };
 
   const handleFinalConfirm = () => {
@@ -143,7 +150,7 @@ export function ConfirmDeleteModal({
 
               <button
                 type="button"
-                onClick={handleFirstStepConfirm}
+                onClick={handleFirstStepClick}
                 className="flex-1 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition shadow"
               >
                 {usageWarningText ? "ยืนยันที่จะลบ" : "ลบข้อมูล"}

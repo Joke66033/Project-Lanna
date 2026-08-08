@@ -382,7 +382,8 @@ export default function Articles() {
         trackRecentActivity("articles", insertedItem.article_id);
         setData((prev) => sortRecentData([insertedItem, ...prev], "articles", "article_id"));
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("Error adding article: " + err.message);
     } finally {
@@ -442,7 +443,8 @@ export default function Articles() {
           return sortRecentData([updatedItem, ...filtered], "articles", "article_id");
         });
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("Error updating article: " + err.message);
     } finally {
@@ -489,9 +491,10 @@ export default function Articles() {
     return dotColors[Math.abs(hash) % dotColors.length];
   };
 
-  const filteredCharCategories = form.learning_category_code
-    ? charCategories.filter((c) => c.learning_category_code === form.learning_category_code)
+  const matchedCharCategories = form.learning_category_code
+    ? charCategories.filter((c) => String(c.learning_category_code) === String(form.learning_category_code))
     : charCategories;
+  const filteredCharCategories = matchedCharCategories.length > 0 ? matchedCharCategories : charCategories;
 
   return (
     <div className="p-6 bg-[#f9f7f4] min-h-screen">

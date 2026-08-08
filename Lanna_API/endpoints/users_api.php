@@ -360,11 +360,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $statusVal = $body['status'] ?? $_POST['status'] ?? null;
             if ($statusVal !== null) {
-                if ($statusVal === 'active' || $statusVal === '1' || $statusVal === 1) {
-                    $dbBody['status'] = 1;
-                } elseif ($statusVal === 'banned' || $statusVal === '0' || $statusVal === 0) {
-                    $dbBody['status'] = 0;
-                }
+                $dbBody['status'] = (string)$statusVal;
             }
 
             if (isset($body['avatar'])) $dbBody['avatar'] = $body['avatar'];

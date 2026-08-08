@@ -287,7 +287,8 @@ export default function AlphabetPage() {
         trackRecentActivity("lanna_char", insertedChar.char_id);
         setData((prev) => sortRecentData([insertedChar, ...prev], "lanna_char", "char_id"));
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("Error adding Lanna char: " + err.message);
     } finally {
@@ -345,7 +346,8 @@ export default function AlphabetPage() {
           return sortRecentData([updatedChar, ...filtered], "lanna_char", "char_id");
         });
       }
-      fetchData();
+      setCurrentPage(1);
+      fetchData(1);
     } catch (err) {
       alert("Error updating Lanna char: " + err.message);
     } finally {

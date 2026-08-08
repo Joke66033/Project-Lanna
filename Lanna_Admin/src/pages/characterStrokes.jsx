@@ -147,6 +147,7 @@ export default function CharacterStrokesPage() {
       setShowAdd(false);
       setSuccessText("เพิ่มข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
       setShowSuccess(true);
+      setCurrentPage(1);
       fetchData();
     } catch (err) {
       alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
@@ -187,6 +188,7 @@ export default function CharacterStrokesPage() {
       setShowEdit(false);
       setSuccessText("แก้ไขข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
       setShowSuccess(true);
+      setCurrentPage(1);
       fetchData();
     } catch (err) {
       alert("เกิดข้อผิดพลาดในการอัปเดตข้อมูล");
@@ -387,95 +389,97 @@ export default function CharacterStrokesPage() {
             setShowEdit(false);
           }}
         >
-          <form onSubmit={showAdd ? handleSaveAdd : handleSaveEdit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                ตัวอักขระ (Character Symbol) *
-              </label>
-              <input
-                type="text"
-                required
-                value={form.char_symbol}
-                onChange={(e) => setForm({ ...form, char_symbol: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-lg font-serif"
-                placeholder="เช่น ᨠ"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                ชื่ออักขระ (Character Name)
-              </label>
-              <input
-                type="text"
-                value={form.char_name}
-                onChange={(e) => setForm({ ...form, char_name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                placeholder="เช่น พยัญชนะ กะ"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={showAdd ? handleSaveAdd : handleSaveEdit} className="flex flex-col flex-1 overflow-hidden">
+            <div className="p-6 overflow-y-auto space-y-4 flex-1">
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                  ประเภท (Category)
+                <label className="block mb-1 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  ตัวอักขระ (CHARACTER SYMBOL) <span className="text-red-500">*</span>
                 </label>
-                <select
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                >
-                  <option value="consonant">consonant (พยัญชนะ)</option>
-                  <option value="vowel">vowel (สระ)</option>
-                  <option value="tone">tone (วรรณยุกต์)</option>
-                  <option value="number">number (ตัวเลข)</option>
-                  <option value="sequence">sequence (ตัวซ้อน/ลำดับ)</option>
-                  <option value="other">other (อื่นๆ)</option>
-                </select>
+                <input
+                  type="text"
+                  required
+                  value={form.char_symbol}
+                  onChange={(e) => setForm({ ...form, char_symbol: e.target.value })}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-lg font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+                  placeholder="เช่น ᨠ"
+                />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                  จำนวนเส้น (Stroke Count)
+                <label className="block mb-1 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  ชื่ออักขระ (CHARACTER NAME)
                 </label>
                 <input
-                  type="number"
-                  min="1"
-                  value={form.stroke_count}
-                  onChange={(e) => setForm({ ...form, stroke_count: parseInt(e.target.value) || 1 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  type="text"
+                  value={form.char_name}
+                  onChange={(e) => setForm({ ...form, char_name: e.target.value })}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+                  placeholder="เช่น พยัญชนะ กะ"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block mb-1 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    หมวดหมู่อักขระ (CATEGORY)
+                  </label>
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white cursor-pointer"
+                  >
+                    <option value="consonant">consonant (พยัญชนะ)</option>
+                    <option value="vowel">vowel (สระ)</option>
+                    <option value="tone">tone (วรรณยุกต์)</option>
+                    <option value="number">number (ตัวเลข)</option>
+                    <option value="sequence">sequence (ตัวซ้อน/ลำดับ)</option>
+                    <option value="other">other (อื่นๆ)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block mb-1 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    จำนวนเส้น (STROKE COUNT)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={form.stroke_count}
+                    onChange={(e) => setForm({ ...form, stroke_count: parseInt(e.target.value) || 1 })}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block mb-1 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  พิกัดจุดลากเส้น (STROKE DATA JSON ARRAY) <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={6}
+                  required
+                  value={form.stroke_data}
+                  onChange={(e) => setForm({ ...form, stroke_data: e.target.value })}
+                  className="w-full border border-gray-300 rounded-xl p-3 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+                  placeholder='[ [ {"x": 20, "y": 50}, {"x": 80, "y": 50} ] ]'
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                พิกัดจุดลากเส้น (Stroke Data JSON Array) *
-              </label>
-              <textarea
-                rows={8}
-                required
-                value={form.stroke_data}
-                onChange={(e) => setForm({ ...form, stroke_data: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-xs"
-                placeholder='[ [ {"x": 20, "y": 50}, {"x": 80, "y": 50} ] ]'
-              />
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t">
+            <div className="flex justify-end gap-3 p-4 bg-gray-50 border-t border-gray-100 rounded-b-2xl">
               <button
                 type="button"
                 onClick={() => {
                   setShowAdd(false);
                   setShowEdit(false);
                 }}
-                className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-white transition"
               >
                 ยกเลิก
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-sm text-white bg-amber-600 rounded-lg hover:bg-amber-700 font-semibold"
+                className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition shadow-sm"
               >
                 บันทึกข้อมูล
               </button>

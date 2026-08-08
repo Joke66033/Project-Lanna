@@ -148,18 +148,15 @@ export default function Users() {
     setShowConfirm(false);
 
     try {
-      try {
-        await fetch(`${BASE}/endpoints/users_api.php?action=updateStatus`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: userId, status: newStatus }),
-        });
-      } catch (e) {}
-
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({ status: newStatus })
-        .eq("user_id", userId);
+      const res = await fetch(`${BASE}/endpoints/users_api.php?action=update&id=${encodeURIComponent(userId)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, status: newStatus }),
+      });
+      const resJson = await res.json();
+      if (resJson.error) {
+        throw new Error(resJson.error.message || "ไม่สามารถอัปเดตสถานะได้");
+      }
 
       trackRecentActivity("users", userId);
       setData((prev) => {
@@ -179,7 +176,8 @@ export default function Users() {
       setShowSuccess(true);
       setPendingUser(null);
 
-      fetchData(currentPage, search, selectedStatus);
+      setCurrentPage(1);
+      fetchData(1, search, selectedStatus);
     } catch (err) {
       console.error("Toggle status error:", err);
       alert(`เกิดข้อผิดพลาด: ${err.message}`);

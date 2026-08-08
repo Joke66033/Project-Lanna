@@ -67,16 +67,17 @@ export default function CategoryAlphabet() {
         list = list.filter((item) => item.name && item.name.toLowerCase().includes(q));
       }
 
-      setTotalCount(list.length);
+      // Sort recent added/edited items to top of entire dataset
+      const sortedList = sortRecentData(list, "category_vocab", "category_vocab_id");
+      setTotalCount(sortedList.length);
 
       const from = (page - 1) * ITEMS_PER_PAGE;
-      const paginated = list.slice(from, from + ITEMS_PER_PAGE);
+      const paginated = sortedList.slice(from, from + ITEMS_PER_PAGE);
 
-      if (page > 1 && paginated.length === 0 && list.length > 0) {
+      if (page > 1 && paginated.length === 0 && sortedList.length > 0) {
         setCurrentPage(page - 1);
       } else {
-        const sorted = sortRecentData(paginated, "category_vocab", "category_vocab_id");
-        setData(sorted);
+        setData(paginated);
         setError(null);
       }
     } catch (err) {

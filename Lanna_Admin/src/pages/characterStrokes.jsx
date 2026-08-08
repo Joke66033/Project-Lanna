@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, Search, Activity, RefreshCw } from "lucide-react"
 import Pagination from "../components/Pagination.jsx";
 import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
 import Modal from "../components/Modal.jsx";
+import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
 
 const getApiBase = () => {
   if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
@@ -66,8 +67,8 @@ export default function CharacterStrokesPage() {
     fetchData();
   }, []);
 
-  // Search & Category Filtering (Client-side to ensure all data displays)
-  const filteredData = data.filter((item) => {
+  // Search & Category Filtering (Client-side with recent activity sorting at top)
+  const rawFiltered = data.filter((item) => {
     const itemCat = (item.category || "").toLowerCase();
     const matchCategory =
       categoryFilter === "all" ||
@@ -80,6 +81,8 @@ export default function CharacterStrokesPage() {
 
     return matchCategory && matchSearch;
   });
+
+  const filteredData = sortRecentData(rawFiltered, "character_strokes", "stroke_id");
 
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE) || 1;
   const paginatedData = filteredData.slice(
@@ -138,6 +141,9 @@ export default function CharacterStrokesPage() {
         alert(result.error.message);
         return;
       }
+      if (result.data && result.data.stroke_id) {
+        trackRecentActivity("character_strokes", result.data.stroke_id);
+      }
       setShowAdd(false);
       setSuccessText("เพิ่มข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
       setShowSuccess(true);
@@ -174,6 +180,9 @@ export default function CharacterStrokesPage() {
       if (result.error) {
         alert(result.error.message);
         return;
+      }
+      if (editItem.stroke_id) {
+        trackRecentActivity("character_strokes", editItem.stroke_id);
       }
       setShowEdit(false);
       setSuccessText("แก้ไขข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");

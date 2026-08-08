@@ -91,9 +91,8 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'article_id'       => $nextId,
                 'title'            => $body['title'] ?? '',
                 'content'          => $body['content'] ?? '',
-                'category_char_id' => !empty($body['category_char_id']) ? $body['category_char_id'] : null,
-                'cover_image_url'  => $body['cover_image_url'] ?? '',
-                'is_active'        => isset($body['is_active']) ? (int)$body['is_active'] : 1
+                'image_path'       => $body['image_path'] ?? $body['cover_image_url'] ?? '',
+                'category_char_id' => !empty($body['category_char_id']) ? $body['category_char_id'] : null
             ];
 
             $res = dbInsert('articles', $insertData);
@@ -116,9 +115,10 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $updateData = [];
             if (array_key_exists('title', $body))            $updateData['title'] = $body['title'];
             if (array_key_exists('content', $body))          $updateData['content'] = $body['content'];
+            if (array_key_exists('image_path', $body) || array_key_exists('cover_image_url', $body)) {
+                $updateData['image_path'] = $body['image_path'] ?? $body['cover_image_url'];
+            }
             if (array_key_exists('category_char_id', $body)) $updateData['category_char_id'] = !empty($body['category_char_id']) ? $body['category_char_id'] : null;
-            if (array_key_exists('cover_image_url', $body))  $updateData['cover_image_url'] = $body['cover_image_url'];
-            if (array_key_exists('is_active', $body))        $updateData['is_active'] = (int)$body['is_active'];
 
             $res = dbUpdate('articles', ['article_id' => 'eq.' . $id], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }

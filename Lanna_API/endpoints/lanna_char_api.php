@@ -83,13 +83,9 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $insertData = [
                 'char_id'          => $nextId,
-                'char_symbol'      => $body['char_symbol'] ?? '',
-                'char_name'        => $body['char_name'] ?? '',
-                'category_char_id' => !empty($body['category_char_id']) ? $body['category_char_id'] : null,
-                'description'      => $body['description'] ?? '',
-                'image_url'        => $body['image_url'] ?? '',
-                'sound_url'        => $body['sound_url'] ?? '',
-                'is_active'        => isset($body['is_active']) ? (int)$body['is_active'] : 1
+                'lanna_char'       => $body['lanna_char'] ?? $body['char_symbol'] ?? $body['ln'] ?? '',
+                'thai_equivalent'  => $body['thai_equivalent'] ?? $body['char_name'] ?? $body['th'] ?? '',
+                'category_char_id' => !empty($body['category_char_id']) ? $body['category_char_id'] : null
             ];
             $res = dbInsert('lanna_char', $insertData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
@@ -101,13 +97,15 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($id === '') { jsonError('Missing id'); break; }
 
             $updateData = [];
-            if (array_key_exists('char_symbol', $body))      $updateData['char_symbol'] = $body['char_symbol'];
-            if (array_key_exists('char_name', $body))        $updateData['char_name'] = $body['char_name'];
-            if (array_key_exists('category_char_id', $body)) $updateData['category_char_id'] = !empty($body['category_char_id']) ? $body['category_char_id'] : null;
-            if (array_key_exists('description', $body))      $updateData['description'] = $body['description'];
-            if (array_key_exists('image_url', $body))        $updateData['image_url'] = $body['image_url'];
-            if (array_key_exists('sound_url', $body))        $updateData['sound_url'] = $body['sound_url'];
-            if (array_key_exists('is_active', $body))        $updateData['is_active'] = (int)$body['is_active'];
+            if (array_key_exists('lanna_char', $body) || array_key_exists('char_symbol', $body) || array_key_exists('ln', $body)) {
+                $updateData['lanna_char'] = $body['lanna_char'] ?? $body['char_symbol'] ?? $body['ln'];
+            }
+            if (array_key_exists('thai_equivalent', $body) || array_key_exists('char_name', $body) || array_key_exists('th', $body)) {
+                $updateData['thai_equivalent'] = $body['thai_equivalent'] ?? $body['char_name'] ?? $body['th'];
+            }
+            if (array_key_exists('category_char_id', $body)) {
+                $updateData['category_char_id'] = !empty($body['category_char_id']) ? $body['category_char_id'] : null;
+            }
 
             $res = dbUpdate('lanna_char', ['char_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }

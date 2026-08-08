@@ -78,9 +78,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $finalData = [
                 'category_char_id'       => $nextId,
                 'name'                   => $body['name'] ?? '',
-                'description'            => $body['description'] ?? '',
-                'learning_category_code' => !empty($body['learning_category_code']) ? $body['learning_category_code'] : null,
-                'is_active'              => isset($body['is_active']) ? (int)$body['is_active'] : 1
+                'learning_category_code' => !empty($body['learning_category_code']) ? $body['learning_category_code'] : null
             ];
             $res = dbInsert('category_lanna_char', $finalData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
@@ -93,9 +91,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $updateData = [];
             if (array_key_exists('name', $body))                   $updateData['name'] = $body['name'];
-            if (array_key_exists('description', $body))            $updateData['description'] = $body['description'];
             if (array_key_exists('learning_category_code', $body)) $updateData['learning_category_code'] = !empty($body['learning_category_code']) ? $body['learning_category_code'] : null;
-            if (array_key_exists('is_active', $body))              $updateData['is_active'] = (int)$body['is_active'];
 
             $res = dbUpdate('category_lanna_char', ['category_char_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }

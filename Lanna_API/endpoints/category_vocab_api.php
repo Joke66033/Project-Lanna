@@ -66,9 +66,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $insertData = [
                 'category_vocab_id' => $nextId,
-                'name'              => $body['name'] ?? '',
-                'description'       => $body['description'] ?? '',
-                'is_active'         => isset($body['is_active']) ? (int)$body['is_active'] : 1
+                'name'              => $body['name'] ?? ''
             ];
             $res = dbInsert('category_vocab', $insertData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
@@ -80,9 +78,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($id === '') { jsonError('Missing id'); break; }
             
             $updateData = [];
-            if (array_key_exists('name', $body))        $updateData['name'] = $body['name'];
-            if (array_key_exists('description', $body)) $updateData['description'] = $body['description'];
-            if (array_key_exists('is_active', $body))   $updateData['is_active'] = (int)$body['is_active'];
+            if (array_key_exists('name', $body)) $updateData['name'] = $body['name'];
 
             $res = dbUpdate('category_vocab', ['category_vocab_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }

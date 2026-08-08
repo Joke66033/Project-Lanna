@@ -313,9 +313,9 @@ export default function AlphabetPage() {
     if (!validateForm()) return;
 
     try {
-      setLoading(true);
+      const targetId = originalForm.char_id || originalForm.id;
       const res = await fetch(
-        `${BASE}/endpoints/lanna_char_api.php?action=update&id=${encodeURIComponent(originalForm.id)}`,
+        `${BASE}/endpoints/lanna_char_api.php?action=update&id=${encodeURIComponent(targetId)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -244,14 +244,31 @@ export default function CategoryLearning() {
       form.is_active !== (originalForm.is_active ? 1 : 0) ||
       (parseInt(form.total_items) || 0) !== (parseInt(originalForm.total_items) || 0));
 
+  const [usageInfo, setUsageInfo] = useState(null);
+
+  const openDeleteConfirm = async (item) => {
+    setDeleteItem(item);
+    setUsageInfo(null);
+    try {
+      const code = item.category_code;
+      const res = await fetch(`${BASE}/endpoints/learning_category_api.php?action=checkUsage&id=${encodeURIComponent(code)}`);
+      const json = await res.json();
+      if (json.data && json.data.inUse) {
+        setUsageInfo(json.data);
+      }
+    } catch (e) {}
+    setShowDelete(true);
+  };
+
   /* ===== DELETE (SQL API) ===== */
   const handleDelete = async () => {
     try {
       setLoading(true);
       const code = deleteItem.category_code;
+      const isCascade = usageInfo && usageInfo.inUse;
 
       const res = await fetch(
-        `${BASE}/endpoints/learning_category_api.php?action=delete&id=${encodeURIComponent(code)}`,
+        `${BASE}/endpoints/learning_category_api.php?action=delete&id=${encodeURIComponent(code)}${isCascade ? '&cascade=true' : ''}`,
         { method: "POST" }
       );
       const resJson = await res.json();
@@ -261,6 +278,8 @@ export default function CategoryLearning() {
       }
 
       setShowDelete(false);
+      setDeleteItem(null);
+      setUsageInfo(null);
       setSuccessText("ลบหมวดหมู่การเรียนรู้เรียบร้อยแล้ว");
       setShowSuccess(true);
 
@@ -387,10 +406,7 @@ export default function CategoryLearning() {
                         <Pencil size={15} />
                       </button>
                       <button
-                        onClick={() => {
-                          setDeleteItem(item);
-                          setShowDelete(true);
-                        }}
+                        onClick={() => openDeleteConfirm(item)}
                         className="lanna-btn-delete"
                         title="ลบ"
                       >
@@ -552,6 +568,7 @@ export default function CategoryLearning() {
         title="ยืนยันการลบหมวดหมู่การเรียนรู้"
         itemName={deleteItem?.title || ""}
         itemSubtitle={deleteItem?.category_code || ""}
+        usageWarningText={usageInfo?.usedInText || ""}
       />
 
       {/* SUCCESS MODAL */}

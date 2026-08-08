@@ -222,14 +222,31 @@ export default function CategoryAlphabet() {
   const isFormChanged =
     showEdit && originalForm && form.name !== originalForm.name;
 
+  const [usageInfo, setUsageInfo] = useState(null);
+
+  const openDeleteConfirm = async (item) => {
+    setDeleteItem(item);
+    setUsageInfo(null);
+    try {
+      const categoryId = item.category_vocab_id || item.id;
+      const res = await fetch(`${BASE}/endpoints/category_vocab_api.php?action=checkUsage&id=${encodeURIComponent(categoryId)}`);
+      const json = await res.json();
+      if (json.data && json.data.inUse) {
+        setUsageInfo(json.data);
+      }
+    } catch (e) {}
+    setShowDelete(true);
+  };
+
   /* ===== DELETE (SQL API) ===== */
   const handleDelete = async () => {
     try {
       setLoading(true);
       const categoryId = deleteItem.category_vocab_id || deleteItem.id;
+      const isCascade = usageInfo && usageInfo.inUse;
 
       const res = await fetch(
-        `${BASE}/endpoints/category_vocab_api.php?action=delete&id=${encodeURIComponent(categoryId)}`,
+        `${BASE}/endpoints/category_vocab_api.php?action=delete&id=${encodeURIComponent(categoryId)}${isCascade ? '&cascade=true' : ''}`,
         { method: "POST" }
       );
       const resJson = await res.json();
@@ -240,6 +257,7 @@ export default function CategoryAlphabet() {
 
       setShowDelete(false);
       setDeleteItem(null);
+      setUsageInfo(null);
       setSuccessText("ลบหมวดหมู่คำศัพท์เรียบร้อยแล้ว");
       setShowSuccess(true);
       fetchData();
@@ -335,7 +353,7 @@ export default function CategoryAlphabet() {
                         <Pencil size={15} />
                       </button>
                       <button
-                        onClick={() => { setDeleteItem(d); setShowDelete(true); }}
+                        onClick={() => openDeleteConfirm(d)}
                         className="lanna-btn-delete"
                         title="ลบ"
                       >
@@ -426,6 +444,7 @@ export default function CategoryAlphabet() {
         onConfirm={handleDelete}
         title="ยืนยันการลบหมวดหมู่"
         itemName={deleteItem?.name || ""}
+        usageWarningText={usageInfo?.usedInText || ""}
       />
 
       {/* SUCCESS MODAL */}

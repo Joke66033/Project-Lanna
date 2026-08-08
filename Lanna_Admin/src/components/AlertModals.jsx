@@ -65,6 +65,7 @@ export function ConfirmDeleteModal({
   itemName = "",
   itemSubtitle = "",
   isLannaText = false,
+  usageWarningText = "",
 }) {
   if (!isOpen) return null;
 
@@ -83,16 +84,24 @@ export function ConfirmDeleteModal({
 
         <div>
           <h3 className="text-xl font-bold text-gray-800">{title}</h3>
-          <p className="text-gray-500 mt-2 text-sm leading-relaxed px-2">
-            คุณแน่ใจหรือไม่ว่าต้องการลบ
-            <br />
-            <span className="font-semibold text-gray-700">
-              {isLannaText ? <LannaText>{itemName}</LannaText> : `"${itemName}"`}
-              {itemSubtitle ? ` (${itemSubtitle})` : ""}
-            </span>
-            <br />
-            เมื่อลบแล้วจะไม่สามารถกู้คืนได้
-          </p>
+          {usageWarningText ? (
+            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 leading-relaxed text-left space-y-1">
+              <p className="font-semibold text-red-800">⚠️ หมวดหมู่นี้ถูกใช้งานอยู่!</p>
+              <p>หมวดหมู่ <span className="font-bold">"{itemName}"</span> ถูกเรียกใช้อยู่ใน <span className="font-bold text-red-900">{usageWarningText}</span></p>
+              <p className="text-red-600">หากยืนยันที่จะลบ ระบบจะทำการลบหมวดหมู่นี้รวมถึงข้อมูลทั้งหมดที่เกี่ยวข้องโดยอัตโนมัติ</p>
+            </div>
+          ) : (
+            <p className="text-gray-500 mt-2 text-sm leading-relaxed px-2">
+              คุณแน่ใจหรือไม่ว่าต้องการลบ
+              <br />
+              <span className="font-semibold text-gray-700">
+                {isLannaText ? <LannaText>{itemName}</LannaText> : `"${itemName}"`}
+                {itemSubtitle ? ` (${itemSubtitle})` : ""}
+              </span>
+              <br />
+              เมื่อลบแล้วจะไม่สามารถกู้คืนได้
+            </p>
+          )}
         </div>
 
         <div className="flex w-full gap-3 pt-2">
@@ -109,7 +118,7 @@ export function ConfirmDeleteModal({
             onClick={onConfirm}
             className="flex-1 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition shadow"
           >
-            ลบข้อมูล
+            {usageWarningText ? "ยืนยันที่จะลบ" : "ลบข้อมูล"}
           </button>
         </div>
       </div>

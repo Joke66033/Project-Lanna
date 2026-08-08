@@ -244,14 +244,31 @@ export default function CategoryLannaChar() {
     originalForm &&
     (form.name !== originalForm.name || form.learning_category_code !== originalForm.learning_category_code);
 
+  const [usageInfo, setUsageInfo] = useState(null);
+
+  const openDeleteConfirm = async (item) => {
+    setDeleteItem(item);
+    setUsageInfo(null);
+    try {
+      const categoryId = item.category_char_id || item.id;
+      const res = await fetch(`${BASE}/endpoints/category_lanna_char_api.php?action=checkUsage&id=${encodeURIComponent(categoryId)}`);
+      const json = await res.json();
+      if (json.data && json.data.inUse) {
+        setUsageInfo(json.data);
+      }
+    } catch (e) {}
+    setShowDelete(true);
+  };
+
   /* ===== DELETE (SQL API) ===== */
   const handleDelete = async () => {
     try {
       setLoading(true);
       const categoryId = deleteItem.category_char_id || deleteItem.id;
+      const isCascade = usageInfo && usageInfo.inUse;
 
       const res = await fetch(
-        `${BASE}/endpoints/category_lanna_char_api.php?action=delete&id=${encodeURIComponent(categoryId)}`,
+        `${BASE}/endpoints/category_lanna_char_api.php?action=delete&id=${encodeURIComponent(categoryId)}${isCascade ? '&cascade=true' : ''}`,
         { method: "POST" }
       );
       const resJson = await res.json();
@@ -262,6 +279,7 @@ export default function CategoryLannaChar() {
 
       setShowDelete(false);
       setDeleteItem(null);
+      setUsageInfo(null);
       setDeleteIndex(null);
       setSuccessText("ลบหมวดหมู่อักขระเรียบร้อยแล้ว");
       setShowSuccess(true);
@@ -384,7 +402,7 @@ export default function CategoryLannaChar() {
                         <Pencil size={15} />
                       </button>
                       <button
-                        onClick={() => { setDeleteItem(d); setShowDelete(true); }}
+                        onClick={() => openDeleteConfirm(d)}
                         className="lanna-btn-delete"
                         title="ลบ"
                       >
@@ -483,6 +501,7 @@ export default function CategoryLannaChar() {
         onConfirm={handleDelete}
         title="ยืนยันการลบหมวดหมู่"
         itemName={deleteItem?.name || ""}
+        usageWarningText={usageInfo?.usedInText || ""}
       />
 
       {/* SUCCESS MODAL */}

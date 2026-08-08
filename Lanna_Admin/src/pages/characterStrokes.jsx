@@ -279,33 +279,45 @@ export default function CharacterStrokesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-600 uppercase">
+                <tr className="bg-amber-50 border-b-2 border-amber-200 text-xs font-bold text-amber-900">
                   <th className="p-4">ID</th>
                   <th className="p-4">ตัวอักขระ</th>
                   <th className="p-4">ชื่ออักขระ</th>
                   <th className="p-4">ประเภท</th>
-                  <th className="p-4 text-center">จำนวนเส้น (Strokes)</th>
+                  <th className="p-4 text-center">จำนวนเส้น (STROKES)</th>
                   <th className="p-4 text-center">จัดการ</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm">
-                {paginatedData.map((item) => (
-                  <tr key={item.stroke_id} className="hover:bg-amber-50/40 transition">
-                    <td className="p-4 font-mono text-gray-500">#{item.stroke_id}</td>
-                    <td className="p-4 text-2xl font-bold text-amber-900 font-serif">
-                      {item.char_symbol}
-                    </td>
-                    <td className="p-4 font-medium text-gray-800">
-                      {item.char_name || "-"}
-                    </td>
-                    <td className="p-4">
-                      <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
-                        {item.category}
-                      </span>
-                    </td>
-                    <td className="p-4 text-center font-semibold text-gray-700">
-                      {item.stroke_count} เส้น
-                    </td>
+                {paginatedData.map((item) => {
+                  const cat = (item.category || "").toLowerCase();
+                  let badge = <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">{item.category || "อื่นๆ"}</span>;
+                  if (cat === "consonant") {
+                    badge = <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">พยัญชนะ</span>;
+                  } else if (cat === "vowel") {
+                    badge = <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">สระ</span>;
+                  } else if (cat === "tone" || cat === "tone_mark") {
+                    badge = <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">วรรณยุกต์</span>;
+                  } else if (cat === "number") {
+                    badge = <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">ตัวเลข</span>;
+                  } else if (cat === "sequence") {
+                    badge = <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">ตัวซ้อน/ลำดับ</span>;
+                  }
+                  return (
+                    <tr key={item.stroke_id} className="hover:bg-amber-50/40 transition">
+                      <td className="p-4 font-mono text-gray-500">#{item.stroke_id}</td>
+                      <td className="p-4 text-2xl font-bold text-amber-900 font-serif">
+                        {item.char_symbol}
+                      </td>
+                      <td className="p-4 font-medium text-gray-800">
+                        {item.char_name || "-"}
+                      </td>
+                      <td className="p-4">
+                        {badge}
+                      </td>
+                      <td className="p-4 text-center font-semibold text-gray-700">
+                        {item.stroke_count} เส้น
+                      </td>
                     <td className="p-4 text-center space-x-2">
                       <button
                         onClick={() => handleOpenEdit(item)}
@@ -326,7 +338,8 @@ export default function CharacterStrokesPage() {
                       </button>
                     </td>
                   </tr>
-                ))}
+                );
+              })}
               </tbody>
             </table>
           </div>

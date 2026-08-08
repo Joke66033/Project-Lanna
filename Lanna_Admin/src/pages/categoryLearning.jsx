@@ -28,6 +28,7 @@ export default function CategoryLearning() {
   const [totalCount, setTotalCount] = useState(0);
 
   const [search, setSearch] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
   const [showAdd, setShowAdd] = useState(false);
@@ -49,7 +50,7 @@ export default function CategoryLearning() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successText, setSuccessText] = useState("");
 
-  const fetchData = async (page = currentPage, searchQuery = search) => {
+  const fetchData = async (page = currentPage, searchQuery = search, statusFilter = selectedStatus) => {
     setLoading(true);
     try {
       let list = [];
@@ -71,6 +72,12 @@ export default function CategoryLearning() {
       if (searchQuery.trim() !== "") {
         const q = searchQuery.trim().toLowerCase();
         list = list.filter((item) => item.title && item.title.toLowerCase().includes(q));
+      }
+
+      if (statusFilter === "1" || statusFilter === "active") {
+        list = list.filter((item) => Number(item.is_active) === 1 || String(item.status) === "1" || String(item.status).toLowerCase() === "active");
+      } else if (statusFilter === "0" || statusFilter === "inactive") {
+        list = list.filter((item) => Number(item.is_active) === 0 || String(item.status) === "0" || String(item.status).toLowerCase() === "inactive");
       }
 
       setTotalCount(list.length);
@@ -95,25 +102,25 @@ export default function CategoryLearning() {
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      fetchData(currentPage, search);
+      fetchData(currentPage, search, selectedStatus);
     }, 200);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [currentPage, search]);
+  }, [currentPage, search, selectedStatus]);
 
   useEffect(() => {
     const channel = supabase
       .channel("learning_category")
       .on("postgres_changes", 
         { event: "*", schema: "public", table: "learning_category" },
-        () => fetchData(currentPage, search)
+        () => fetchData(currentPage, search, selectedStatus)
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentPage, search]);
+  }, [currentPage, search, selectedStatus]);
 
   /* ===== AUTO CLOSE SUCCESS ===== */
   useEffect(() => {
@@ -295,18 +302,34 @@ export default function CategoryLearning() {
         </button>
       </div>
 
-      {/* SEARCH */}
-      <div className="relative mb-6">
-        <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-        <input
-          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white text-sm"
-          placeholder="ค้นหาตามชื่อหมวดหมู่การเรียนรู้..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
+      {/* SEARCH & FILTER */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white text-sm"
+            placeholder="ค้นหาตามชื่อหมวดหมู่การเรียนรู้..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+        <div className="w-full sm:w-64">
+          <select
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white cursor-pointer text-sm"
+            value={selectedStatus}
+            onChange={(e) => {
+              setSelectedStatus(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="all">ทั้งหมด</option>
+            <option value="1">กำลังใช้งาน</option>
+            <option value="0">ปิดใช้งาน</option>
+          </select>
+        </div>
       </div>
 
       {/* LOADING / ERROR / TABLE */}

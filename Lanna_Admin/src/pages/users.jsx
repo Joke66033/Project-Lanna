@@ -4,6 +4,14 @@ import Pagination from "../components/Pagination.jsx";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
 import { SuccessModal } from "../components/AlertModals.jsx";
 
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
+    return 'https://siripaporn.lnw.mn';
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
+};
+const BASE = getApiBase();
+
 /* ================= MODAL ================= */
 import Modal from "../components/Modal.jsx";
 import { categoryColors } from "../lib/categoryColors";
@@ -181,9 +189,9 @@ export default function Users() {
   return (
     <div className="p-6 bg-[#f9f7f4] min-h-screen text-base">
       {/* ===== HEADER CARD BANNER ===== */}
-      <div className="bg-purple-50/70 border border-purple-200 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="bg-rose-50/70 border border-rose-200 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700 shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center text-rose-700 shrink-0">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
@@ -202,7 +210,7 @@ export default function Users() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white text-sm"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 bg-white text-sm"
             placeholder="ค้นหาด้วยชื่อผู้ใช้งาน หรืออีเมล..."
             value={search}
             onChange={(e) => {
@@ -213,7 +221,7 @@ export default function Users() {
         </div>
         <div className="w-full sm:w-64">
           <select
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white cursor-pointer text-sm"
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 bg-white cursor-pointer text-sm"
             value={selectedStatus}
             onChange={(e) => {
               setSelectedStatus(e.target.value);
@@ -230,7 +238,7 @@ export default function Users() {
       {/* ===== TABLE ===== */}
       {loading ? (
         <div className="flex items-center justify-center p-12 bg-white rounded-xl shadow-sm">
-          <div className={`animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 ${colors.borderCol}`} />
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-rose-600" />
         </div>
       ) : error ? (
         <div className="p-12 text-center text-red-600 bg-white rounded-xl shadow-sm border border-red-200">
@@ -238,7 +246,7 @@ export default function Users() {
           <p className="text-sm mt-1">{error}</p>
           <button
             onClick={() => fetchData()}
-            className={`mt-4 px-4 py-2 ${colors.primaryBg} text-white rounded-lg ${colors.primaryBgHover} transition`}
+            className="mt-4 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition"
           >
             โหลดใหม่
           </button>
@@ -246,8 +254,8 @@ export default function Users() {
       ) : (
         <div className="lanna-table-card">
           <table className="lanna-table">
-            <thead className={colors.theadBg}>
-              <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
+            <thead className="bg-rose-50">
+              <tr className="text-rose-700 border-b-2 border-rose-200" style={{ background: 'none' }}>
                 <th className="th-num">#</th>
                 <th className="th-left">ชื่อผู้ใช้งาน</th>
                 <th className="th-left">อีเมล</th>
@@ -263,7 +271,7 @@ export default function Users() {
                   <tr key={user.id || user.email}>
                     {/* ลำดับ */}
                     <td className="td-num">
-                      <span className={`lanna-seq ${colors.seqBg} ${colors.seqText} ${colors.seqBgHover} ${colors.seqTextHover}`}>
+                      <span className="lanna-seq bg-rose-100 text-rose-600 hover:bg-rose-200 hover:text-rose-700">
                         {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                       </span>
                     </td>
@@ -275,11 +283,11 @@ export default function Users() {
                           <img
                             src={user.avatar}
                             alt={user.name}
-                            className="w-9 h-9 rounded-full object-cover border border-purple-100 shrink-0"
+                            className="w-9 h-9 rounded-full object-cover border border-rose-100 shrink-0"
                             onError={(e) => { e.target.style.display = 'none'; }}
                           />
                         ) : (
-                          <div className="w-9 h-9 rounded-full bg-purple-100 text-purple-700 font-semibold flex items-center justify-center text-sm shrink-0">
+                          <div className="w-9 h-9 rounded-full bg-rose-100 text-rose-700 font-semibold flex items-center justify-center text-sm shrink-0">
                             {user.name ? user.name.charAt(0) : "U"}
                           </div>
                         )}

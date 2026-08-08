@@ -109,7 +109,13 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $res = dbUpdate('lanna_char', ['char_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
-            jsonOk($res['data']);
+
+            $resRow = dbSelectSingle('lanna_char', '*', ['char_id' => 'eq.' . rawurlencode($id)]);
+            if ($resRow['data']) {
+                jsonOk($resRow['data']);
+            } else {
+                jsonOk(array_merge(['char_id' => $id], $updateData));
+            }
             break;
 
         case 'delete':

@@ -299,16 +299,16 @@ export default function Dashboard() {
   const totalSelected = chartData.reduce((sum, i) => sum + i.value, 0);
 
   const COLORS = [
-    "#3B82F6", // Blue
-    "#10B981", // Emerald Green
-    "#F59E0B", // Amber
-    "#8B5CF6", // Purple
-    "#EC4899", // Pink
-    "#06B6D4", // Cyan
-    "#F97316", // Orange
-    "#6366F1", // Indigo
-    "#84CC16", // Lime
-    "#14B8A6", // Teal
+    "#EA580C", // Rich Orange 600
+    "#F97316", // Vibrant Orange 500
+    "#C2410C", // Deep Terracotta Orange 700
+    "#FB923C", // Light Warm Orange 400
+    "#D97706", // Amber Gold Orange 600
+    "#F59E0B", // Bright Amber Orange 500
+    "#FF7F50", // Coral Orange
+    "#E11D48", // Rose Red-Orange
+    "#FDBA74", // Soft Peach Orange 300
+    "#9A3412", // Dark Chocolate Orange 800
   ];
 
   if (loading) {

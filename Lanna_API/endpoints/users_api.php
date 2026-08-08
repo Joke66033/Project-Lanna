@@ -360,7 +360,12 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $statusVal = $body['status'] ?? $_POST['status'] ?? null;
             if ($statusVal !== null) {
-                $dbBody['status'] = (string)$statusVal;
+                $sStr = strtolower((string)$statusVal);
+                if ($sStr === 'active' || $sStr === '1') {
+                    $dbBody['status'] = 1;
+                } else {
+                    $dbBody['status'] = 0;
+                }
             }
 
             if (isset($body['avatar'])) $dbBody['avatar'] = $body['avatar'];
@@ -448,11 +453,10 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = dbUpdate('users', ['user_id' => 'eq.' . rawurlencode($id)], $dbBody);
             if ($res['error']) { jsonError($res['error']['message']); break; }
 
-            $updatedUser = $res['data'];
+            $resRow = dbSelectSingle('users', '*', ['user_id' => 'eq.' . rawurlencode($id)]);
+            $updatedUser = $resRow['data'] ?? array_merge(['user_id' => $id], $dbBody);
             if ($updatedUser) {
-                if (isset($updatedUser['status'])) {
-                    $updatedUser['status'] = ($updatedUser['status'] == 1) ? 'active' : 'banned';
-                }
+                $updatedUser['status'] = ($updatedUser['status'] == 1 || $updatedUser['status'] === 'active') ? 'active' : 'banned';
                 unset($updatedUser['password_hash']);
                 resolveUserAvatar($updatedUser);
             }

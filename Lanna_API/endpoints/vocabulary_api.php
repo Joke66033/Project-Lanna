@@ -148,9 +148,12 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (array_key_exists('meaning', $body))           $updateData['meaning'] = $body['meaning'];
             if (array_key_exists('category_vocab_id', $body)) $updateData['category_vocab_id'] = !empty($body['category_vocab_id']) ? $body['category_vocab_id'] : null;
 
-            $res = dbUpdate('vocabulary', ['vocab_id' => 'eq.' . rawurlencode($id)], $updateData);
-            if ($res['error']) { jsonError($res['error']['message']); break; }
-            jsonOk($res['data']);
+            $resRow = dbSelectSingle('vocabulary', '*', ['vocab_id' => 'eq.' . rawurlencode($id)]);
+            if ($resRow['data']) {
+                jsonOk($resRow['data']);
+            } else {
+                jsonOk(array_merge(['vocab_id' => $id], $updateData));
+            }
             break;
 
         case 'delete':

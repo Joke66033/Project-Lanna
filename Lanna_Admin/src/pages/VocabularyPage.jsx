@@ -573,6 +573,23 @@ export default function VocabularyPage() {
           >
             {/* SCROLLABLE BODY */}
             <div className="p-6 overflow-y-auto space-y-4 flex-1">
+              {/* คำศัพท์ไทย */}
+              <div>
+                <label className="text-sm font-medium">คำศัพท์ไทย</label>
+                <input
+                  value={form.thai_word}
+                  placeholder="ตัวอย่าง: สวัสดี"
+                  className={`mt-1 w-full border rounded-xl px-4 py-3 ${
+                    errors.thai_word ? "border-red-500" : ""
+                  }`}
+                  onChange={(e) => {
+                    setForm((prev) => ({ ...prev, thai_word: e.target.value }));
+                    setErrors((prev) => ({ ...prev, thai_word: null }));
+                  }}
+                />
+                {errors.thai_word && <p className="text-red-500 text-sm mt-1">{errors.thai_word}</p>}
+              </div>
+
               {/* คำศัพท์ล้านนา */}
               <div>
                 <label className="text-sm font-medium">คำศัพท์ล้านนา</label>
@@ -594,7 +611,7 @@ export default function VocabularyPage() {
                     onClick={handleConvert}
                     className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-4 py-2 rounded-lg transition shrink-0 text-sm"
                   >
-                    แปลงจากไทย
+                    แปลงจากคำศัพท์ไทย
                   </button>
                 </div>
                 <p className="text-red-500 text-xs mt-1.5 font-normal leading-relaxed">
@@ -606,23 +623,6 @@ export default function VocabularyPage() {
                   </p>
                 )}
                 {errors.lanna_word && <p className="text-red-500 text-sm mt-1">{errors.lanna_word}</p>}
-              </div>
-
-              {/* คำศัพท์ไทย */}
-              <div>
-                <label className="text-sm font-medium">คำศัพท์ไทย</label>
-                <input
-                  value={form.thai_word}
-                  placeholder="ตัวอย่าง: สวัสดี"
-                  className={`mt-1 w-full border rounded-xl px-4 py-3 ${
-                    errors.thai_word ? "border-red-500" : ""
-                  }`}
-                  onChange={(e) => {
-                    setForm((prev) => ({ ...prev, thai_word: e.target.value }));
-                    setErrors((prev) => ({ ...prev, thai_word: null }));
-                  }}
-                />
-                {errors.thai_word && <p className="text-red-500 text-sm mt-1">{errors.thai_word}</p>}
               </div>
 
               {/* คำอ่าน / ลำดับการพิมพ์ */}

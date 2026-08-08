@@ -142,6 +142,7 @@ export default function Users() {
   const confirmToggleStatus = async () => {
     if (!pendingUser) return;
     const newStatus = pendingUser.isActive ? "suspended" : "active";
+    const newStatusInt = pendingUser.isActive ? 0 : 1;
     const userId = pendingUser.id;
 
     setToggling(userId);
@@ -158,16 +159,11 @@ export default function Users() {
         throw new Error(resJson.error.message || "ไม่สามารถอัปเดตสถานะได้");
       }
 
-      trackRecentActivity("users", userId);
-      setData((prev) => {
-        const mapped = prev.map((u) =>
-          (u.user_id || u.id) === userId
-            ? { ...u, status: newStatus }
-            : u
-        );
-        return sortRecentData(mapped, "users", "user_id");
-      });
+      try {
+        await supabase.from("users").update({ status: newStatusInt }).eq("user_id", userId);
+      } catch (e) {}
 
+      trackRecentActivity("users", userId);
       setSuccessText(
         pendingUser.isActive
           ? `ระงับบัญชี "${pendingUser.name}" เรียบร้อยแล้ว`

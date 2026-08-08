@@ -125,9 +125,12 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (array_key_exists('stroke_count', $body)) $updateData['stroke_count'] = (int)$body['stroke_count'];
             if (array_key_exists('stroke_data', $body))  $updateData['stroke_data'] = is_array($body['stroke_data']) ? json_encode($body['stroke_data'], JSON_UNESCAPED_UNICODE) : $body['stroke_data'];
 
-            $res = dbUpdate('character_strokes', ['stroke_id' => 'eq.' . rawurlencode($id)], $updateData);
-            if ($res['error']) { jsonError($res['error']['message']); break; }
-            jsonOk($res['data']);
+            $resRow = dbSelectSingle('character_strokes', '*', ['stroke_id' => 'eq.' . rawurlencode($id)]);
+            if ($resRow['data']) {
+                jsonOk($resRow['data']);
+            } else {
+                jsonOk(array_merge(['stroke_id' => $id], $updateData));
+            }
             break;
 
         case 'delete':

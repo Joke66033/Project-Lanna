@@ -203,20 +203,20 @@ export default function CharacterStrokesPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-200 shadow-sm">
+      {/* Header Banner (Indigo Theme) */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-indigo-50/70 p-6 rounded-2xl border border-indigo-200 shadow-sm">
         <div>
-          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <Activity className="w-7 h-7 text-amber-600" />
+          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <Activity className="w-7 h-7 text-indigo-600" />
             จัดการเส้นทางการวาดอักขระล้านนา
           </h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-gray-500 mt-1">
             จัดเก็บและปรับแต่งพิกัดจุดลากเส้นของแต่ละตัวอักขระสำหรับระบบฝึกเขียน (100x100 Grid)
           </p>
         </div>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow-md transition shrink-0"
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow-md transition shrink-0"
         >
           <Plus className="w-5 h-5" />
           เพิ่มข้อมูลเส้นการวาด
@@ -235,7 +235,7 @@ export default function CharacterStrokesPage() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none bg-white"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none bg-white"
           />
         </div>
 
@@ -246,7 +246,7 @@ export default function CharacterStrokesPage() {
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none cursor-pointer bg-white"
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none cursor-pointer bg-white"
           >
             <option value="all">ทุกประเภท</option>
             <option value="consonant">พยัญชนะ</option>
@@ -284,8 +284,8 @@ export default function CharacterStrokesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-amber-50 border-b-2 border-amber-200 text-xs font-bold text-amber-900">
-                  <th className="p-4 whitespace-nowrap">ID</th>
+                <tr className="bg-indigo-50 border-b-2 border-indigo-200 text-xs font-bold text-indigo-900">
+                  <th className="p-4 whitespace-nowrap text-center w-16">#</th>
                   <th className="p-4 whitespace-nowrap">ตัวอักขระ</th>
                   <th className="p-4 whitespace-nowrap">ชื่ออักขระ</th>
                   <th className="p-4 whitespace-nowrap">ประเภท</th>
@@ -294,7 +294,7 @@ export default function CharacterStrokesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm">
-                {paginatedData.map((item) => {
+                {paginatedData.map((item, index) => {
                   const cat = (item.category || "").toLowerCase();
                   let badge = <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">{item.category || "อื่นๆ"}</span>;
                   if (cat === "consonant") {
@@ -309,8 +309,12 @@ export default function CharacterStrokesPage() {
                     badge = <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">ตัวซ้อน/ลำดับ</span>;
                   }
                   return (
-                    <tr key={item.stroke_id} className="hover:bg-amber-50/60 transition">
-                      <td className="p-4 font-mono text-gray-500">#{item.stroke_id}</td>
+                    <tr key={item.stroke_id} className="hover:bg-indigo-50/60 transition">
+                      <td className="p-4 text-center">
+                        <span className="lanna-seq bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:text-indigo-800">
+                          {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
+                        </span>
+                      </td>
                       <td className="p-4 text-2xl font-bold text-amber-900 font-serif">
                         {item.char_symbol}
                       </td>

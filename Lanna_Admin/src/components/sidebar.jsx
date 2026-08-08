@@ -165,8 +165,8 @@ export default function Sidebar() {
           className={({ isActive }) =>
             `block px-4 py-2 rounded-lg text-base font-medium transition ${
               isActive
-                ? `${categoryColors.vocabulary.sidebarActive} font-bold pl-3 shadow-sm`
-                : `${categoryColors.vocabulary.sidebarNormal}`
+                ? `${categoryColors.characterStrokes.sidebarActive} font-bold pl-3 shadow-sm`
+                : `${categoryColors.characterStrokes.sidebarNormal}`
             }`
           }
         >

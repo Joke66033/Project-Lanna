@@ -44,10 +44,12 @@ export default function Topbar() {
 
   const getBorderClass = () => {
     const path = location.pathname;
-    if (path.startsWith("/vocabulary")) return "border-orange-600";
-    if (path.startsWith("/alphabet")) return "border-amber-600";
-    if (path.startsWith("/categoryAlphabet")) return "border-emerald-600";
-    if (path.startsWith("/categoryLannaChar")) return "border-teal-600";
+    if (path.startsWith("/dashboard")) return "border-orange-600";
+    if (path.startsWith("/vocabulary")) return "border-amber-600";
+    if (path.startsWith("/alphabet")) return "border-emerald-600";
+    if (path.startsWith("/characterStrokes")) return "border-indigo-600";
+    if (path.startsWith("/categoryAlphabet")) return "border-teal-600";
+    if (path.startsWith("/categoryLannaChar")) return "border-cyan-600";
     if (path.startsWith("/categoryLearning")) return "border-sky-600";
     if (path.startsWith("/articles")) return "border-violet-600";
     if (path.startsWith("/users")) return "border-rose-600";

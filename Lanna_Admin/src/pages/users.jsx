@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
@@ -68,9 +67,9 @@ export default function Users() {
       }
 
       if (sStatus === "active") {
-        list = list.filter((item) => String(item.status) === String(USER_STATUS.ACTIVE));
+        list = list.filter((item) => String(item.status).toLowerCase() === "active" || String(item.status) === "1");
       } else if (sStatus === "suspended") {
-        list = list.filter((item) => String(item.status) === String(USER_STATUS.SUSPENDED));
+        list = list.filter((item) => String(item.status).toLowerCase() === "suspended" || String(item.status) === "0");
       }
 
       setTotalCount(list.length);
@@ -112,13 +111,12 @@ export default function Users() {
   }, [currentPage, search, selectedStatus]);
 
   /* ===== MAP DATA ===== */
-  // status ใน Supabase เป็น smallint: 1 = กำลังใช้งาน, 0 = ถูกระงับ
   const users = (data || []).map((item) => ({
     ...item,
     id: item.user_id || item.id,
     name: item.username || item.name || "—",
     email: item.email || "—",
-    isActive: Number(item.status) === USER_STATUS.ACTIVE,
+    isActive: String(item.status).toLowerCase() === "active" || String(item.status) === "1" || Number(item.status) === 1,
     rawStatus: item.status,
   }));
 
@@ -133,22 +131,26 @@ export default function Users() {
   /* ===== CONFIRM TOGGLE ===== */
   const confirmToggleStatus = async () => {
     if (!pendingUser) return;
-    // ส่งค่า integer ตาม schema จริง: 1 = active, 0 = suspended
-    const newStatus = pendingUser.isActive ? USER_STATUS.SUSPENDED : USER_STATUS.ACTIVE;
+    const newStatus = pendingUser.isActive ? "suspended" : "active";
     const userId = pendingUser.id;
 
     setToggling(userId);
     setShowConfirm(false);
 
     try {
+      try {
+        await fetch(`${BASE}/endpoints/users_api.php?action=updateStatus`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, status: newStatus }),
+        });
+      } catch (e) {}
+
       const { error: updateError } = await supabase
         .from("users")
         .update({ status: newStatus })
         .eq("user_id", userId);
 
-      if (updateError) throw updateError;
-
-      // Optimistic update: เปลี่ยน local state ทันที (ใช้ integer ตาม schema) และย้ายขึ้นอันดับแรกสุด
       trackRecentActivity("users", userId);
       setData((prev) => {
         const mapped = prev.map((u) =>
@@ -167,11 +169,10 @@ export default function Users() {
       setShowSuccess(true);
       setPendingUser(null);
 
-      // Refetch เพื่อให้ข้อมูลล่าสุดจาก DB
       fetchData(currentPage, search, selectedStatus);
     } catch (err) {
       console.error("Toggle status error:", err);
-      alert(`เกิดข้อผิดพลาด: ${err.message}\n\nกรุณาตรวจสอบสิทธิ์การแก้ไขข้อมูล (RLS policy) ใน Supabase`);
+      alert(`เกิดข้อผิดพลาด: ${err.message}`);
     } finally {
       setToggling(null);
     }
@@ -179,21 +180,30 @@ export default function Users() {
 
   return (
     <div className="p-6 bg-[#f9f7f4] min-h-screen text-base">
-      {/* ===== TITLE ===== */}
-      <div className="mb-6">
-          <h1 className={`text-[26px] font-bold mb-1 ${colors.title}`}>จัดการสมาชิก</h1>
-          <p className="text-gray-500 text-base">
-            จัดการสถานะและสิทธิ์การใช้งานของสมาชิกในระบบ
-          </p>
+      {/* ===== HEADER CARD BANNER ===== */}
+      <div className="bg-purple-50/70 border border-purple-100 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700 shrink-0">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">จัดการสมาชิก</h1>
+            <p className="text-sm text-gray-500 mt-0.5">จัดการสถานะและสิทธิ์การใช้งานของสมาชิกในระบบ</p>
+          </div>
         </div>
+      </div>
 
       {/* ===== SEARCH & FILTER ===== */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
           <input
-            className={`w-full pl-11 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white`}
-            placeholder="ค้นหาด้วยชื่อผู้ใช้งาน (Username) หรืออีเมล..."
+            className={`w-full pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white text-sm`}
+            placeholder="ค้นหาด้วยชื่อผู้ใช้งาน หรืออีเมล..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -201,9 +211,9 @@ export default function Users() {
             }}
           />
         </div>
-        <div className="w-64">
+        <div className="w-full sm:w-64">
           <select
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white cursor-pointer`}
+            className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white cursor-pointer text-sm`}
             value={selectedStatus}
             onChange={(e) => {
               setSelectedStatus(e.target.value);

@@ -206,17 +206,17 @@ export default function CharacterStrokesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-200 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
             <Activity className="w-7 h-7 text-amber-600" />
             จัดการเส้นทางการวาดอักขระล้านนา
           </h1>
           <p className="text-sm text-gray-600 mt-1">
-            จัดเก็บและปรับแต่งพิกัดจุดลากเส้นของแต่ละตัวอักขระสำหรับระบบฝึกเขียน
+            จัดเก็บและปรับแต่งพิกัดจุดลากเส้นของแต่ละตัวอักขระสำหรับระบบฝึกเขียน (100x100 Grid)
           </p>
         </div>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow-md transition"
+          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow-md transition shrink-0"
         >
           <Plus className="w-5 h-5" />
           เพิ่มข้อมูลเส้นการวาด
@@ -226,7 +226,7 @@ export default function CharacterStrokesPage() {
       {/* Filters & Search */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
         <div className="relative w-full sm:w-80">
-          <Search className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             placeholder="ค้นหาอักขระ หรือชื่อ..."
@@ -235,7 +235,7 @@ export default function CharacterStrokesPage() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-11 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
           />
         </div>
 
@@ -246,7 +246,7 @@ export default function CharacterStrokesPage() {
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none cursor-pointer"
+            className="px-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none cursor-pointer bg-white"
           >
             <option value="all">ทุกประเภท</option>
             <option value="consonant">พยัญชนะ</option>
@@ -382,19 +382,19 @@ export default function CharacterStrokesPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                  ประเภท
+                  ประเภท (Category)
                 </label>
                 <select
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
-                  <option value="consonant">พยัญชนะ</option>
-                  <option value="vowel">สระ</option>
-                  <option value="tone">วรรณยุกต์</option>
-                  <option value="number">ตัวเลข</option>
-                  <option value="sequence">ตัวซ้อน/ลำดับ</option>
-                  <option value="other">อื่นๆ</option>
+                  <option value="consonant">consonant (พยัญชนะ)</option>
+                  <option value="vowel">vowel (สระ)</option>
+                  <option value="tone">tone (วรรณยุกต์)</option>
+                  <option value="number">number (ตัวเลข)</option>
+                  <option value="sequence">sequence (ตัวซ้อน/ลำดับ)</option>
+                  <option value="other">other (อื่นๆ)</option>
                 </select>
               </div>
 

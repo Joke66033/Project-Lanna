@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
@@ -388,15 +388,16 @@ export default function AlphabetPage() {
 
   return (
     <div className="p-6 bg-[#f9f7f4] min-h-screen">
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h1 className={`text-[26px] font-bold ${colors.title}`}>
-            จัดการข้อมูลอักขระ
-          </h1>
-          <p className="text-gray-500 text-base mt-1">
-            เพิ่ม แก้ไข และจัดการข้อมูลอักขระล้านนา
-          </p>
+      {/* HEADER CARD BANNER */}
+      <div className="bg-orange-50/70 border border-orange-100 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+            <Type className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">จัดการข้อมูลอักขระ</h1>
+            <p className="text-sm text-gray-500 mt-0.5">เพิ่ม แก้ไข และจัดการข้อมูลอักขระล้านนา</p>
+          </div>
         </div>
         <button
           onClick={() => {
@@ -406,18 +407,18 @@ export default function AlphabetPage() {
             setShowEdit(false);
             setShowAdd(true);
           }}
-          className={`flex items-center gap-2 ${colors.button} text-white px-5 py-2.5 rounded-xl shadow transition font-semibold`}
+          className={`flex items-center gap-2 ${colors.button} text-white px-5 py-2.5 rounded-xl shadow transition font-semibold shrink-0`}
         >
           <Plus size={18} /> เพิ่มอักขระ
         </button>
       </div>
 
       {/* SEARCH & FILTER */}
-      <div className="flex gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
-            className={`w-full pl-11 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white`}
+            className={`w-full pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white text-sm`}
             placeholder="ค้นหาอักขระ..."
             value={search}
             onChange={(e) => {
@@ -426,21 +427,23 @@ export default function AlphabetPage() {
             }}
           />
         </div>
-        <select
-          className={`w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white cursor-pointer`}
-          value={selectedCategory}
-          onChange={(e) => {
-            setSelectedCategory(e.target.value);
-            setCurrentPage(1);
-          }}
-        >
-          <option value="all">ทั้งหมด</option>
-          {categories.map((cat) => (
-            <option key={cat.category_char_id} value={cat.category_char_id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+        <div className="w-full sm:w-64">
+          <select
+            className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white cursor-pointer text-sm`}
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="all">ทั้งหมด</option>
+            {categories.map((cat) => (
+              <option key={cat.category_char_id} value={cat.category_char_id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* TABLE */}

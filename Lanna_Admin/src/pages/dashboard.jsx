@@ -451,8 +451,11 @@ export default function Dashboard() {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={pieData}
-                      dataKey="value"
+                      data={pieData.map((item) => ({
+                        ...item,
+                        renderValue: total > 0 ? (item.value || 0.001) : 1,
+                      }))}
+                      dataKey="renderValue"
                       innerRadius={85}
                       outerRadius={110}
                       paddingAngle={3}
@@ -464,9 +467,9 @@ export default function Dashboard() {
                   </PieChart>
                 </ResponsiveContainer>
 
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <p className="text-3xl font-bold">{pieData.length}</p>
-                  <p className="text-gray-500">หมวดหมู่</p>
+                  <p className="text-gray-500 text-sm">หมวดหมู่</p>
                 </div>
               </div>
 
@@ -480,14 +483,14 @@ export default function Dashboard() {
                     >
                       <div className="flex items-center gap-3">
                         <span
-                          className="w-3 h-3 rounded-full"
+                          className="w-3 h-3 rounded-full shrink-0"
                           style={{
                             backgroundColor: COLORS[index % COLORS.length],
                           }}
                         />
-                        <span>{item.name}</span>
+                        <span className="text-sm font-medium text-gray-700">{item.name}</span>
                       </div>
-                      <span className="font-semibold">{percent}%</span>
+                      <span className="font-semibold text-sm text-gray-700">{percent}%</span>
                     </div>
                   );
                 })}

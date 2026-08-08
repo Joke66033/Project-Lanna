@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
@@ -269,13 +269,18 @@ export default function CategoryLearning() {
 
   return (
     <div className="p-6 bg-[#f9f7f4] min-h-screen">
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h1 className={`text-[26px] font-bold ${colors.title}`}>จัดการหมวดหมู่การเรียนรู้</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            สร้างและดูแลหมวดหมู่การเรียนรู้หลักสำหรับจัดกลุ่มอักขระล้านนา
-          </p>
+      {/* HEADER CARD BANNER */}
+      <div className="bg-sky-50/70 border border-sky-100 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center text-sky-700 shrink-0">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">จัดการหมวดหมู่การเรียนรู้</h1>
+            <p className="text-sm text-gray-500 mt-0.5">สร้างและดูแลหมวดหมู่การเรียนรู้หลักสำหรับจัดกลุ่มอักขระล้านนา</p>
+          </div>
         </div>
         <button
           onClick={() => {
@@ -283,7 +288,7 @@ export default function CategoryLearning() {
             setErrors({});
             setShowAdd(true);
           }}
-          className={`flex items-center gap-2 ${colors.button} text-white px-4 py-2.5 rounded-lg font-semibold shadow-md transition`}
+          className={`flex items-center gap-2 ${colors.button} text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition shrink-0`}
         >
           <Plus size={18} />
           <span>เพิ่มหมวดหมู่การเรียนรู้</span>
@@ -291,19 +296,17 @@ export default function CategoryLearning() {
       </div>
 
       {/* SEARCH */}
-      <div className="flex gap-4 mb-4">
-        <div className="relative flex-1">
-          <Search className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            className={`w-full pl-11 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white`}
-            placeholder="ค้นหาตามชื่อหมวดหมู่การเรียนรู้..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-          />
-        </div>
+      <div className="relative mb-6">
+        <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <input
+          className={`w-full pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white text-sm`}
+          placeholder="ค้นหาตามชื่อหมวดหมู่การเรียนรู้..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
       </div>
 
       {/* LOADING / ERROR / TABLE */}

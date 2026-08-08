@@ -64,9 +64,13 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $nextId = 'CV' . str_pad((string)$nextNumber, 4, '0', STR_PAD_LEFT);
 
-            // 2. INSERT with generated ID
-            $finalData = array_merge($body, ['category_vocab_id' => $nextId]);
-            $res = dbInsert('category_vocab', $finalData);
+            $insertData = [
+                'category_vocab_id' => $nextId,
+                'name'              => $body['name'] ?? '',
+                'description'       => $body['description'] ?? '',
+                'is_active'         => isset($body['is_active']) ? (int)$body['is_active'] : 1
+            ];
+            $res = dbInsert('category_vocab', $insertData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;
@@ -74,7 +78,13 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'update':
             $id = $_GET['id'] ?? '';
             if ($id === '') { jsonError('Missing id'); break; }
-            $res = dbUpdate('category_vocab', ['category_vocab_id' => 'eq.' . rawurlencode($id)], $body);
+            
+            $updateData = [];
+            if (array_key_exists('name', $body))        $updateData['name'] = $body['name'];
+            if (array_key_exists('description', $body)) $updateData['description'] = $body['description'];
+            if (array_key_exists('is_active', $body))   $updateData['is_active'] = (int)$body['is_active'];
+
+            $res = dbUpdate('category_vocab', ['category_vocab_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;

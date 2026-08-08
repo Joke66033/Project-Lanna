@@ -81,9 +81,17 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $nextId = 'V' . str_pad((string)$nextNumber, 3, '0', STR_PAD_LEFT);
 
-            // 2. INSERT with generated ID
-            $finalData = array_merge($body, ['char_id' => $nextId]);
-            $res = dbInsert('lanna_char', $finalData);
+            $insertData = [
+                'char_id'          => $nextId,
+                'char_symbol'      => $body['char_symbol'] ?? '',
+                'char_name'        => $body['char_name'] ?? '',
+                'category_char_id' => !empty($body['category_char_id']) ? $body['category_char_id'] : null,
+                'description'      => $body['description'] ?? '',
+                'image_url'        => $body['image_url'] ?? '',
+                'sound_url'        => $body['sound_url'] ?? '',
+                'is_active'        => isset($body['is_active']) ? (int)$body['is_active'] : 1
+            ];
+            $res = dbInsert('lanna_char', $insertData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;
@@ -91,7 +99,17 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'update':
             $id = $_GET['id'] ?? '';
             if ($id === '') { jsonError('Missing id'); break; }
-            $res = dbUpdate('lanna_char', ['char_id' => 'eq.' . rawurlencode($id)], $body);
+
+            $updateData = [];
+            if (array_key_exists('char_symbol', $body))      $updateData['char_symbol'] = $body['char_symbol'];
+            if (array_key_exists('char_name', $body))        $updateData['char_name'] = $body['char_name'];
+            if (array_key_exists('category_char_id', $body)) $updateData['category_char_id'] = !empty($body['category_char_id']) ? $body['category_char_id'] : null;
+            if (array_key_exists('description', $body))      $updateData['description'] = $body['description'];
+            if (array_key_exists('image_url', $body))        $updateData['image_url'] = $body['image_url'];
+            if (array_key_exists('sound_url', $body))        $updateData['sound_url'] = $body['sound_url'];
+            if (array_key_exists('is_active', $body))        $updateData['is_active'] = (int)$body['is_active'];
+
+            $res = dbUpdate('lanna_char', ['char_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;

@@ -148,8 +148,10 @@ export default function CategoryLearning() {
     try {
       setLoading(true);
       const submitData = {
-        ...form,
-        total_items: parseInt(form.total_items || '0', 10)
+        category_code: form.category_code,
+        title: form.title,
+        description: form.description,
+        is_active: form.is_active
       };
       const res = await fetch(
         `${BASE}/endpoints/learning_category_api.php?action=create`,
@@ -175,7 +177,7 @@ export default function CategoryLearning() {
       }
       fetchData();
     } catch (err) {
-      alert("เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่: " + err.message);
+      alert("เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่: " + (err.message || err));
     } finally {
       setLoading(false);
     }
@@ -201,8 +203,9 @@ export default function CategoryLearning() {
     try {
       setLoading(true);
       const submitData = {
-        ...form,
-        total_items: parseInt(form.total_items || '0', 10)
+        title: form.title,
+        description: form.description,
+        is_active: form.is_active
       };
       const res = await fetch(
         `${BASE}/endpoints/learning_category_api.php?action=update&id=${encodeURIComponent(originalForm.category_code)}`,

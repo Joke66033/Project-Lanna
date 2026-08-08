@@ -75,7 +75,13 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nextId = $prefix . str_pad((string)$nextNumber, 4, '0', STR_PAD_LEFT);
 
             // 2. INSERT ข้อมูลพร้อมกับ ID และรหัสหมวดหมู่หลัก (learning_category_code)
-            $finalData = array_merge($body, ['category_char_id' => $nextId]);
+            $finalData = [
+                'category_char_id'       => $nextId,
+                'name'                   => $body['name'] ?? '',
+                'description'            => $body['description'] ?? '',
+                'learning_category_code' => !empty($body['learning_category_code']) ? $body['learning_category_code'] : null,
+                'is_active'              => isset($body['is_active']) ? (int)$body['is_active'] : 1
+            ];
             $res = dbInsert('category_lanna_char', $finalData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
@@ -85,8 +91,13 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_GET['id'] ?? '';
             if ($id === '') { jsonError('Missing id'); break; }
             
-            // อัปเดตฟิลด์ต่างๆ (รวมถึง learning_category_code)
-            $res = dbUpdate('category_lanna_char', ['category_char_id' => 'eq.' . rawurlencode($id)], $body);
+            $updateData = [];
+            if (array_key_exists('name', $body))                   $updateData['name'] = $body['name'];
+            if (array_key_exists('description', $body))            $updateData['description'] = $body['description'];
+            if (array_key_exists('learning_category_code', $body)) $updateData['learning_category_code'] = !empty($body['learning_category_code']) ? $body['learning_category_code'] : null;
+            if (array_key_exists('is_active', $body))              $updateData['is_active'] = (int)$body['is_active'];
+
+            $res = dbUpdate('category_lanna_char', ['category_char_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;

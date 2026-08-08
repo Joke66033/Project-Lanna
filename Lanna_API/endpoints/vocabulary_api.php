@@ -120,9 +120,18 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $body['lanna_word'] = generateLannaUnicode($baseText);
             }
 
-            // 3. INSERT with generated ID
-            $finalData = array_merge($body, ['vocab_id' => $nextId]);
-            $res = dbInsert('vocabulary', $finalData);
+            $insertData = [
+                'vocab_id'          => $nextId,
+                'thai_word'         => $body['thai_word'] ?? '',
+                'lanna_word'        => $body['lanna_word'] ?? '',
+                'reading'           => $body['reading'] ?? '',
+                'meaning'           => $body['meaning'] ?? '',
+                'category_vocab_id' => !empty($body['category_vocab_id']) ? $body['category_vocab_id'] : null,
+                'image_url'         => $body['image_url'] ?? '',
+                'sound_url'         => $body['sound_url'] ?? '',
+                'is_active'         => isset($body['is_active']) ? (int)$body['is_active'] : 1
+            ];
+            $res = dbInsert('vocabulary', $insertData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;
@@ -134,7 +143,18 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $baseText = !empty($body['thai_word']) ? $body['thai_word'] : ($body['reading'] ?? '');
                 $body['lanna_word'] = generateLannaUnicode($baseText);
             }
-            $res = dbUpdate('vocabulary', ['vocab_id' => 'eq.' . rawurlencode($id)], $body);
+
+            $updateData = [];
+            if (array_key_exists('thai_word', $body))         $updateData['thai_word'] = $body['thai_word'];
+            if (array_key_exists('lanna_word', $body))        $updateData['lanna_word'] = $body['lanna_word'];
+            if (array_key_exists('reading', $body))           $updateData['reading'] = $body['reading'];
+            if (array_key_exists('meaning', $body))           $updateData['meaning'] = $body['meaning'];
+            if (array_key_exists('category_vocab_id', $body)) $updateData['category_vocab_id'] = !empty($body['category_vocab_id']) ? $body['category_vocab_id'] : null;
+            if (array_key_exists('image_url', $body))         $updateData['image_url'] = $body['image_url'];
+            if (array_key_exists('sound_url', $body))         $updateData['sound_url'] = $body['sound_url'];
+            if (array_key_exists('is_active', $body))         $updateData['is_active'] = (int)$body['is_active'];
+
+            $res = dbUpdate('vocabulary', ['vocab_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;

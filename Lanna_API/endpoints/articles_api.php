@@ -87,19 +87,22 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $nextId = 'AR' . str_pad((string)$nextNumber, 4, '0', STR_PAD_LEFT);
 
-            // 2. ลบ category (ฟิลด์ซ้ำซ้อนและไม่มีในตารางจริง) แล้ว INSERT
-            $finalData = $body;
-            unset($finalData['category']);
-            $finalData = array_merge($finalData, ['article_id' => $nextId]);
+            $insertData = [
+                'article_id'       => $nextId,
+                'title'            => $body['title'] ?? '',
+                'content'          => $body['content'] ?? '',
+                'category_char_id' => !empty($body['category_char_id']) ? $body['category_char_id'] : null,
+                'cover_image_url'  => $body['cover_image_url'] ?? '',
+                'is_active'        => isset($body['is_active']) ? (int)$body['is_active'] : 1
+            ];
 
-            $res = dbInsert('articles', $finalData);
+            $res = dbInsert('articles', $insertData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             
-            // 3. ดึงข้อมูลที่เพิ่งเพิ่มกลับมาพร้อมความสัมพันธ์แบบ Join ไปให้ Frontend
+            // 3. ดึงข้อมูลที่เพิ่งเพิ่มกลับมาพร้อมความสัมพันธ์แบบ Join ส่งกลับไปให้ Frontend
             $insertedId = $res['data']['article_id'] ?? $nextId;
             $resJoined = dbSelectSingle('articles', '*,category_lanna_char(*,learning_category(*))', ['article_id' => 'eq.' . $insertedId]);
             if ($resJoined['error']) {
-                // หากการ join มีปัญหาให้คืนข้อมูลที่ insert ได้ตามปกติ
                 jsonOk($res['data']);
             } else {
                 jsonOk($resJoined['data']);
@@ -109,11 +112,15 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'update':
             $id = $_GET['id'] ?? '';
             if ($id === '') { jsonError('Missing id'); break; }
-            // ลบ category (ฟิลด์ซ้ำซ้อนและไม่มีในตารางจริง) แล้ว UPDATE
-            $finalData = $body;
-            unset($finalData['category']);
 
-            $res = dbUpdate('articles', ['article_id' => 'eq.' . $id], $finalData);
+            $updateData = [];
+            if (array_key_exists('title', $body))            $updateData['title'] = $body['title'];
+            if (array_key_exists('content', $body))          $updateData['content'] = $body['content'];
+            if (array_key_exists('category_char_id', $body)) $updateData['category_char_id'] = !empty($body['category_char_id']) ? $body['category_char_id'] : null;
+            if (array_key_exists('cover_image_url', $body))  $updateData['cover_image_url'] = $body['cover_image_url'];
+            if (array_key_exists('is_active', $body))        $updateData['is_active'] = (int)$body['is_active'];
+
+            $res = dbUpdate('articles', ['article_id' => 'eq.' . $id], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             
             // ดึงข้อมูลที่อัปเดตใหม่กลับมาพร้อมความสัมพันธ์แบบ Join ส่งกลับไปให้ Frontend

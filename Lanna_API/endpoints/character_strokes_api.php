@@ -99,7 +99,17 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $nextNum = $last ? (intval(substr($last, 1)) + 1) : 1;
                 $body['stroke_id'] = 'S' . str_pad($nextNum, 5, '0', STR_PAD_LEFT);
             }
-            $res = dbInsert('character_strokes', $body);
+
+            $insertData = [
+                'stroke_id'    => $body['stroke_id'],
+                'char_symbol'  => $body['char_symbol'],
+                'char_name'    => $body['char_name'] ?? '',
+                'category'     => $body['category'] ?? 'consonant',
+                'stroke_count' => isset($body['stroke_count']) ? (int)$body['stroke_count'] : 1,
+                'stroke_data'  => is_array($body['stroke_data'] ?? null) ? json_encode($body['stroke_data'], JSON_UNESCAPED_UNICODE) : ($body['stroke_data'] ?? '[]')
+            ];
+
+            $res = dbInsert('character_strokes', $insertData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;
@@ -107,10 +117,15 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'update':
             $id = $_GET['id'] ?? '';
             if ($id === '') { jsonError('Missing id'); break; }
-            if (is_array($body['stroke_data'] ?? null)) {
-                $body['stroke_data'] = json_encode($body['stroke_data'], JSON_UNESCAPED_UNICODE);
-            }
-            $res = dbUpdate('character_strokes', ['stroke_id' => 'eq.' . rawurlencode($id)], $body);
+
+            $updateData = [];
+            if (array_key_exists('char_symbol', $body))  $updateData['char_symbol'] = $body['char_symbol'];
+            if (array_key_exists('char_name', $body))    $updateData['char_name'] = $body['char_name'];
+            if (array_key_exists('category', $body))     $updateData['category'] = $body['category'];
+            if (array_key_exists('stroke_count', $body)) $updateData['stroke_count'] = (int)$body['stroke_count'];
+            if (array_key_exists('stroke_data', $body))  $updateData['stroke_data'] = is_array($body['stroke_data']) ? json_encode($body['stroke_data'], JSON_UNESCAPED_UNICODE) : $body['stroke_data'];
+
+            $res = dbUpdate('character_strokes', ['stroke_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;

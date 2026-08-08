@@ -480,7 +480,7 @@ export default function AlphabetPage() {
           <table className="lanna-table">
             <thead className={colors.theadBg}>
               <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
-                <th className="th-num whitespace-nowrap">#</th>
+                <th className="th-num whitespace-nowrap">ลำดับ</th>
                 <th className="whitespace-nowrap">อักขระล้านนา</th>
                 <th className="whitespace-nowrap">อักขระไทย</th>
                 <th className="whitespace-nowrap">หมวดหมู่</th>

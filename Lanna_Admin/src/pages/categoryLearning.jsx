@@ -387,7 +387,7 @@ export default function CategoryLearning() {
           <table className="lanna-table">
             <thead className={colors.theadBg}>
               <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
-                <th className="th-num whitespace-nowrap">#</th>
+                <th className="th-num whitespace-nowrap">ลำดับ</th>
                 <th className="th-left whitespace-nowrap">หัวข้อหลัก</th>
                 <th className="th-left whitespace-nowrap">คำอธิบาย</th>
                 <th className="!text-center whitespace-nowrap">สถานะ</th>

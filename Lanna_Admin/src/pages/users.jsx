@@ -269,7 +269,7 @@ export default function Users() {
           <table className="lanna-table">
             <thead className="bg-rose-50">
               <tr className="text-rose-700 border-b-2 border-rose-200" style={{ background: 'none' }}>
-                <th className="th-num whitespace-nowrap">#</th>
+                <th className="th-num whitespace-nowrap">ลำดับ</th>
                 <th className="!text-center whitespace-nowrap" style={{ width: '90px' }}>รูปโปรไฟล์</th>
                 <th className="th-left whitespace-nowrap">ชื่อผู้ใช้งาน</th>
                 <th className="th-left whitespace-nowrap">อีเมล</th>

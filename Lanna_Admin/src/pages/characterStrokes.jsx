@@ -299,10 +299,10 @@ export default function CharacterStrokesPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-indigo-50 border-b-2 border-indigo-200 text-xs font-bold text-indigo-900">
-                  <th className="p-4 whitespace-nowrap text-center w-16">#</th>
+                  <th className="p-4 whitespace-nowrap text-center w-16">ลำดับ</th>
                   <th className="p-4 whitespace-nowrap">ตัวอักขระ</th>
                   <th className="p-4 whitespace-nowrap">ชื่ออักขระ</th>
-                  <th className="p-4 whitespace-nowrap">ประเภท</th>
+                  <th className="p-4 whitespace-nowrap">หมวดหมู่อักขระ</th>
                   <th className="p-4 text-center whitespace-nowrap">จำนวนเส้น (STROKES)</th>
                   <th className="p-4 text-center whitespace-nowrap">จัดการ</th>
                 </tr>

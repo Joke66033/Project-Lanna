@@ -455,7 +455,7 @@ export default function VocabularyPage() {
             <table className="lanna-table">
               <thead className={colors.theadBg}>
                 <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
-                  <th className="th-num whitespace-nowrap">#</th>
+                  <th className="th-num whitespace-nowrap">ลำดับ</th>
                   <th className="th-left whitespace-nowrap">คำศัพท์ล้านนา</th>
                   <th className="whitespace-nowrap">คำศัพท์ไทย</th>
                   <th className="whitespace-nowrap">คำอ่าน / ลำดับการพิมพ์</th>

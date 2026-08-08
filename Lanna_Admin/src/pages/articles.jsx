@@ -611,7 +611,7 @@ export default function Articles() {
           <table className="lanna-table">
             <thead className={colors.theadBg}>
               <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
-                <th className="th-num whitespace-nowrap">#</th>
+                <th className="th-num whitespace-nowrap">ลำดับ</th>
                 <th className="th-left whitespace-nowrap min-w-[200px]">หัวข้อเนื้อหา</th>
                 <th className="th-left whitespace-nowrap min-w-[180px]">หมวดหมู่การเรียนรู้</th>
                 <th className="th-left whitespace-nowrap min-w-[280px]">รายละเอียดเนื้อหา</th>

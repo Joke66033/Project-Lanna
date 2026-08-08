@@ -471,9 +471,9 @@ export default function Articles() {
   return (
     <div className="p-6 bg-[#f9f7f4] min-h-screen">
       {/* HEADER CARD BANNER */}
-      <div className="bg-orange-50/70 border border-orange-100 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="bg-violet-50/70 border border-violet-200 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center text-violet-700 shrink-0">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
@@ -487,7 +487,7 @@ export default function Articles() {
             setErrors({});
             setShowAdd(true);
           }}
-          className={`flex items-center gap-2 ${colors.button} text-white px-5 py-2.5 rounded-xl shadow transition font-semibold shrink-0`}
+          className="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition shrink-0"
         >
           <Plus size={18} /> เพิ่มเนื้อหาการเรียนรู้
         </button>
@@ -498,7 +498,7 @@ export default function Articles() {
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
-            className={`w-full pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white text-sm`}
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white text-sm"
             placeholder="ค้นหาหัวข้อเนื้อหา..."
             value={search}
             onChange={(e) => {
@@ -509,7 +509,7 @@ export default function Articles() {
         </div>
         <div className="w-full sm:w-64">
           <select
-            className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white cursor-pointer text-sm`}
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white cursor-pointer text-sm"
             value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);

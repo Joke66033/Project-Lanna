@@ -270,7 +270,7 @@ export default function CategoryLearning() {
   return (
     <div className="p-6 bg-[#f9f7f4] min-h-screen">
       {/* HEADER CARD BANNER */}
-      <div className="bg-sky-50/70 border border-sky-100 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="bg-sky-50/70 border border-sky-200 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center text-sky-700 shrink-0">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,7 +288,7 @@ export default function CategoryLearning() {
             setErrors({});
             setShowAdd(true);
           }}
-          className={`flex items-center gap-2 ${colors.button} text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition shrink-0`}
+          className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition shrink-0"
         >
           <Plus size={18} />
           <span>เพิ่มหมวดหมู่การเรียนรู้</span>
@@ -299,7 +299,7 @@ export default function CategoryLearning() {
       <div className="relative mb-6">
         <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
-          className={`w-full pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white text-sm`}
+          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-white text-sm"
           placeholder="ค้นหาตามชื่อหมวดหมู่การเรียนรู้..."
           value={search}
           onChange={(e) => {

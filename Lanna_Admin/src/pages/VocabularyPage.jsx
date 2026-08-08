@@ -375,9 +375,9 @@ export default function VocabularyPage() {
   return (
     <div className="p-6 bg-[#f9f7f4] min-h-screen">
       {/* HEADER CARD BANNER */}
-      <div className="bg-orange-50/70 border border-orange-100 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700 shrink-0">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
@@ -392,7 +392,7 @@ export default function VocabularyPage() {
             setShowEdit(false);
             setShowAdd(true);
           }}
-          className={`flex items-center gap-2 ${colors.button} text-white px-5 py-2.5 rounded-xl shadow transition font-semibold shrink-0`}
+          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition shrink-0"
         >
           <Plus size={18} /> เพิ่มคำศัพท์
         </button>
@@ -403,7 +403,7 @@ export default function VocabularyPage() {
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
-            className="w-full pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-white text-sm"
+            className="w-full pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white text-sm"
             placeholder="ค้นหาคำศัพท์..."
             value={search}
             onChange={(e) => {
@@ -414,7 +414,7 @@ export default function VocabularyPage() {
         </div>
         <div className="w-full sm:w-64">
           <select
-            className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-white cursor-pointer text-sm"
+            className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white cursor-pointer text-sm"
             value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);

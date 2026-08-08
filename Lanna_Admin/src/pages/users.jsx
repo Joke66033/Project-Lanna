@@ -181,7 +181,7 @@ export default function Users() {
   return (
     <div className="p-6 bg-[#f9f7f4] min-h-screen text-base">
       {/* ===== HEADER CARD BANNER ===== */}
-      <div className="bg-purple-50/70 border border-purple-100 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="bg-purple-50/70 border border-purple-200 rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700 shrink-0">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,7 +202,7 @@ export default function Users() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
-            className={`w-full pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white text-sm`}
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white text-sm"
             placeholder="ค้นหาด้วยชื่อผู้ใช้งาน หรืออีเมล..."
             value={search}
             onChange={(e) => {
@@ -213,7 +213,7 @@ export default function Users() {
         </div>
         <div className="w-full sm:w-64">
           <select
-            className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white cursor-pointer text-sm`}
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white cursor-pointer text-sm"
             value={selectedStatus}
             onChange={(e) => {
               setSelectedStatus(e.target.value);

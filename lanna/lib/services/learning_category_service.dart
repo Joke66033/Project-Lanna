@@ -35,9 +35,23 @@ class LearningCategoryService {
     CategoryModel(
       categoryCode: 'LC005',
       title: 'ตัวสะกดล้านนา',
-      description: 'เรียนรู้ตัวสะกด ห นำ ระวง อักขรวิธี และอักษรพิเศษ',
+      description: 'เรียนรู้ตัวสะกดและ ห นำ',
       isActive: true,
       totalItems: 36,
+    ),
+    CategoryModel(
+      categoryCode: 'LC006',
+      title: 'อักษรควบกล้ำล้านนา',
+      description: 'เรียนรู้พยัญชนะควบกล้ำ (ระวง/ระโฮง)',
+      isActive: true,
+      totalItems: 7,
+    ),
+    CategoryModel(
+      categoryCode: 'LC007',
+      title: 'อักขรวิธีล้านนา',
+      description: 'หลักการสะกด ตัวซ้อน ตัวห้อย อักษรพิเศษ และภาษาบาลี',
+      isActive: true,
+      totalItems: 46,
     ),
   ];
 

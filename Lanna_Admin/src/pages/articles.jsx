@@ -5,6 +5,7 @@ import {
   Pencil,
   Trash2,
   ChevronDown,
+  Search,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
@@ -488,15 +489,18 @@ export default function Articles() {
 
       {/* SEARCH & FILTER */}
       <div className="flex gap-4 mb-4">
-        <input
-          className={`flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white`}
-          placeholder="ค้นหาหัวข้อเนื้อหา..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
+        <div className="relative flex-1">
+          <Search className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            className={`w-full pl-11 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white`}
+            placeholder="ค้นหาหัวข้อเนื้อหา..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
         <select
           className={`w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white cursor-pointer`}
           value={selectedCategory}

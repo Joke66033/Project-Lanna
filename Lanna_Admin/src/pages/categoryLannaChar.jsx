@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
 import LearningCategorySelect from "../components/LearningCategorySelect.jsx";
@@ -299,9 +299,10 @@ export default function CategoryLannaChar() {
 
       {/* SEARCH & FILTER */}
       <div className="flex gap-4 mb-4">
-        <div className="flex-1">
+        <div className="relative flex-1">
+          <Search className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white`}
+            className={`w-full pl-11 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white`}
             placeholder="ค้นหาหมวดหมู่อักขระ..."
             value={search}
             onChange={(e) => {

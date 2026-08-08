@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Search } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
@@ -188,9 +189,10 @@ export default function Users() {
 
       {/* ===== SEARCH & FILTER ===== */}
       <div className="flex gap-4 mb-6">
-        <div className="flex-1">
+        <div className="relative flex-1">
+          <Search className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white`}
+            className={`w-full pl-11 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${colors.ringFocus} bg-white`}
             placeholder="ค้นหาด้วยชื่อผู้ใช้งาน (Username) หรืออีเมล..."
             value={search}
             onChange={(e) => {
@@ -209,8 +211,8 @@ export default function Users() {
             }}
           >
             <option value="all">ทั้งหมด</option>
-            <option value="active">กำลังใช้งาน (Active)</option>
-            <option value="suspended">ถูกระงับ (Suspended)</option>
+            <option value="active">กำลังใช้งาน</option>
+            <option value="suspended">ถูกระงับ</option>
           </select>
         </div>
       </div>

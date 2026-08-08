@@ -45,6 +45,8 @@ textarea.lanna-char {
 
 
 /* ช่องค้นหา - บังคับ padding-left 44px ไม่ให้ไอคอนแว่นขยายทับข้อความ */
+input[type="text"].admin-search-input,
+input.admin-search-input,
 .admin-search-input {
   padding-left: 44px !important;
 }
@@ -195,7 +197,10 @@ textarea {
   border: 1px solid #e2e8f0 !important;
   background-color: #ffffff !important;
   border-radius: 8px !important;
-  padding: 10px 14px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-right: 14px !important;
+  padding-left: 14px;
   font-size: 1rem !important;
   color: #1e293b !important;
   outline: none !important;

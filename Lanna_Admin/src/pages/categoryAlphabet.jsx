@@ -302,13 +302,14 @@ export default function CategoryAlphabet() {
         <div className="relative flex-1 w-full flex items-center">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
           <input
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white relative z-0"
+            className="w-full admin-search-input pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white relative z-0"
             placeholder="ค้นหาหมวดหมู่คำศัพท์..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
+            style={{ paddingLeft: '44px' }}
           />
         </div>
         <button

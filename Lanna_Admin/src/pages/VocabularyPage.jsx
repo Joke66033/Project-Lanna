@@ -410,6 +410,7 @@ export default function VocabularyPage() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
+            style={{ paddingLeft: '44px' }}
           />
         </div>
         <div className="w-full sm:w-64">

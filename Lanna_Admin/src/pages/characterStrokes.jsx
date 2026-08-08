@@ -239,6 +239,7 @@ export default function CharacterStrokesPage() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
+            style={{ paddingLeft: '44px' }}
             className="w-full admin-search-input pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none bg-white relative z-0"
           />
         </div>

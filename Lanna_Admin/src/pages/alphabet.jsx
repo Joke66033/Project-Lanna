@@ -415,10 +415,10 @@ export default function AlphabetPage() {
 
       {/* SEARCH & FILTER (Image 1 Format) */}
       <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center gap-3 mb-6">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="relative flex-1 w-full flex items-center">
+          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
           <input
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white text-sm"
+            className="w-full admin-search-input pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white text-sm relative z-0"
             placeholder="ค้นหาอักขระ หรือชื่อ..."
             value={search}
             onChange={(e) => {
@@ -436,7 +436,7 @@ export default function AlphabetPage() {
               setCurrentPage(1);
             }}
           >
-            <option value="all">ทุกประเภท</option>
+            <option value="all">ทั้งหมด</option>
             {categories.map((cat) => (
               <option key={cat.category_char_id} value={cat.category_char_id}>
                 {cat.name}

@@ -45,10 +45,7 @@ export default function CharacterStrokesPage() {
     setLoading(true);
     setError(null);
     try {
-      let url = `${BASE}/endpoints/character_strokes_api.php?action=getAll`;
-      if (categoryFilter !== "all") {
-        url += `&category=${categoryFilter}`;
-      }
+      const url = `${BASE}/endpoints/character_strokes_api.php?action=getAll`;
       const res = await fetch(url);
       const result = await res.json();
       if (result.error) {
@@ -67,14 +64,21 @@ export default function CharacterStrokesPage() {
 
   useEffect(() => {
     fetchData();
-  }, [categoryFilter]);
+  }, []);
 
-  // Search & Pagination filtering
+  // Search & Category Filtering (Client-side to ensure all data displays)
   const filteredData = data.filter((item) => {
+    const itemCat = (item.category || "").toLowerCase();
+    const matchCategory =
+      categoryFilter === "all" ||
+      itemCat === categoryFilter.toLowerCase() ||
+      (categoryFilter === "tone" && (itemCat === "tone" || itemCat === "tone_mark"));
+
     const matchSearch =
       (item.char_symbol || "").toLowerCase().includes(search.toLowerCase()) ||
       (item.char_name || "").toLowerCase().includes(search.toLowerCase());
-    return matchSearch;
+
+    return matchCategory && matchSearch;
   });
 
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE) || 1;
@@ -235,7 +239,7 @@ export default function CharacterStrokesPage() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none bg-white relative z-0"
+            className="w-full admin-search-input pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none bg-white relative z-0"
           />
         </div>
 
@@ -248,7 +252,7 @@ export default function CharacterStrokesPage() {
             }}
             className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none cursor-pointer bg-white"
           >
-            <option value="all">ทุกประเภท</option>
+            <option value="all">ทั้งหมด</option>
             <option value="consonant">พยัญชนะ</option>
             <option value="vowel">สระ</option>
             <option value="tone">วรรณยุกต์</option>

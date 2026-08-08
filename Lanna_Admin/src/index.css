@@ -417,13 +417,10 @@ label {
 }
 
 /* Body rows */
+/* Body rows */
 .lanna-table tbody tr {
-  background-color: #ffffff !important;
-  transition: background-color 0.1s ease !important;
-}
-
-.lanna-table tbody tr:hover {
-  background-color: rgba(255, 247, 237, 0.5) !important;
+  background-color: #ffffff;
+  transition: background-color 0.15s ease-in-out;
 }
 
 .lanna-table tbody td {
@@ -446,16 +443,9 @@ label {
   width: 28px;
   height: 28px;
   border-radius: 9999px;
-  background-color: #ffedd5;
-  color: #b45309;
   font-size: 0.75rem;
   font-weight: 700;
-  transition: background-color 0.12s, color 0.12s;
-}
-
-.lanna-table tbody tr:hover .lanna-seq {
-  background-color: #fed7aa;
-  color: #92400e;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
 
 /* คอลัมน์ลำดับ */

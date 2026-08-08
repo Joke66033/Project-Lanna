@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, BookOpen } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 import Pagination from "../components/Pagination.jsx";
 import { normalizeLannaText } from "../lib/lannaNormalizer.js";

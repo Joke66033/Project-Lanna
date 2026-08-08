@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Type } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";

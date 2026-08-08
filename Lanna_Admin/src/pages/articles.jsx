@@ -5,6 +5,8 @@ import {
   Pencil,
   Trash2,
   ChevronDown,
+  Search,
+  BookOpen,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";

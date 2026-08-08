@@ -98,13 +98,12 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = dbInsert('articles', $insertData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             
-            // 3. ดึงข้อมูลที่เพิ่งเพิ่มกลับมาพร้อมความสัมพันธ์แบบ Join ส่งกลับไปให้ Frontend
             $insertedId = $res['data']['article_id'] ?? $nextId;
-            $resJoined = dbSelectSingle('articles', '*,category_lanna_char(*,learning_category(*))', ['article_id' => 'eq.' . $insertedId]);
-            if ($resJoined['error']) {
-                jsonOk($res['data']);
+            $resRow = dbSelectSingle('articles', '*', ['article_id' => 'eq.' . $insertedId]);
+            if ($resRow['data']) {
+                jsonOk($resRow['data']);
             } else {
-                jsonOk($resJoined['data']);
+                jsonOk($insertData);
             }
             break;
 
@@ -123,12 +122,11 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = dbUpdate('articles', ['article_id' => 'eq.' . $id], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             
-            // ดึงข้อมูลที่อัปเดตใหม่กลับมาพร้อมความสัมพันธ์แบบ Join ส่งกลับไปให้ Frontend
-            $resJoined = dbSelectSingle('articles', '*,category_lanna_char(*,learning_category(*))', ['article_id' => 'eq.' . $id]);
-            if ($resJoined['error']) {
-                jsonOk($res['data']);
+            $resRow = dbSelectSingle('articles', '*', ['article_id' => 'eq.' . $id]);
+            if ($resRow['data']) {
+                jsonOk($resRow['data']);
             } else {
-                jsonOk($resJoined['data']);
+                jsonOk(array_merge(['article_id' => $id], $updateData));
             }
             break;
 

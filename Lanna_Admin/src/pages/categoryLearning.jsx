@@ -172,9 +172,9 @@ export default function CategoryLearning() {
       setSuccessText("เพิ่มหมวดหมู่การเรียนรู้เรียบร้อยแล้ว");
       setShowSuccess(true);
 
-      if (insertedItem) {
-        trackRecentActivity("learning_category", insertedItem.category_code);
-        setData((prev) => sortRecentData([insertedItem, ...prev], "learning_category", "category_code"));
+      const newCode = insertedItem?.category_code || resJson?.data?.category_code || form.category_code;
+      if (newCode) {
+        trackRecentActivity("learning_category", newCode);
       }
       setCurrentPage(1);
       fetchData(1);
@@ -209,8 +209,9 @@ export default function CategoryLearning() {
         description: form.description,
         is_active: form.is_active
       };
+      const targetCode = originalForm.category_code || originalForm.id;
       const res = await fetch(
-        `${BASE}/endpoints/learning_category_api.php?action=update&id=${encodeURIComponent(originalForm.category_code)}`,
+        `${BASE}/endpoints/learning_category_api.php?action=update&id=${encodeURIComponent(targetCode)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -226,13 +227,8 @@ export default function CategoryLearning() {
       setSuccessText("แก้ไขข้อมูลหมวดหมู่เรียบร้อยแล้ว");
       setShowSuccess(true);
 
-      if (updatedItem) {
-        trackRecentActivity("learning_category", updatedItem.category_code);
-        setData((prev) => {
-          const filtered = prev.filter((item) => item.category_code !== updatedItem.category_code);
-          return sortRecentData([updatedItem, ...filtered], "learning_category", "category_code");
-        });
-      }
+      const editCode = updatedItem?.category_code || targetCode;
+      trackRecentActivity("learning_category", editCode);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {

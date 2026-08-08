@@ -171,7 +171,12 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 jsonError($res['error']['message']);
                 break;
             }
-            jsonOk($res['data']);
+            $resRow = dbSelectSingle('learning_category', '*', ['category_code' => 'eq.' . rawurlencode($id)]);
+            if ($resRow['data']) {
+                jsonOk($resRow['data']);
+            } else {
+                jsonOk(array_merge(['category_code' => $id], $updateData));
+            }
             break;
 
         case 'delete':

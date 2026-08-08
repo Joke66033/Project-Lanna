@@ -378,9 +378,9 @@ export default function Articles() {
       setShowSuccess(true);
 
       // Update state locally (prepend)
-      if (insertedItem) {
-        trackRecentActivity("articles", insertedItem.article_id);
-        setData((prev) => sortRecentData([insertedItem, ...prev], "articles", "article_id"));
+      const articleId = insertedItem?.article_id || resJson?.data?.article_id;
+      if (articleId) {
+        trackRecentActivity("articles", articleId);
       }
       setCurrentPage(1);
       fetchData(1);
@@ -413,8 +413,9 @@ export default function Articles() {
 
     try {
       setSubmitting(true);
+      const targetId = form.id;
       const res = await fetch(
-        `${BASE}/endpoints/articles_api.php?action=update&id=${form.id}`,
+        `${BASE}/endpoints/articles_api.php?action=update&id=${encodeURIComponent(targetId)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -436,13 +437,8 @@ export default function Articles() {
       setShowSuccess(true);
 
       // Update state locally (prepend updated item)
-      if (updatedItem) {
-        trackRecentActivity("articles", updatedItem.article_id);
-        setData((prev) => {
-          const filtered = prev.filter((item) => (item.article_id || item.id) !== (updatedItem.article_id || updatedItem.id));
-          return sortRecentData([updatedItem, ...filtered], "articles", "article_id");
-        });
-      }
+      const editId = updatedItem?.article_id || targetId;
+      trackRecentActivity("articles", editId);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {

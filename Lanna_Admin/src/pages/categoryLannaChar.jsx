@@ -204,9 +204,9 @@ export default function CategoryLannaChar() {
       setShowSuccess(true);
 
       // Prepend to state
-      if (insertedItem) {
-        trackRecentActivity("category_lanna_char", insertedItem.category_char_id);
-        setData((prev) => sortRecentData([insertedItem, ...prev], "category_lanna_char", "category_char_id"));
+      const catId = insertedItem?.category_char_id || resJson?.data?.category_char_id;
+      if (catId) {
+        trackRecentActivity("category_lanna_char", catId);
       }
       setCurrentPage(1);
       fetchData(1);
@@ -233,8 +233,9 @@ export default function CategoryLannaChar() {
 
     try {
       setLoading(true);
+      const targetId = originalForm.category_char_id || originalForm.id;
       const res = await fetch(
-        `${BASE}/endpoints/category_lanna_char_api.php?action=update&id=${encodeURIComponent(originalForm.id)}`,
+        `${BASE}/endpoints/category_lanna_char_api.php?action=update&id=${encodeURIComponent(targetId)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -255,13 +256,8 @@ export default function CategoryLannaChar() {
       setShowSuccess(true);
 
       // Prepend to state
-      if (updatedItem) {
-        trackRecentActivity("category_lanna_char", updatedItem.category_char_id);
-        setData((prev) => {
-          const filtered = prev.filter((item) => (item.category_char_id || item.id) !== (updatedItem.category_char_id || updatedItem.id));
-          return sortRecentData([updatedItem, ...filtered], "category_lanna_char", "category_char_id");
-        });
-      }
+      const editCatId = updatedItem?.category_char_id || targetId;
+      trackRecentActivity("category_lanna_char", editCatId);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {

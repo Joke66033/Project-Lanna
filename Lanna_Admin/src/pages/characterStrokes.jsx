@@ -285,12 +285,12 @@ export default function CharacterStrokesPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-amber-50 border-b-2 border-amber-200 text-xs font-bold text-amber-900">
-                  <th className="p-4">ID</th>
-                  <th className="p-4">ตัวอักขระ</th>
-                  <th className="p-4">ชื่ออักขระ</th>
-                  <th className="p-4">ประเภท</th>
-                  <th className="p-4 text-center">จำนวนเส้น (STROKES)</th>
-                  <th className="p-4 text-center">จัดการ</th>
+                  <th className="p-4 whitespace-nowrap">ID</th>
+                  <th className="p-4 whitespace-nowrap">ตัวอักขระ</th>
+                  <th className="p-4 whitespace-nowrap">ชื่ออักขระ</th>
+                  <th className="p-4 whitespace-nowrap">ประเภท</th>
+                  <th className="p-4 text-center whitespace-nowrap">จำนวนเส้น (STROKES)</th>
+                  <th className="p-4 text-center whitespace-nowrap">จัดการ</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm">
@@ -309,7 +309,7 @@ export default function CharacterStrokesPage() {
                     badge = <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">ตัวซ้อน/ลำดับ</span>;
                   }
                   return (
-                    <tr key={item.stroke_id} className="hover:bg-amber-50/40 transition">
+                    <tr key={item.stroke_id} className="hover:bg-amber-50/60 transition">
                       <td className="p-4 font-mono text-gray-500">#{item.stroke_id}</td>
                       <td className="p-4 text-2xl font-bold text-amber-900 font-serif">
                         {item.char_symbol}

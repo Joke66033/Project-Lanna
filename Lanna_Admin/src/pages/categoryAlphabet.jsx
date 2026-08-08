@@ -344,15 +344,15 @@ export default function CategoryAlphabet() {
           <table className="lanna-table">
             <thead className={colors.theadBg}>
               <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
-                <th className="th-num">#</th>
-                <th className="th-left">ชื่อหมวดหมู่</th>
-                <th>จัดการ</th>
+                <th className="th-num whitespace-nowrap">#</th>
+                <th className="th-left whitespace-nowrap">ชื่อหมวดหมู่</th>
+                <th className="whitespace-nowrap">จัดการ</th>
               </tr>
             </thead>
 
             <tbody>
               {paginatedData.map((d, i) => (
-                <tr key={d.id || i}>
+                <tr key={d.id || i} className="hover:bg-teal-50/60 transition-colors">
                   <td className="td-num">
                     <span className={`lanna-seq ${colors.seqBg} ${colors.seqText} ${colors.seqBgHover} ${colors.seqTextHover}`}>
                       {(currentPage - 1) * ITEMS_PER_PAGE + i + 1}

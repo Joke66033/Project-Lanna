@@ -478,16 +478,16 @@ export default function AlphabetPage() {
           <table className="lanna-table">
             <thead className={colors.theadBg}>
               <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
-                <th className="th-num">#</th>
-                <th>อักขระล้านนา</th>
-                <th>อักขระไทย</th>
-                <th>หมวดหมู่</th>
-                <th>จัดการ</th>
+                <th className="th-num whitespace-nowrap">#</th>
+                <th className="whitespace-nowrap">อักขระล้านนา</th>
+                <th className="whitespace-nowrap">อักขระไทย</th>
+                <th className="whitespace-nowrap">หมวดหมู่</th>
+                <th className="whitespace-nowrap">จัดการ</th>
               </tr>
             </thead>
             <tbody>
               {paginatedData.map((d, i) => (
-                <tr key={d.id || i}>
+                <tr key={d.id || i} className="hover:bg-emerald-50/60 transition-colors">
                   <td className="td-num">
                     <span className={`lanna-seq ${colors.seqBg} ${colors.seqText} ${colors.seqBgHover} ${colors.seqTextHover}`}>
                       {(currentPage - 1) * ITEMS_PER_PAGE + i + 1}

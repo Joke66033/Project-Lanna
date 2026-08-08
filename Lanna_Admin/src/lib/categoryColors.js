@@ -1,7 +1,7 @@
 export const categoryColors = {
   dashboard: {
-    sidebarActive: "bg-orange-50 text-orange-700 border-l-4 border-orange-600",
-    sidebarNormal: "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+    sidebarActive: "bg-orange-50 text-orange-700 font-bold border-l-4 border-orange-600 shadow-sm",
+    sidebarNormal: "text-gray-600 hover:bg-orange-50/70 hover:text-orange-700",
     seqBg: "bg-orange-100",
     seqText: "text-orange-600",
     seqBgHover: "hover:bg-orange-200",
@@ -15,8 +15,8 @@ export const categoryColors = {
     borderCol: "border-orange-600",
   },
   vocabulary: {
-    sidebarActive: "bg-amber-50 text-amber-900 border-l-4 border-amber-800",
-    sidebarNormal: "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+    sidebarActive: "bg-amber-50 text-amber-900 font-bold border-l-4 border-amber-800 shadow-sm",
+    sidebarNormal: "text-gray-600 hover:bg-amber-50/70 hover:text-amber-900",
     seqBg: "bg-amber-100",
     seqText: "text-amber-600",
     seqBgHover: "hover:bg-amber-200",
@@ -30,8 +30,8 @@ export const categoryColors = {
     borderCol: "border-amber-600",
   },
   alphabet: {
-    sidebarActive: "bg-[#F7FBEA] text-[#3F6212] border-l-4 border-[#4D7C0F]",
-    sidebarNormal: "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+    sidebarActive: "bg-emerald-50 text-emerald-700 font-bold border-l-4 border-emerald-600 shadow-sm",
+    sidebarNormal: "text-gray-600 hover:bg-emerald-50/70 hover:text-emerald-700",
     seqBg: "bg-emerald-100",
     seqText: "text-emerald-600",
     seqBgHover: "hover:bg-emerald-200",
@@ -45,8 +45,8 @@ export const categoryColors = {
     borderCol: "border-emerald-600",
   },
   categoryVocab: {
-    sidebarActive: "bg-[#F0FDFA] text-[#115E59] border-l-4 border-[#0F766E]",
-    sidebarNormal: "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+    sidebarActive: "bg-teal-50 text-teal-700 font-bold border-l-4 border-teal-600 shadow-sm",
+    sidebarNormal: "text-gray-600 hover:bg-teal-50/70 hover:text-teal-700",
     seqBg: "bg-teal-100",
     seqText: "text-teal-600",
     seqBgHover: "hover:bg-teal-200",
@@ -60,8 +60,8 @@ export const categoryColors = {
     borderCol: "border-teal-600",
   },
   categoryAlphabet: {
-    sidebarActive: "bg-amber-50 text-amber-900 border-l-4 border-amber-800",
-    sidebarNormal: "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+    sidebarActive: "bg-amber-50 text-amber-900 font-bold border-l-4 border-amber-800 shadow-sm",
+    sidebarNormal: "text-gray-600 hover:bg-amber-50/70 hover:text-amber-900",
     seqBg: "bg-amber-100",
     seqText: "text-amber-600",
     seqBgHover: "hover:bg-amber-200",
@@ -75,8 +75,8 @@ export const categoryColors = {
     borderCol: "border-amber-600",
   },
   categoryLearning: {
-    sidebarActive: "bg-sky-50 text-sky-700 border-l-4 border-sky-600",
-    sidebarNormal: "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+    sidebarActive: "bg-sky-50 text-sky-700 font-bold border-l-4 border-sky-600 shadow-sm",
+    sidebarNormal: "text-gray-600 hover:bg-sky-50/70 hover:text-sky-700",
     seqBg: "bg-sky-100",
     seqText: "text-sky-600",
     seqBgHover: "hover:bg-sky-200",
@@ -90,8 +90,8 @@ export const categoryColors = {
     borderCol: "border-sky-600",
   },
   articles: {
-    sidebarActive: "bg-violet-50 text-violet-700 border-l-4 border-violet-600",
-    sidebarNormal: "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+    sidebarActive: "bg-violet-50 text-violet-700 font-bold border-l-4 border-violet-600 shadow-sm",
+    sidebarNormal: "text-gray-600 hover:bg-violet-50/70 hover:text-violet-700",
     seqBg: "bg-violet-100",
     seqText: "text-violet-600",
     seqBgHover: "hover:bg-violet-200",
@@ -105,8 +105,8 @@ export const categoryColors = {
     borderCol: "border-violet-600",
   },
   users: {
-    sidebarActive: "bg-rose-50 text-rose-700 border-l-4 border-rose-600",
-    sidebarNormal: "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+    sidebarActive: "bg-rose-50 text-rose-700 font-bold border-l-4 border-rose-600 shadow-sm",
+    sidebarNormal: "text-gray-600 hover:bg-rose-50/70 hover:text-rose-700",
     seqBg: "bg-rose-100",
     seqText: "text-rose-600",
     seqBgHover: "hover:bg-rose-200",

@@ -383,16 +383,16 @@ export default function CategoryLearning() {
           <table className="lanna-table">
             <thead className={colors.theadBg}>
               <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
-                <th className="th-num">#</th>
-                <th className="th-left">หัวข้อหลัก</th>
-                <th className="th-left">คำอธิบาย</th>
-                <th className="!text-center">สถานะ</th>
-                <th>จัดการ</th>
+                <th className="th-num whitespace-nowrap">#</th>
+                <th className="th-left whitespace-nowrap">หัวข้อหลัก</th>
+                <th className="th-left whitespace-nowrap">คำอธิบาย</th>
+                <th className="!text-center whitespace-nowrap">สถานะ</th>
+                <th className="whitespace-nowrap">จัดการ</th>
               </tr>
             </thead>
             <tbody>
               {data.map((item, index) => (
-                <tr key={item.category_code || index}>
+                <tr key={item.category_code || index} className="hover:bg-sky-50/60 transition-colors">
                   <td className="td-num">
                     <span className={`lanna-seq ${colors.seqBg} ${colors.seqText} ${colors.seqBgHover} ${colors.seqTextHover}`}>
                       {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}

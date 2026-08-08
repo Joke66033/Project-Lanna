@@ -268,12 +268,12 @@ export default function Users() {
           <table className="lanna-table">
             <thead className="bg-rose-50">
               <tr className="text-rose-700 border-b-2 border-rose-200" style={{ background: 'none' }}>
-                <th className="th-num">#</th>
-                <th className="!text-center" style={{ width: '90px' }}>รูปโปรไฟล์</th>
-                <th className="th-left">ชื่อผู้ใช้งาน</th>
-                <th className="th-left">อีเมล</th>
-                <th className="!text-center">สถานะ</th>
-                <th>การจัดการ</th>
+                <th className="th-num whitespace-nowrap">#</th>
+                <th className="!text-center whitespace-nowrap" style={{ width: '90px' }}>รูปโปรไฟล์</th>
+                <th className="th-left whitespace-nowrap">ชื่อผู้ใช้งาน</th>
+                <th className="th-left whitespace-nowrap">อีเมล</th>
+                <th className="!text-center whitespace-nowrap">สถานะ</th>
+                <th className="whitespace-nowrap">การจัดการ</th>
               </tr>
             </thead>
 
@@ -281,7 +281,7 @@ export default function Users() {
               {paginatedUsers.map((user, index) => {
                 const isToggling = toggling === user.id;
                 return (
-                  <tr key={user.id || user.email}>
+                  <tr key={user.id || user.email} className="hover:bg-rose-50/60 transition-colors">
                     {/* ลำดับ */}
                     <td className="td-num">
                       <span className="lanna-seq bg-rose-100 text-rose-600 hover:bg-rose-200 hover:text-rose-700">

@@ -453,18 +453,18 @@ export default function VocabularyPage() {
             <table className="lanna-table">
               <thead className={colors.theadBg}>
                 <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
-                  <th className="th-num">#</th>
-                  <th className="th-left">คำศัพท์ล้านนา</th>
-                  <th>คำศัพท์ไทย</th>
-                  <th>คำอ่าน / ลำดับการพิมพ์</th>
-                  <th className="th-left">ความหมาย</th>
-                  <th>หมวดหมู่</th>
-                  <th>จัดการ</th>
+                  <th className="th-num whitespace-nowrap">#</th>
+                  <th className="th-left whitespace-nowrap">คำศัพท์ล้านนา</th>
+                  <th className="whitespace-nowrap">คำศัพท์ไทย</th>
+                  <th className="whitespace-nowrap">คำอ่าน / ลำดับการพิมพ์</th>
+                  <th className="th-left whitespace-nowrap">ความหมาย</th>
+                  <th className="whitespace-nowrap">หมวดหมู่</th>
+                  <th className="whitespace-nowrap">จัดการ</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedData.map((d, i) => (
-                  <tr key={d.vocab_id || i}>
+                  <tr key={d.vocab_id || i} className="hover:bg-amber-50/60 transition-colors">
                     <td className="td-num">
                       <span className={`lanna-seq ${colors.seqBg} ${colors.seqText} ${colors.seqBgHover} ${colors.seqTextHover}`}>
                         {(currentPage - 1) * ITEMS_PER_PAGE + i + 1}

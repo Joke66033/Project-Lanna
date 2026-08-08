@@ -610,17 +610,17 @@ export default function Articles() {
           <table className="lanna-table">
             <thead className={colors.theadBg}>
               <tr className={`${colors.theadText} border-b-2 ${colors.theadBorder}`} style={{ background: 'none' }}>
-                <th className="th-num">#</th>
-                <th className="th-left w-[25%]">หัวข้อเนื้อหา</th>
-                <th className="w-[15%]">หมวดหมู่การเรียนรู้</th>
-                <th className="th-left w-[45%]">รายละเอียดเนื้อหา</th>
-                <th className="w-[15%]">หมวดหมู่อักขระ</th>
-                <th>จัดการ</th>
+                <th className="th-num whitespace-nowrap">#</th>
+                <th className="th-left whitespace-nowrap min-w-[200px]">หัวข้อเนื้อหา</th>
+                <th className="th-left whitespace-nowrap min-w-[180px]">หมวดหมู่การเรียนรู้</th>
+                <th className="th-left whitespace-nowrap min-w-[280px]">รายละเอียดเนื้อหา</th>
+                <th className="th-left whitespace-nowrap min-w-[180px]">หมวดหมู่อักขระ</th>
+                <th className="whitespace-nowrap">จัดการ</th>
               </tr>
             </thead>
             <tbody>
               {paginatedArticles.map((a, i) => (
-                <tr key={a.id || i}>
+                <tr key={a.id || i} className="hover:bg-violet-50/60 transition-colors">
                   <td className="td-num">
                     <span className={`lanna-seq ${colors.seqBg} ${colors.seqText} ${colors.seqBgHover} ${colors.seqTextHover}`}>
                       {(currentPage - 1) * itemsPerPage + i + 1}

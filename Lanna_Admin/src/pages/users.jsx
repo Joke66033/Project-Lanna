@@ -270,7 +270,24 @@ export default function Users() {
 
                     {/* ชื่อผู้ใช้ */}
                     <td>
-                      <p className="lanna-cell-main">{user.name}</p>
+                      <div className="flex items-center gap-3">
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.name}
+                            className="w-9 h-9 rounded-full object-cover border border-purple-100 shrink-0"
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-purple-100 text-purple-700 font-semibold flex items-center justify-center text-sm shrink-0">
+                            {user.name ? user.name.charAt(0) : "U"}
+                          </div>
+                        )}
+                        <div>
+                          <p className="lanna-cell-main font-semibold text-gray-900">{user.name}</p>
+                          <p className="text-xs text-gray-400 font-mono">ID: {user.id}</p>
+                        </div>
+                      </div>
                     </td>
 
                     {/* อีเมล */}

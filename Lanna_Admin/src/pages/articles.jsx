@@ -829,6 +829,7 @@ export default function Articles() {
         onConfirm={handleDelete}
         title="ยืนยันการลบเนื้อหาการเรียนรู้"
         itemName={deleteIndex !== null && articles[deleteIndex] ? articles[deleteIndex].title : ""}
+        itemType="เนื้อหาการเรียนรู้"
       />
 
       {/* SUCCESS MODAL */}

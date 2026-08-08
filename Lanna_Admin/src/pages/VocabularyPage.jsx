@@ -712,8 +712,9 @@ export default function VocabularyPage() {
         onClose={() => setShowDelete(false)}
         onConfirm={handleDelete}
         title="ยืนยันการลบคำศัพท์"
-        itemName={deleteItem?.lanna_word || ""}
+        itemName={deleteItem?.lanna_word || deleteItem?.thai_word || ""}
         itemSubtitle={deleteItem?.thai_word || ""}
+        itemType="คำศัพท์"
         isLannaText={true}
       />
 

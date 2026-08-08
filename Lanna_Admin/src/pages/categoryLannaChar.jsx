@@ -511,8 +511,9 @@ export default function CategoryLannaChar() {
         isOpen={showDelete}
         onClose={() => setShowDelete(false)}
         onConfirm={handleDelete}
-        title="ยืนยันการลบหมวดหมู่"
+        title="ยืนยันการลบหมวดหมู่อักขระ"
         itemName={deleteItem?.name || ""}
+        itemType="หมวดหมู่อักขระ"
         usageWarningText={usageInfo?.usedInText || ""}
       />
 

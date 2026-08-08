@@ -583,6 +583,7 @@ export default function CategoryLearning() {
         title="ยืนยันการลบหมวดหมู่การเรียนรู้"
         itemName={deleteItem?.title || ""}
         itemSubtitle={deleteItem?.category_code || ""}
+        itemType="หมวดหมู่การเรียนรู้"
         usageWarningText={usageInfo?.usedInText || ""}
       />
 

@@ -458,6 +458,7 @@ export default function CategoryAlphabet() {
         onConfirm={handleDelete}
         title="ยืนยันการลบหมวดหมู่"
         itemName={deleteItem?.name || ""}
+        itemType="หมวดหมู่"
         usageWarningText={usageInfo?.usedInText || ""}
       />
 

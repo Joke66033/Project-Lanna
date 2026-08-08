@@ -484,15 +484,15 @@ export default function CharacterStrokesPage() {
         </Modal>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {showDelete && (
-        <ConfirmDeleteModal
-          title="ยืนยันการลบข้อมูลเส้นทางการวาด"
-          message={`คุณต้องการลบข้อมูลเส้นทางการวาดของ "${deleteItem?.char_symbol}" (${deleteItem?.char_name}) ใช่หรือไม่?`}
-          onConfirm={handleDelete}
-          onCancel={() => setShowDelete(false)}
-        />
-      )}
+      <ConfirmDeleteModal
+        isOpen={showDelete}
+        onClose={() => setShowDelete(false)}
+        onConfirm={handleDelete}
+        title="ยืนยันการลบข้อมูลเส้นทางการวาด"
+        itemName={deleteItem?.char_symbol || deleteItem?.char_name || ""}
+        itemSubtitle={deleteItem?.char_name || ""}
+        itemType="ข้อมูลเส้นทางการวาด"
+      />
 
       {/* Success Notification */}
       {showSuccess && (

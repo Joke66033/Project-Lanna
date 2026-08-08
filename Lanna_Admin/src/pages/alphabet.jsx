@@ -686,8 +686,9 @@ export default function AlphabetPage() {
         onClose={() => setShowDelete(false)}
         onConfirm={handleDelete}
         title="ยืนยันการลบอักขระ"
-        itemName={deleteItem?.ln || ""}
-        itemSubtitle={deleteItem?.th || ""}
+        itemName={deleteItem?.ln || deleteItem?.lanna_char || ""}
+        itemSubtitle={deleteItem?.th || deleteItem?.thai_equivalent || ""}
+        itemType="ข้อมูลอักขระ"
         isLannaText={true}
       />
 

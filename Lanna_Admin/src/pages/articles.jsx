@@ -38,7 +38,8 @@ export default function Articles() {
 
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedLearningCategory, setSelectedLearningCategory] = useState("all");
+  const [selectedCharCategory, setSelectedCharCategory] = useState("all");
 
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -72,29 +73,47 @@ export default function Articles() {
     const fetchAllCategories = async () => {
       try {
         // 1. Fetch active learning categories
-        const { data: learnData } = await supabase
-          .from("learning_category")
-          .select("category_code, title, is_active")
-          .order("category_code", { ascending: true });
+        let learnData = [];
+        try {
+          const res = await fetch(`${BASE}/endpoints/learning_category_api.php?action=getAll`);
+          const json = await res.json();
+          learnData = json.data || [];
+        } catch (e) {}
 
-        const activeLearnCats = (learnData || []).filter(
+        if (!Array.isArray(learnData) || learnData.length === 0) {
+          const { data } = await supabase
+            .from("learning_category")
+            .select("category_code, title, is_active")
+            .order("category_code", { ascending: true });
+          learnData = data || [];
+        }
+
+        const activeLearnCats = learnData.filter(
           (c) => c.is_active !== false && c.is_active !== "0" && c.is_active !== 0
         );
         setLearningCategories(activeLearnCats);
         const activeCodes = new Set(activeLearnCats.map((c) => c.category_code));
 
-        // 2. Fetch char categories belonging only to active learning categories
-        const { data: cats } = await supabase
-          .from("category_lanna_char")
-          .select("category_char_id, name, learning_category_code")
-          .order("category_char_id", { ascending: true });
+        // 2. Fetch char categories
+        let charCats = [];
+        try {
+          const res = await fetch(`${BASE}/endpoints/category_lanna_char_api.php?action=getAll`);
+          const json = await res.json();
+          charCats = json.data || [];
+        } catch (e) {}
 
-        if (cats) {
-          const activeCharCats = cats.filter(
-            (c) => !c.learning_category_code || activeCodes.has(c.learning_category_code)
-          );
-          setCharCategories(activeCharCats);
+        if (!Array.isArray(charCats) || charCats.length === 0) {
+          const { data } = await supabase
+            .from("category_lanna_char")
+            .select("category_char_id, name, learning_category_code")
+            .order("category_char_id", { ascending: true });
+          charCats = data || [];
         }
+
+        const activeCharCats = charCats.filter(
+          (c) => !c.learning_category_code || activeCodes.has(c.learning_category_code)
+        );
+        setCharCategories(activeCharCats);
       } catch (err) {
         console.error("Error fetching categories in articles:", err);
       }
@@ -113,7 +132,12 @@ export default function Articles() {
   }, []);
 
   /* ===== FETCH ARTICLES ===== */
-  const fetchData = async (page = currentPage, searchQuery = search, categoryId = selectedCategory) => {
+  const fetchData = async (
+    page = currentPage,
+    searchQuery = search,
+    learnCat = selectedLearningCategory,
+    charCat = selectedCharCategory
+  ) => {
     setLoading(true);
     try {
       let list = [];
@@ -126,20 +150,25 @@ export default function Articles() {
       }
 
       if (!Array.isArray(list) || list.length === 0) {
-        let selectStr = "*, category_lanna_char(name, learning_category_code, learning_category(title, category_code))";
-        if (categoryId && categoryId !== "all") {
-          selectStr = "*, category_lanna_char!inner(name, learning_category_code, learning_category(title, category_code))";
-        }
         const { data: resData } = await supabase
           .from("articles")
-          .select(selectStr);
+          .select("*, category_lanna_char(name, learning_category_code, learning_category(title, category_code))");
         list = resData || [];
       }
 
-      if (categoryId && categoryId !== "all") {
+      // Dropdown 1 filter: หมวดหมู่การเรียนรู้
+      if (learnCat && learnCat !== "all") {
         list = list.filter((item) => {
           const lCode = item.learning_category_code || item.category_lanna_char?.learning_category_code;
-          return String(lCode) === String(categoryId);
+          return String(lCode) === String(learnCat);
+        });
+      }
+
+      // Dropdown 2 filter: หมวดหมู่อักขระ
+      if (charCat && charCat !== "all") {
+        list = list.filter((item) => {
+          const cId = item.category_char_id || item.category_lanna_char?.category_char_id;
+          return String(cId) === String(charCat);
         });
       }
 
@@ -171,33 +200,27 @@ export default function Articles() {
     }
   };
 
-  // Reset page when category changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory]);
-
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      fetchData(currentPage, search, selectedCategory);
+      fetchData(currentPage, search, selectedLearningCategory, selectedCharCategory);
     }, 200);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [currentPage, search, selectedCategory]);
+  }, [currentPage, search, selectedLearningCategory, selectedCharCategory]);
 
   useEffect(() => {
-    // Real-time subscription
     const channel = supabase
       .channel("articles")
       .on("postgres_changes",
         { event: "*", schema: "public", table: "articles" },
-        () => fetchData(currentPage, search, selectedCategory)
+        () => fetchData(currentPage, search, selectedLearningCategory, selectedCharCategory)
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentPage, search, selectedCategory]);
+  }, [currentPage, search, selectedLearningCategory, selectedCharCategory]);
 
   const getCharCategoryName = (item) => {
     if (item.category_lanna_char?.name) return item.category_lanna_char.name;
@@ -494,7 +517,8 @@ export default function Articles() {
       </div>
 
       {/* SEARCH & FILTER */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-end gap-3 mb-6">
+        {/* SEARCH INPUT */}
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
@@ -507,21 +531,51 @@ export default function Articles() {
             }}
           />
         </div>
-        <div className="w-full sm:w-64">
+
+        {/* DROPDOWN 1: หมวดหมู่การเรียนรู้ */}
+        <div className="w-full md:w-60">
+          <label className="block text-xs font-semibold text-gray-600 mb-1">
+            ค้นหาตามหมวดหมู่การเรียนรู้:
+          </label>
           <select
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white cursor-pointer text-sm"
-            value={selectedCategory}
+            className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white cursor-pointer text-sm text-gray-700 font-medium"
+            value={selectedLearningCategory}
             onChange={(e) => {
-              setSelectedCategory(e.target.value);
+              setSelectedLearningCategory(e.target.value);
+              setSelectedCharCategory("all");
               setCurrentPage(1);
             }}
           >
-            <option value="all">ทั้งหมด</option>
+            <option value="all">หมวดหมู่การเรียนรู้: ทั้งหมด</option>
             {learningCategories.map((cat) => (
               <option key={cat.category_code} value={cat.category_code}>
                 {cat.title}
               </option>
             ))}
+          </select>
+        </div>
+
+        {/* DROPDOWN 2: หมวดหมู่อักขระ */}
+        <div className="w-full md:w-60">
+          <label className="block text-xs font-semibold text-gray-600 mb-1">
+            ค้นหาตามหมวดหมู่อักขระ:
+          </label>
+          <select
+            className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white cursor-pointer text-sm text-gray-700 font-medium"
+            value={selectedCharCategory}
+            onChange={(e) => {
+              setSelectedCharCategory(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="all">หมวดหมู่อักขระ: ทั้งหมด</option>
+            {charCategories
+              .filter((c) => selectedLearningCategory === "all" || c.learning_category_code === selectedLearningCategory)
+              .map((cat) => (
+                <option key={cat.category_char_id} value={cat.category_char_id}>
+                  {cat.name}
+                </option>
+              ))}
           </select>
         </div>
       </div>

@@ -48,6 +48,49 @@ export function SuccessModal({ isOpen, onClose, message, autoCloseMs = 2000 }) {
 }
 
 /*
+  WarningModal props:
+  - isOpen: boolean
+  - onClose: () => void
+  - title: string
+  - message: string
+*/
+export function WarningModal({ isOpen, onClose, title = "ไม่สามารถลบข้อมูลได้", message = "" }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl relative overflow-x-hidden flex flex-col items-center text-center space-y-5 animate-in fade-in zoom-in-95 duration-150">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-black text-xl leading-none"
+        >
+          ✕
+        </button>
+
+        <div className="w-20 h-20 flex items-center justify-center rounded-full bg-amber-100 flex-shrink-0 animate-bounce">
+          <AlertTriangle size={40} className="text-amber-600" />
+        </div>
+
+        <div>
+          <h3 className="text-xl font-bold text-gray-800">{title}</h3>
+          <p className="text-gray-600 mt-2 text-sm leading-relaxed px-2">
+            {message}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-full py-3 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 transition shadow"
+        >
+          ตกลง
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/*
   ConfirmDeleteModal props:
   - isOpen: boolean
   - onClose: () => void

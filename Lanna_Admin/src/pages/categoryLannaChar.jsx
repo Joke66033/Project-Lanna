@@ -12,7 +12,7 @@ const getApiBase = () => {
 };
 const BASE = getApiBase();
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
-import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
+import { SuccessModal, ConfirmDeleteModal, WarningModal } from "../components/AlertModals.jsx";
 
 import Modal from "../components/Modal.jsx";
 import { categoryColors, getCategoryBadgeStyle } from "../lib/categoryColors";
@@ -292,6 +292,9 @@ export default function CategoryLannaChar() {
     setShowDelete(true);
   };
 
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningText, setWarningText] = useState("");
+
   /* ===== DELETE (SQL API) ===== */
   const handleDelete = async () => {
     try {
@@ -305,7 +308,7 @@ export default function CategoryLannaChar() {
       );
       const resJson = await res.json();
       if (resJson.error) {
-        const errMsg = typeof resJson.error === 'string' ? resJson.error : (resJson.error.message || 'ไม่สามารถลบข้อมูลได้');
+        const errMsg = typeof resJson.error === 'string' ? resJson.error : (resJson.error.message || 'ไม่สามารถลบข้อมูลได้ เนื่องจากมีการใช้งานหมวดหมู่นี้อยู่');
         throw new Error(errMsg);
       }
 
@@ -317,7 +320,9 @@ export default function CategoryLannaChar() {
       setShowSuccess(true);
       fetchData();
     } catch (err) {
-      alert(err.message || err);
+      setShowDelete(false);
+      setWarningText(err.message || err);
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -553,6 +558,14 @@ export default function CategoryLannaChar() {
         isOpen={showSuccess}
         onClose={() => setShowSuccess(false)}
         message={successText}
+      />
+
+      {/* WARNING MODAL */}
+      <WarningModal
+        isOpen={showWarning}
+        onClose={() => setShowWarning(false)}
+        title="ไม่สามารถลบข้อมูลได้"
+        message={warningText}
       />
     </div>
   );

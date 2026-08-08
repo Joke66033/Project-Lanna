@@ -283,9 +283,9 @@ export default function AlphabetPage() {
       setShowSuccess(true);
 
       // Prepend to state
-      if (insertedChar) {
-        trackRecentActivity("lanna_char", insertedChar.char_id);
-        setData((prev) => sortRecentData([insertedChar, ...prev], "lanna_char", "char_id"));
+      const charId = insertedChar?.char_id || resJson?.data?.char_id;
+      if (charId) {
+        trackRecentActivity("lanna_char", charId);
       }
       setCurrentPage(1);
       fetchData(1);
@@ -339,13 +339,8 @@ export default function AlphabetPage() {
       setShowSuccess(true);
 
       // Update state locally (prepend)
-      if (updatedChar) {
-        trackRecentActivity("lanna_char", updatedChar.char_id);
-        setData((prev) => {
-          const filtered = prev.filter((item) => (item.char_id || item.id) !== (updatedChar.char_id || updatedChar.id));
-          return sortRecentData([updatedChar, ...filtered], "lanna_char", "char_id");
-        });
-      }
+      const editCharId = updatedChar?.char_id || targetId;
+      trackRecentActivity("lanna_char", editCharId);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {

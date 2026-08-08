@@ -11,7 +11,7 @@ const getApiBase = () => {
 };
 const BASE = getApiBase();
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
-import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
+import { SuccessModal, ConfirmDeleteModal, WarningModal } from "../components/AlertModals.jsx";
 
 import Modal from "../components/Modal.jsx";
 import { categoryColors, getCategoryBadgeStyle } from "../lib/categoryColors";
@@ -162,9 +162,9 @@ export default function CategoryAlphabet() {
       setShowSuccess(true);
 
       // Prepend to state
-      if (insertedItem) {
-        trackRecentActivity("category_vocab", insertedItem.category_vocab_id);
-        setData((prev) => sortRecentData([insertedItem, ...prev], "category_vocab", "category_vocab_id"));
+      const catId = insertedItem?.category_vocab_id || resJson?.data?.category_vocab_id;
+      if (catId) {
+        trackRecentActivity("category_vocab", catId);
       }
       setCurrentPage(1);
       fetchData(1);
@@ -188,8 +188,9 @@ export default function CategoryAlphabet() {
 
     try {
       setLoading(true);
+      const targetId = originalForm.category_vocab_id || originalForm.id;
       const res = await fetch(
-        `${BASE}/endpoints/category_vocab_api.php?action=update&id=${encodeURIComponent(originalForm.id)}`,
+        `${BASE}/endpoints/category_vocab_api.php?action=update&id=${encodeURIComponent(targetId)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -206,13 +207,8 @@ export default function CategoryAlphabet() {
       setShowSuccess(true);
 
       // Prepend to state
-      if (updatedItem) {
-        trackRecentActivity("category_vocab", updatedItem.category_vocab_id);
-        setData((prev) => {
-          const filtered = prev.filter((item) => (item.category_vocab_id || item.id) !== (updatedItem.category_vocab_id || updatedItem.id));
-          return sortRecentData([updatedItem, ...filtered], "category_vocab", "category_vocab_id");
-        });
-      }
+      const editCatId = updatedItem?.category_vocab_id || targetId;
+      trackRecentActivity("category_vocab", editCatId);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
@@ -241,6 +237,9 @@ export default function CategoryAlphabet() {
     setShowDelete(true);
   };
 
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningText, setWarningText] = useState("");
+
   /* ===== DELETE (SQL API) ===== */
   const handleDelete = async () => {
     try {
@@ -254,7 +253,7 @@ export default function CategoryAlphabet() {
       );
       const resJson = await res.json();
       if (resJson.error) {
-        const errMsg = typeof resJson.error === 'string' ? resJson.error : (resJson.error.message || 'ไม่สามารถลบข้อมูลได้');
+        const errMsg = typeof resJson.error === 'string' ? resJson.error : (resJson.error.message || 'ไม่สามารถลบข้อมูลได้ เนื่องจากมีการใช้งานหมวดหมู่นี้อยู่');
         throw new Error(errMsg);
       }
 
@@ -265,7 +264,9 @@ export default function CategoryAlphabet() {
       setShowSuccess(true);
       fetchData();
     } catch (err) {
-      alert(err.message || err);
+      setShowDelete(false);
+      setWarningText(err.message || err);
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -469,6 +470,14 @@ export default function CategoryAlphabet() {
         isOpen={showSuccess}
         onClose={() => setShowSuccess(false)}
         message={successText}
+      />
+
+      {/* WARNING MODAL */}
+      <WarningModal
+        isOpen={showWarning}
+        onClose={() => setShowWarning(false)}
+        title="ไม่สามารถลบข้อมูลได้"
+        message={warningText}
       />
     </div>
   );

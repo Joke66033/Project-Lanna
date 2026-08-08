@@ -392,75 +392,75 @@ export default function CharacterStrokesPage() {
           <form onSubmit={showAdd ? handleSaveAdd : handleSaveEdit} className="flex flex-col flex-1 overflow-hidden">
             <div className="p-6 overflow-y-auto space-y-4 flex-1">
               <div>
-                <label className="block mb-1 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  ตัวอักขระ (CHARACTER SYMBOL) <span className="text-red-500">*</span>
+                <label className="block mb-1 text-sm font-bold text-gray-700">
+                  ตัวอักขระ <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
                   value={form.char_symbol}
                   onChange={(e) => setForm({ ...form, char_symbol: e.target.value })}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-lg font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-lg font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white shadow-sm"
                   placeholder="เช่น ᨠ"
                 />
               </div>
 
               <div>
-                <label className="block mb-1 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  ชื่ออักขระ (CHARACTER NAME)
+                <label className="block mb-1 text-sm font-bold text-gray-700">
+                  ชื่ออักขระ
                 </label>
                 <input
                   type="text"
                   value={form.char_name}
                   onChange={(e) => setForm({ ...form, char_name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white shadow-sm"
                   placeholder="เช่น พยัญชนะ กะ"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-1 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    หมวดหมู่อักขระ (CATEGORY)
+                  <label className="block mb-1 text-sm font-bold text-gray-700">
+                    หมวดหมู่อักขระ
                   </label>
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white cursor-pointer"
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white cursor-pointer shadow-sm"
                   >
-                    <option value="consonant">consonant (พยัญชนะ)</option>
-                    <option value="vowel">vowel (สระ)</option>
-                    <option value="tone">tone (วรรณยุกต์)</option>
-                    <option value="number">number (ตัวเลข)</option>
-                    <option value="sequence">sequence (ตัวซ้อน/ลำดับ)</option>
-                    <option value="other">other (อื่นๆ)</option>
+                    <option value="consonant">พยัญชนะ</option>
+                    <option value="vowel">สระ</option>
+                    <option value="tone">วรรณยุกต์</option>
+                    <option value="number">ตัวเลข</option>
+                    <option value="sequence">ตัวซ้อน / ลำดับ</option>
+                    <option value="other">อื่นๆ</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block mb-1 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    จำนวนเส้น (STROKE COUNT)
+                  <label className="block mb-1 text-sm font-bold text-gray-700">
+                    จำนวนเส้น
                   </label>
                   <input
                     type="number"
                     min="1"
                     value={form.stroke_count}
                     onChange={(e) => setForm({ ...form, stroke_count: parseInt(e.target.value) || 1 })}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white shadow-sm"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block mb-1 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  พิกัดจุดลากเส้น (STROKE DATA JSON ARRAY) <span className="text-red-500">*</span>
+                <label className="block mb-1 text-sm font-bold text-gray-700">
+                  พิกัดจุดลากเส้น <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   rows={6}
                   required
                   value={form.stroke_data}
                   onChange={(e) => setForm({ ...form, stroke_data: e.target.value })}
-                  className="w-full border border-gray-300 rounded-xl p-3 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+                  className="w-full border border-gray-300 rounded-xl p-3 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white shadow-sm"
                   placeholder='[ [ {"x": 20, "y": 50}, {"x": 80, "y": 50} ] ]'
                 />
               </div>

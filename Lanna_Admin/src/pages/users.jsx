@@ -311,7 +311,6 @@ export default function Users() {
                     <td>
                       <div>
                         <p className="lanna-cell-main font-semibold text-gray-900">{user.name}</p>
-                        <p className="text-xs text-gray-400 font-mono">ID: {user.id}</p>
                       </div>
                     </td>
 

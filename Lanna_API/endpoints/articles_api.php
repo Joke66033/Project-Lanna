@@ -115,14 +115,14 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (array_key_exists('title', $body))            $updateData['title'] = $body['title'];
             if (array_key_exists('content', $body))          $updateData['content'] = $body['content'];
             if (array_key_exists('image_path', $body) || array_key_exists('cover_image_url', $body)) {
-                $updateData['image_path'] = $body['image_path'] ?? $body['cover_image_url'];
+                $updateData['image_path'] = $body['image_path'] ?? ($body['cover_image_url'] ?? '');
             }
             if (array_key_exists('category_char_id', $body)) $updateData['category_char_id'] = !empty($body['category_char_id']) ? $body['category_char_id'] : null;
 
-            $res = dbUpdate('articles', ['article_id' => 'eq.' . $id], $updateData);
+            $res = dbUpdate('articles', ['article_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             
-            $resRow = dbSelectSingle('articles', '*', ['article_id' => 'eq.' . $id]);
+            $resRow = dbSelectSingle('articles', '*', ['article_id' => 'eq.' . rawurlencode($id)]);
             if ($resRow['data']) {
                 jsonOk($resRow['data']);
             } else {

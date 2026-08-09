@@ -1,7 +1,7 @@
 <?php
-// Temporarily enable error display to diagnose HTTP 500 error
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+// Disable display_errors to prevent PHP warnings/notices from breaking JSON responses
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING & ~E_DEPRECATED);
+ini_set('display_errors', '0');
 
 // ===== PHP 8.0+ Polyfills for PHP 7.x Compatibility =====
 if (!function_exists('str_contains')) {

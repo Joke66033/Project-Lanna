@@ -177,9 +177,10 @@ export default function CategoryLearning() {
       if (newCode) {
         trackRecentActivity("learning_category", newCode);
       }
-      setData((prev) => [newObj, ...prev.filter((i) => (i.category_code || i.id) !== newCode)]);
+      setSearch("");
+      setSelectedStatus("all");
       setCurrentPage(1);
-      fetchData(1);
+      fetchData(1, "", "all");
     } catch (err) {
       alert("เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่: " + (err.message || err));
     } finally {
@@ -233,8 +234,10 @@ export default function CategoryLearning() {
       const editCode = updatedObj?.category_code || targetCode;
       trackRecentActivity("learning_category", editCode);
       setData((prev) => [updatedObj, ...prev.filter((i) => (i.category_code || i.id) !== editCode)]);
+      setSearch("");
+      setSelectedStatus("all");
       setCurrentPage(1);
-      fetchData(1);
+      fetchData(1, "", "all");
     } catch (err) {
       alert("เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่: " + err.message);
     } finally {

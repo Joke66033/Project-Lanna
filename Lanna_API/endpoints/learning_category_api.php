@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $filters['is_active'] = 'eq.true';
             }
             
-            $res = dbSelect('learning_category', $selectStr, $filters, 'category_code.asc');
+            $res = dbSelect('learning_category', $selectStr, $filters, 'category_code.desc');
             if ($res['error']) {
                 jsonError($res['error']['message']);
                 break;

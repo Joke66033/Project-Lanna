@@ -122,7 +122,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = dbUpdate('articles', ['article_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             
-            $resRow = dbSelectSingle('articles', '*', ['article_id' => 'eq.' . rawurlencode($id)]);
+            $resRow = dbSelectSingle('articles', '*,category_lanna_char(*,learning_category(*))', ['article_id' => 'eq.' . rawurlencode($id)]);
             if ($resRow['data']) {
                 jsonOk($resRow['data']);
             } else {

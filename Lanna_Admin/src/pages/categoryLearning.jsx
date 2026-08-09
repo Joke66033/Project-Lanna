@@ -169,13 +169,15 @@ export default function CategoryLearning() {
       setShowAdd(false);
       setForm({ category_code: "", title: "", description: "", is_active: 1, total_items: 0 });
       setErrors({});
-      setSuccessText("เพิ่มหมวดหมู่การเรียนรู้เรียบร้อยแล้ว");
+      setSuccessText("เพิ่มหมวดหมู่สำเร็จ");
       setShowSuccess(true);
 
-      const newCode = insertedItem?.category_code || resJson?.data?.category_code || form.category_code;
+      const newObj = insertedItem || resJson?.data || { category_code: submitData.category_code, ...submitData };
+      const newCode = newObj?.category_code || newObj?.id;
       if (newCode) {
         trackRecentActivity("learning_category", newCode);
       }
+      setData((prev) => [newObj, ...prev.filter((i) => (i.category_code || i.id) !== newCode)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
@@ -224,11 +226,13 @@ export default function CategoryLearning() {
 
       setShowEdit(false);
       setOriginalForm(null);
-      setSuccessText("แก้ไขข้อมูลหมวดหมู่เรียบร้อยแล้ว");
+      setSuccessText("แก้ไขหมวดหมู่สำเร็จ");
       setShowSuccess(true);
 
-      const editCode = updatedItem?.category_code || targetCode;
+      const updatedObj = updatedItem || { ...originalForm, ...submitData, category_code: targetCode, id: targetCode };
+      const editCode = updatedObj?.category_code || targetCode;
       trackRecentActivity("learning_category", editCode);
+      setData((prev) => [updatedObj, ...prev.filter((i) => (i.category_code || i.id) !== editCode)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
@@ -282,7 +286,7 @@ export default function CategoryLearning() {
       setShowDelete(false);
       setDeleteItem(null);
       setUsageInfo(null);
-      setSuccessText("ลบหมวดหมู่การเรียนรู้เรียบร้อยแล้ว");
+      setSuccessText("ลบหมวดหมู่สำเร็จ");
       setShowSuccess(true);
 
       setData((prev) => prev.filter((item) => item.category_code !== code));
@@ -559,9 +563,9 @@ export default function CategoryLearning() {
             <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
               <button
                 type="submit"
-                disabled={!isFormChanged}
+                disabled={loading || !form.title.trim()}
                 className={`w-full py-3 rounded-xl font-bold transition-all ${
-                  !isFormChanged
+                  loading || !form.title.trim()
                     ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                     : "bg-[#16A34A] hover:bg-[#15803D] text-white shadow"
                 }`}

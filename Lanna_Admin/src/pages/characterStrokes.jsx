@@ -148,7 +148,7 @@ export default function CharacterStrokesPage() {
       }
       setData((prev) => [newStroke, ...prev.filter((i) => (i.stroke_id || i.id) !== strokeId)]);
       setShowAdd(false);
-      setSuccessText("เพิ่มข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
+      setSuccessText("เพิ่มข้อมูลสำเร็จ");
       setShowSuccess(true);
       setCurrentPage(1);
       fetchData(1);
@@ -169,8 +169,9 @@ export default function CharacterStrokesPage() {
         return;
       }
 
+      const targetId = editItem.stroke_id || editItem.id;
       const res = await fetch(
-        `${BASE}/endpoints/character_strokes_api.php?action=update&id=${editItem.stroke_id}`,
+        `${BASE}/endpoints/character_strokes_api.php?action=update&id=${encodeURIComponent(targetId)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -185,14 +186,14 @@ export default function CharacterStrokesPage() {
         alert(result.error.message);
         return;
       }
-      const updatedStroke = result.data || { ...editItem, ...form, stroke_id: editItem.stroke_id };
-      const strokeId = updatedStroke.stroke_id || editItem.stroke_id;
+      const updatedStroke = result.data || { ...editItem, ...form, stroke_id: targetId };
+      const strokeId = updatedStroke.stroke_id || targetId;
       if (strokeId) {
         trackRecentActivity("character_strokes", strokeId);
       }
       setData((prev) => [updatedStroke, ...prev.filter((i) => (i.stroke_id || i.id) !== strokeId)]);
       setShowEdit(false);
-      setSuccessText("แก้ไขข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
+      setSuccessText("แก้ไขข้อมูลสำเร็จ");
       setShowSuccess(true);
       setCurrentPage(1);
       fetchData(1);
@@ -204,8 +205,9 @@ export default function CharacterStrokesPage() {
   const handleDelete = async () => {
     if (!deleteItem) return;
     try {
+      const targetId = deleteItem.stroke_id || deleteItem.id;
       const res = await fetch(
-        `${BASE}/endpoints/character_strokes_api.php?action=delete&id=${deleteItem.stroke_id}`,
+        `${BASE}/endpoints/character_strokes_api.php?action=delete&id=${encodeURIComponent(targetId)}`,
         { method: "POST" }
       );
       const result = await res.json();
@@ -214,7 +216,7 @@ export default function CharacterStrokesPage() {
         return;
       }
       setShowDelete(false);
-      setSuccessText("ลบข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
+      setSuccessText("ลบข้อมูลสำเร็จ");
       setShowSuccess(true);
       fetchData();
     } catch (err) {
@@ -505,12 +507,11 @@ export default function CharacterStrokesPage() {
       />
 
       {/* Success Notification */}
-      {showSuccess && (
-        <SuccessModal
-          text={successText}
-          onClose={() => setShowSuccess(false)}
-        />
-      )}
+      <SuccessModal
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        message={successText}
+      />
     </div>
   );
 }

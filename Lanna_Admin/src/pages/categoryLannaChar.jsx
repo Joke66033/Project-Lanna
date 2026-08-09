@@ -200,14 +200,16 @@ export default function CategoryLannaChar() {
       setShowAdd(false);
       setForm({ name: "", learning_category_code: "" });
       setErrors({});
-      setSuccessText("เพิ่มหมวดหมู่เรียบร้อยแล้ว");
+      setSuccessText("เพิ่มหมวดหมู่สำเร็จ");
       setShowSuccess(true);
 
       // Prepend to state
-      const catId = insertedItem?.category_char_id || resJson?.data?.category_char_id;
+      const newObj = insertedItem || resJson?.data || { name: form.name };
+      const catId = newObj?.category_char_id || newObj?.id;
       if (catId) {
         trackRecentActivity("category_lanna_char", catId);
       }
+      setData((prev) => [newObj, ...prev.filter((i) => (i.category_char_id || i.id) !== catId)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
@@ -252,12 +254,14 @@ export default function CategoryLannaChar() {
       setShowEdit(false);
       setOriginalForm(null);
       setForm({ name: "", learning_category_code: "" });
-      setSuccessText("แก้ไขหมวดหมู่เรียบร้อยแล้ว");
+      setSuccessText("แก้ไขหมวดหมู่สำเร็จ");
       setShowSuccess(true);
 
       // Prepend to state
-      const editCatId = updatedItem?.category_char_id || targetId;
+      const updatedObj = updatedItem || { category_char_id: targetId, id: targetId, name: form.name, learning_category_code: form.learning_category_code };
+      const editCatId = updatedObj?.category_char_id || targetId;
       trackRecentActivity("category_lanna_char", editCatId);
+      setData((prev) => [updatedObj, ...prev.filter((i) => (i.category_char_id || i.id) !== editCatId)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
@@ -312,7 +316,7 @@ export default function CategoryLannaChar() {
       setDeleteItem(null);
       setUsageInfo(null);
       setDeleteIndex(null);
-      setSuccessText("ลบหมวดหมู่อักขระเรียบร้อยแล้ว");
+      setSuccessText("ลบหมวดหมู่สำเร็จ");
       setShowSuccess(true);
       fetchData();
     } catch (err) {
@@ -525,11 +529,12 @@ export default function CategoryLannaChar() {
             {/* STICKY FOOTER */}
             <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
               <button
-                disabled={showAdd ? !form.name : !isFormChanged}
-                className={`w-full py-3 rounded-xl font-semibold transition-all ${(showAdd && !form.name) || (showEdit && !isFormChanged)
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-[#16A34A] hover:bg-[#15803D] text-white shadow"
-                  }`}
+                disabled={loading || !form.name.trim()}
+                className={`w-full py-3 rounded-xl font-semibold transition-all ${
+                  loading || !form.name.trim()
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#16A34A] hover:bg-[#15803D] text-white shadow"
+                }`}
               >
                 บันทึกข้อมูล
               </button>

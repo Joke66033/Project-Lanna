@@ -164,10 +164,15 @@ export default function Users() {
       } catch (e) {}
 
       trackRecentActivity("users", userId);
+      setData((prev) => {
+        const target = prev.find((u) => (u.user_id || u.id) === userId);
+        const updated = target ? { ...target, status: newStatus } : { user_id: userId, id: userId, status: newStatus };
+        return [updated, ...prev.filter((u) => (u.user_id || u.id) !== userId)];
+      });
       setSuccessText(
         pendingUser.isActive
-          ? `ระงับบัญชี "${pendingUser.name}" เรียบร้อยแล้ว`
-          : `เปิดใช้งานบัญชี "${pendingUser.name}" เรียบร้อยแล้ว`
+          ? `ระงับบัญชี "${pendingUser.name}" สำเร็จ`
+          : `เปิดใช้งานบัญชี "${pendingUser.name}" สำเร็จ`
       );
       setShowSuccess(true);
       setPendingUser(null);

@@ -279,7 +279,7 @@ export default function AlphabetPage() {
       setShowAdd(false);
       setErrors({});
       setThaiDraft("");
-      setSuccessText("เพิ่มอักขระเรียบร้อยแล้ว");
+      setSuccessText("เพิ่มข้อมูลสำเร็จ");
       setShowSuccess(true);
 
       // Prepend to state
@@ -337,7 +337,7 @@ export default function AlphabetPage() {
       setOriginalForm(null);
       setThaiDraft("");
       setErrors({});
-      setSuccessText("แก้ไขอักขระเรียบร้อยแล้ว");
+      setSuccessText("แก้ไขข้อมูลสำเร็จ");
       setShowSuccess(true);
 
       // Update state locally (prepend)
@@ -365,8 +365,9 @@ export default function AlphabetPage() {
   const handleDelete = async () => {
     try {
       setLoading(true);
+      const targetId = deleteItem.char_id || deleteItem.id;
       const res = await fetch(
-        `${BASE}/endpoints/lanna_char_api.php?action=delete&id=${encodeURIComponent(deleteItem.id)}`,
+        `${BASE}/endpoints/lanna_char_api.php?action=delete&id=${encodeURIComponent(targetId)}`,
         { method: "POST" }
       );
       const { error: resError } = await res.json();
@@ -374,7 +375,7 @@ export default function AlphabetPage() {
 
       setShowDelete(false);
       setDeleteItem(null);
-      setSuccessText("ลบอักขระเรียบร้อยแล้ว");
+      setSuccessText("ลบข้อมูลสำเร็จ");
       setShowSuccess(true);
       fetchData();
     } catch (err) {
@@ -662,14 +663,9 @@ export default function AlphabetPage() {
             {/* STICKY FOOTER */}
             <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
               <button
-                disabled={
-                  showAdd
-                    ? !form.th || !form.ln || !form.category_char_id
-                    : showEdit && !isFormChanged
-                }
+                disabled={loading || !form.th || !form.ln || !form.category_char_id}
                 className={`w-full py-3 rounded-xl font-semibold transition-all ${
-                  (showAdd && (!form.th || !form.ln || !form.category_char_id)) ||
-                  (showEdit && !isFormChanged)
+                  loading || !form.th || !form.ln || !form.category_char_id
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#16A34A] hover:bg-[#15803D] text-white shadow"
                 }`}

@@ -252,7 +252,7 @@ export default function VocabularyPage() {
       setShowAdd(false);
       setForm({ lanna_word: "", thai_word: "", reading: "", meaning: "", category_vocab_id: "" });
       setErrors({});
-      setSuccessText("เพิ่มคำศัพท์เรียบร้อยแล้ว");
+      setSuccessText("เพิ่มคำศัพท์สำเร็จ");
       setShowSuccess(true);
       
       // Update state locally (prepend)
@@ -308,7 +308,7 @@ export default function VocabularyPage() {
       setOriginalForm(null);
       setForm({ lanna_word: "", thai_word: "", reading: "", meaning: "", category_vocab_id: "" });
       setErrors({});
-      setSuccessText("แก้ไขคำศัพท์เรียบร้อยแล้ว");
+      setSuccessText("แก้ไขคำศัพท์สำเร็จ");
       setShowSuccess(true);
 
       // Update state locally (prepend updated item)
@@ -338,8 +338,9 @@ export default function VocabularyPage() {
   const handleDelete = async () => {
     try {
       setLoading(true);
+      const targetId = deleteItem.vocab_id || deleteItem.id;
       const res = await fetch(
-        `${BASE}/endpoints/vocabulary_api.php?action=delete&id=${encodeURIComponent(deleteItem.vocab_id)}`,
+        `${BASE}/endpoints/vocabulary_api.php?action=delete&id=${encodeURIComponent(targetId)}`,
         { method: "POST" }
       );
       const { error: resError } = await res.json();
@@ -347,7 +348,7 @@ export default function VocabularyPage() {
 
       setShowDelete(false);
       setDeleteItem(null);
-      setSuccessText("ลบคำศัพท์เรียบร้อยแล้ว");
+      setSuccessText("ลบคำศัพท์สำเร็จ");
       setShowSuccess(true);
       fetchData();
     } catch (err) {
@@ -691,15 +692,12 @@ export default function VocabularyPage() {
             {/* STICKY FOOTER */}
             <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
               <button
-                disabled={
-                  showAdd
-                    ? !form.lanna_word || !form.thai_word || !form.reading || !form.meaning || !form.category_vocab_id
-                    : showEdit && !isFormChanged
-                }
-                className={`w-full py-3 rounded-xl font-semibold transition-all ${(showAdd && (!form.lanna_word || !form.thai_word)) || (showEdit && !isFormChanged)
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-[#16A34A] hover:bg-[#15803D] text-white shadow"
-                  }`}
+                disabled={loading || !form.thai_word || !form.category_vocab_id}
+                className={`w-full py-3 rounded-xl font-semibold transition-all ${
+                  loading || !form.thai_word || !form.category_vocab_id
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#16A34A] hover:bg-[#15803D] text-white shadow"
+                }`}
               >
                 บันทึกข้อมูล
               </button>

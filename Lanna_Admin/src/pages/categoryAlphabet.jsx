@@ -160,7 +160,7 @@ export default function CategoryAlphabet() {
       setShowAdd(false);
       setForm({ name: "" });
       setErrors({});
-      setSuccessText("เพิ่มหมวดหมู่เรียบร้อยแล้ว");
+      setSuccessText("เพิ่มหมวดหมู่สำเร็จ");
       setShowSuccess(true);
 
       // Prepend to state
@@ -207,7 +207,7 @@ export default function CategoryAlphabet() {
 
       setShowEdit(false);
       setOriginalForm(null);
-      setSuccessText("แก้ไขหมวดหมู่เรียบร้อยแล้ว");
+      setSuccessText("แก้ไขหมวดหมู่สำเร็จ");
       setShowSuccess(true);
 
       // Prepend to state
@@ -266,7 +266,7 @@ export default function CategoryAlphabet() {
       setShowDelete(false);
       setDeleteItem(null);
       setUsageInfo(null);
-      setSuccessText("ลบหมวดหมู่คำศัพท์เรียบร้อยแล้ว");
+      setSuccessText("ลบหมวดหมู่สำเร็จ");
       setShowSuccess(true);
       fetchData();
     } catch (err) {
@@ -446,9 +446,9 @@ export default function CategoryAlphabet() {
             {/* STICKY FOOTER */}
             <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
               <button
-                disabled={showAdd ? !form.name : !isFormChanged}
+                disabled={loading || !form.name.trim()}
                 className={`w-full py-3 rounded-xl font-semibold transition-all ${
-                  (showAdd && !form.name) || (showEdit && !isFormChanged)
+                  loading || !form.name.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#16A34A] hover:bg-[#15803D] text-white shadow"
                 }`}

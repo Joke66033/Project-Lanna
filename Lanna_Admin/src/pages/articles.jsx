@@ -374,14 +374,16 @@ export default function Articles() {
 
       resetForm();
       setShowAdd(false);
-      setSuccessText("เพิ่มเนื้อหาการเรียนรู้เรียบร้อยแล้ว");
+      setSuccessText("เพิ่มข้อมูลสำเร็จ");
       setShowSuccess(true);
 
       // Update state locally (prepend)
-      const articleId = insertedItem?.article_id || resJson?.data?.article_id;
+      const newArticle = insertedItem || resJson?.data || { ...form };
+      const articleId = newArticle?.article_id || newArticle?.id;
       if (articleId) {
         trackRecentActivity("articles", articleId);
       }
+      setData((prev) => [newArticle, ...prev.filter((i) => (i.article_id || i.id) !== articleId)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
@@ -433,12 +435,14 @@ export default function Articles() {
 
       setShowEdit(false);
       setEditIndex(null);
-      setSuccessText("แก้ไขข้อมูลเรียบร้อยแล้ว");
+      setSuccessText("แก้ไขข้อมูลสำเร็จ");
       setShowSuccess(true);
 
       // Update state locally (prepend updated item)
-      const editId = updatedItem?.article_id || targetId;
+      const updatedArticle = updatedItem || { ...form, article_id: targetId, id: targetId };
+      const editId = updatedArticle?.article_id || targetId;
       trackRecentActivity("articles", editId);
+      setData((prev) => [updatedArticle, ...prev.filter((i) => (i.article_id || i.id) !== editId)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
@@ -452,8 +456,10 @@ export default function Articles() {
   const handleDelete = async () => {
     try {
       setLoading(true);
+      const targetItem = articles[deleteIndex];
+      const targetId = targetItem?.article_id || targetItem?.id;
       const res = await fetch(
-        `${BASE}/endpoints/articles_api.php?action=delete&id=${articles[deleteIndex].id}`,
+        `${BASE}/endpoints/articles_api.php?action=delete&id=${encodeURIComponent(targetId)}`,
         { method: "POST" }
       );
       const { error: resError } = await res.json();
@@ -461,7 +467,7 @@ export default function Articles() {
 
       setShowDelete(false);
       setDeleteIndex(null);
-      setSuccessText("ลบข้อมูลเรียบร้อยแล้ว");
+      setSuccessText("ลบข้อมูลสำเร็จ");
       setShowSuccess(true);
       fetchData();
     } catch (err) {

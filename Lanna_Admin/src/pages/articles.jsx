@@ -384,8 +384,11 @@ export default function Articles() {
         trackRecentActivity("articles", articleId);
       }
       setData((prev) => [newArticle, ...prev.filter((i) => (i.article_id || i.id) !== articleId)]);
+      setSelectedLearningCategory("all");
+      setSelectedCharCategory("all");
+      setSearch("");
       setCurrentPage(1);
-      fetchData(1);
+      fetchData(1, "", "all", "all");
     } catch (err) {
       alert("Error adding article: " + err.message);
     } finally {
@@ -396,15 +399,17 @@ export default function Articles() {
   /* ===== EDIT ===== */
   const openEdit = (index) => {
     const a = articles[index];
+    const itemArticleId = a?.article_id || a?.id;
     setEditIndex(index);
     setForm({
-      id: a.id,
-      category: a.category || "",
-      title: a.title || "",
-      content: a.content || "",
-      category_char_id: a.category_char_id ? String(a.category_char_id) : "",
-      image_path: a.image_path || null,
-      learning_category_code: a.learning_category_code || "",
+      id: itemArticleId,
+      article_id: itemArticleId,
+      category: a?.category || "",
+      title: a?.title || "",
+      content: a?.content || "",
+      category_char_id: a?.category_char_id ? String(a.category_char_id) : "",
+      image_path: a?.image_path || null,
+      learning_category_code: a?.learning_category_code || "",
     });
     setShowEdit(true);
   };
@@ -415,7 +420,7 @@ export default function Articles() {
 
     try {
       setSubmitting(true);
-      const targetId = form.id;
+      const targetId = form.article_id || form.id || articles[editIndex]?.article_id || articles[editIndex]?.id;
       const res = await fetch(
         `${BASE}/endpoints/articles_api.php?action=update&id=${encodeURIComponent(targetId)}`,
         {
@@ -443,8 +448,11 @@ export default function Articles() {
       const editId = updatedArticle?.article_id || targetId;
       trackRecentActivity("articles", editId);
       setData((prev) => [updatedArticle, ...prev.filter((i) => (i.article_id || i.id) !== editId)]);
+      setSelectedLearningCategory("all");
+      setSelectedCharCategory("all");
+      setSearch("");
       setCurrentPage(1);
-      fetchData(1);
+      fetchData(1, "", "all", "all");
     } catch (err) {
       alert("Error updating article: " + err.message);
     } finally {

@@ -80,6 +80,9 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $updateData = [];
             if (array_key_exists('name', $body)) $updateData['name'] = $body['name'];
 
+            $res = dbUpdate('category_vocab', ['category_vocab_id' => 'eq.' . rawurlencode($id)], $updateData);
+            if ($res['error']) { jsonError($res['error']['message']); break; }
+
             $resRow = dbSelectSingle('category_vocab', '*', ['category_vocab_id' => 'eq.' . rawurlencode($id)]);
             if ($resRow['data']) {
                 jsonOk($resRow['data']);

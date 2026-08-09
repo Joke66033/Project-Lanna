@@ -93,6 +93,9 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (array_key_exists('name', $body))                   $updateData['name'] = $body['name'];
             if (array_key_exists('learning_category_code', $body)) $updateData['learning_category_code'] = !empty($body['learning_category_code']) ? $body['learning_category_code'] : null;
 
+            $res = dbUpdate('category_lanna_char', ['category_char_id' => 'eq.' . rawurlencode($id)], $updateData);
+            if ($res['error']) { jsonError($res['error']['message']); break; }
+
             $resRow = dbSelectSingle('category_lanna_char', '*', ['category_char_id' => 'eq.' . rawurlencode($id)]);
             if ($resRow['data']) {
                 jsonOk($resRow['data']);

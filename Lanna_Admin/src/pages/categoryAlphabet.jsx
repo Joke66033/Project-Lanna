@@ -112,7 +112,9 @@ export default function CategoryAlphabet() {
   }, [currentPage, search])
 
   const displayData = (data || []).map((item) => ({
-    id: item.category_vocab_id,
+    ...item,
+    id: item.category_vocab_id || item.id,
+    category_vocab_id: item.category_vocab_id || item.id,
     name: item.name || "",
   }));
 
@@ -162,10 +164,12 @@ export default function CategoryAlphabet() {
       setShowSuccess(true);
 
       // Prepend to state
-      const catId = insertedItem?.category_vocab_id || resJson?.data?.category_vocab_id;
+      const newObj = insertedItem || resJson?.data || { name: form.name };
+      const catId = newObj?.category_vocab_id || newObj?.id;
       if (catId) {
         trackRecentActivity("category_vocab", catId);
       }
+      setData((prev) => [newObj, ...prev.filter((i) => (i.category_vocab_id || i.id) !== catId)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
@@ -207,8 +211,10 @@ export default function CategoryAlphabet() {
       setShowSuccess(true);
 
       // Prepend to state
-      const editCatId = updatedItem?.category_vocab_id || targetId;
+      const updatedObj = updatedItem || { category_vocab_id: targetId, id: targetId, name: form.name };
+      const editCatId = updatedObj?.category_vocab_id || targetId;
       trackRecentActivity("category_vocab", editCatId);
+      setData((prev) => [updatedObj, ...prev.filter((i) => (i.category_vocab_id || i.id) !== editCatId)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {

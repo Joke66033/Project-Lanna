@@ -283,10 +283,12 @@ export default function AlphabetPage() {
       setShowSuccess(true);
 
       // Prepend to state
-      const charId = insertedChar?.char_id || resJson?.data?.char_id;
+      const newChar = insertedChar || resJson?.data || { lanna_char: form.ln, thai_equivalent: form.th, category_char_id: form.category_char_id };
+      const charId = newChar?.char_id || newChar?.id;
       if (charId) {
         trackRecentActivity("lanna_char", charId);
       }
+      setData((prev) => [newChar, ...prev.filter((i) => (i.char_id || i.id) !== charId)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
@@ -339,8 +341,10 @@ export default function AlphabetPage() {
       setShowSuccess(true);
 
       // Update state locally (prepend)
-      const editCharId = updatedChar?.char_id || targetId;
+      const updatedObj = updatedChar || { char_id: targetId, id: targetId, lanna_char: form.ln, thai_equivalent: form.th, category_char_id: form.category_char_id };
+      const editCharId = updatedObj?.char_id || targetId;
       trackRecentActivity("lanna_char", editCharId);
+      setData((prev) => [updatedObj, ...prev.filter((i) => (i.char_id || i.id) !== editCharId)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {

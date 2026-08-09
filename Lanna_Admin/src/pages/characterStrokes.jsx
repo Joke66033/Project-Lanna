@@ -141,14 +141,17 @@ export default function CharacterStrokesPage() {
         alert(result.error.message);
         return;
       }
-      if (result.data && result.data.stroke_id) {
-        trackRecentActivity("character_strokes", result.data.stroke_id);
+      const newStroke = result.data || { ...form };
+      const strokeId = newStroke.stroke_id || result.data?.stroke_id;
+      if (strokeId) {
+        trackRecentActivity("character_strokes", strokeId);
       }
+      setData((prev) => [newStroke, ...prev.filter((i) => (i.stroke_id || i.id) !== strokeId)]);
       setShowAdd(false);
       setSuccessText("เพิ่มข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
       setShowSuccess(true);
       setCurrentPage(1);
-      fetchData();
+      fetchData(1);
     } catch (err) {
       alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     }
@@ -182,14 +185,17 @@ export default function CharacterStrokesPage() {
         alert(result.error.message);
         return;
       }
-      if (editItem.stroke_id) {
-        trackRecentActivity("character_strokes", editItem.stroke_id);
+      const updatedStroke = result.data || { ...editItem, ...form, stroke_id: editItem.stroke_id };
+      const strokeId = updatedStroke.stroke_id || editItem.stroke_id;
+      if (strokeId) {
+        trackRecentActivity("character_strokes", strokeId);
       }
+      setData((prev) => [updatedStroke, ...prev.filter((i) => (i.stroke_id || i.id) !== strokeId)]);
       setShowEdit(false);
       setSuccessText("แก้ไขข้อมูลเส้นทางการวาดเรียบร้อยแล้ว");
       setShowSuccess(true);
       setCurrentPage(1);
-      fetchData();
+      fetchData(1);
     } catch (err) {
       alert("เกิดข้อผิดพลาดในการอัปเดตข้อมูล");
     }

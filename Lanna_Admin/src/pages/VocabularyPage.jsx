@@ -256,10 +256,12 @@ export default function VocabularyPage() {
       setShowSuccess(true);
       
       // Update state locally (prepend)
-      if (insertedItem) {
-        trackRecentActivity("vocabulary", insertedItem.vocab_id);
-        setData((prev) => sortRecentData([insertedItem, ...prev], "vocabulary", "vocab_id"));
+      const newVocab = insertedItem || resJson?.data || { ...form };
+      const vocabId = newVocab?.vocab_id || newVocab?.id;
+      if (vocabId) {
+        trackRecentActivity("vocabulary", vocabId);
       }
+      setData((prev) => [newVocab, ...prev.filter((i) => (i.vocab_id || i.id) !== vocabId)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
@@ -289,8 +291,9 @@ export default function VocabularyPage() {
 
     try {
       setLoading(true);
+      const targetId = originalForm.vocab_id || originalForm.id;
       const res = await fetch(
-        `${BASE}/endpoints/vocabulary_api.php?action=update&id=${encodeURIComponent(originalForm.vocab_id)}`,
+        `${BASE}/endpoints/vocabulary_api.php?action=update&id=${encodeURIComponent(targetId)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -309,13 +312,10 @@ export default function VocabularyPage() {
       setShowSuccess(true);
 
       // Update state locally (prepend updated item)
-      if (updatedItem) {
-        trackRecentActivity("vocabulary", updatedItem.vocab_id);
-        setData((prev) => {
-          const filtered = prev.filter((item) => (item.vocab_id || item.id) !== (updatedItem.vocab_id || updatedItem.id));
-          return sortRecentData([updatedItem, ...filtered], "vocabulary", "vocab_id");
-        });
-      }
+      const updatedObj = updatedItem || { ...originalForm, ...form, vocab_id: targetId, id: targetId };
+      const editId = updatedObj?.vocab_id || targetId;
+      trackRecentActivity("vocabulary", editId);
+      setData((prev) => [updatedObj, ...prev.filter((i) => (i.vocab_id || i.id) !== editId)]);
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {

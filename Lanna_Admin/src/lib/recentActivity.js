@@ -1,9 +1,26 @@
+export function getItemId(item, idField) {
+  if (!item) return "";
+  if (idField && item[idField] !== undefined && item[idField] !== null && String(item[idField]).trim() !== "") {
+    return String(item[idField]).trim();
+  }
+  if (item.category_vocab_id) return String(item.category_vocab_id).trim();
+  if (item.category_char_id) return String(item.category_char_id).trim();
+  if (item.category_code) return String(item.category_code).trim();
+  if (item.char_id) return String(item.char_id).trim();
+  if (item.vocab_id) return String(item.vocab_id).trim();
+  if (item.article_id) return String(item.article_id).trim();
+  if (item.stroke_id) return String(item.stroke_id).trim();
+  if (item.user_id) return String(item.user_id).trim();
+  if (item.id !== undefined && item.id !== null) return String(item.id).trim();
+  return "";
+}
+
 export function trackRecentActivity(type, id) {
   try {
-    if (id === undefined || id === null || id === "") return;
-    const strId = String(id);
+    if (id === undefined || id === null || String(id).trim() === "") return;
+    const strId = String(id).trim();
     const key = `recent_${type}`;
-    const existing = JSON.parse(localStorage.getItem(key) || "[]").map(String);
+    const existing = JSON.parse(localStorage.getItem(key) || "[]").map((x) => String(x).trim());
     const updated = [strId, ...existing.filter((item) => item !== strId)].slice(0, 50);
     localStorage.setItem(key, JSON.stringify(updated));
   } catch (e) {
@@ -14,7 +31,7 @@ export function trackRecentActivity(type, id) {
 export function sortRecentData(dataList, type, idField = "id") {
   try {
     const key = `recent_${type}`;
-    const recentIds = JSON.parse(localStorage.getItem(key) || "[]").map(String);
+    const recentIds = JSON.parse(localStorage.getItem(key) || "[]").map((x) => String(x).trim());
     if (!recentIds.length || !Array.isArray(dataList)) return dataList;
 
     const recentSet = new Set(recentIds);
@@ -22,9 +39,8 @@ export function sortRecentData(dataList, type, idField = "id") {
     const otherItems = [];
 
     dataList.forEach((item) => {
-      const rawId = item[idField] !== undefined ? item[idField] : (item.id !== undefined ? item.id : (item.char_id || item.user_id || item.vocab_id || item.article_id || item.category_code || item.category_vocab_id || item.category_char_id || item.stroke_id));
-      const itemId = String(rawId);
-      if (recentSet.has(itemId)) {
+      const itemId = getItemId(item, idField);
+      if (itemId && recentSet.has(itemId)) {
         recentItems.push(item);
       } else {
         otherItems.push(item);
@@ -32,9 +48,9 @@ export function sortRecentData(dataList, type, idField = "id") {
     });
 
     recentItems.sort((a, b) => {
-      const rawA = a[idField] !== undefined ? a[idField] : (a.id !== undefined ? a.id : (a.char_id || a.user_id || a.vocab_id || a.article_id || a.category_code || a.category_vocab_id || a.category_char_id || a.stroke_id));
-      const rawB = b[idField] !== undefined ? b[idField] : (b.id !== undefined ? b.id : (b.char_id || b.user_id || b.vocab_id || b.article_id || b.category_code || b.category_vocab_id || b.category_char_id || b.stroke_id));
-      return recentIds.indexOf(String(rawA)) - recentIds.indexOf(String(rawB));
+      const idA = getItemId(a, idField);
+      const idB = getItemId(b, idField);
+      return recentIds.indexOf(idA) - recentIds.indexOf(idB);
     });
 
     return [...recentItems, ...otherItems];

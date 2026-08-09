@@ -195,12 +195,13 @@ export default function AlphabetPage() {
 
 
   const displayData = (data || []).map((item, idx) => ({
-    id: item.char_id || item.id || idx,
+    ...item,
+    id: item.char_id || item.id,
+    char_id: item.char_id || item.id,
     ln: item.lanna_char || item.lanna_word || item.ln || "",
     th: item.thai_equivalent || item.thai_word || item.thai_char || item.th || "",
     category: item.category_lanna_char?.name || "ไม่ระบุหมวดหมู่",
     category_char_id: item.category_char_id || "",
-    ...item
   }));
 
   const [showAdd, setShowAdd] = useState(false);

@@ -3,15 +3,18 @@ export function getItemId(item, idField) {
   if (idField && item[idField] !== undefined && item[idField] !== null && String(item[idField]).trim() !== "") {
     return String(item[idField]).trim();
   }
-  if (item.category_vocab_id) return String(item.category_vocab_id).trim();
-  if (item.category_char_id) return String(item.category_char_id).trim();
-  if (item.category_code) return String(item.category_code).trim();
+  // Record Primary Keys first (specific entity IDs)
   if (item.char_id) return String(item.char_id).trim();
   if (item.vocab_id) return String(item.vocab_id).trim();
   if (item.article_id) return String(item.article_id).trim();
   if (item.stroke_id) return String(item.stroke_id).trim();
   if (item.user_id) return String(item.user_id).trim();
-  if (item.id !== undefined && item.id !== null) return String(item.id).trim();
+
+  // Category Primary Keys (for category management tables)
+  if (item.category_vocab_id) return String(item.category_vocab_id).trim();
+  if (item.category_char_id) return String(item.category_char_id).trim();
+  if (item.category_code) return String(item.category_code).trim();
+  if (item.id !== undefined && item.id !== null && String(item.id).trim() !== "") return String(item.id).trim();
   return "";
 }
 

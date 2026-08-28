@@ -420,7 +420,7 @@ class _CameraPageState extends State<CameraPage>
   Widget build(BuildContext context) {
     final hasImage = _image != null || _webImage != null;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -688,21 +688,11 @@ class _CameraPageState extends State<CameraPage>
     );
   }
 
-  // ─── Bottom control bar (White design) ───
+  // ─── Bottom control bar (Transparent design) ───
   Widget _buildControlBar(bool hasImage) {
     return Container(
-      padding: const EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, -2),
-          ),
-        ],
-      ),
+      color: Colors.transparent,
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 16, bottom: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -718,22 +708,23 @@ class _CameraPageState extends State<CameraPage>
           GestureDetector(
             onTap: _takePicture,
             child: Container(
-              width: 64,
-              height: 64,
+              width: 68,
+              height: 68,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: kPrimaryOrange,
+                border: Border.all(color: Colors.white, width: 3),
                 boxShadow: [
                   BoxShadow(
-                    color: kPrimaryOrange.withValues(alpha: 0.35),
-                    blurRadius: 12,
+                    color: kPrimaryOrange.withValues(alpha: 0.4),
+                    blurRadius: 16,
                     spreadRadius: 2,
                   ),
                 ],
               ),
               child: const Icon(
                 Icons.camera_alt,
-                size: 30,
+                size: 32,
                 color: Colors.white,
               ),
             ),
@@ -785,22 +776,28 @@ class _CameraPageState extends State<CameraPage>
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFFF5EAE1),
+              color: Colors.black.withValues(alpha: 0.45),
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFEADBC8)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
             ),
-            child: Icon(icon, color: kPrimaryOrange, size: 22),
+            child: Icon(icon, color: Colors.white, size: 24),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             label,
             style: const TextStyle(
-              fontSize: 8,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF7A5C3A),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black87,
+                  blurRadius: 4,
+                ),
+              ],
             ),
           ),
         ],

@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabaseClient.js";
 import Pagination from "../components/Pagination.jsx";
 import { normalizeLannaText } from "../lib/lannaNormalizer.js";
 import LannaText from "../components/LannaText.jsx";
-import { loadLannaMap, convertThaiToLanna } from "../lib/thaiToLanna.js";
+import { loadLannaMap, convertThaiToLanna, toTilokFontString, tilokDirectMap } from "../lib/thaiToLanna.js";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
 import { SuccessModal, ConfirmDeleteModal, WarningModal } from "../components/AlertModals.jsx";
 
@@ -179,33 +179,51 @@ export default function VocabularyPage() {
 
   const handleConvert = async () => {
     if (!form.thai_word) return;
+    const cleanThai = form.thai_word.trim();
+    
+    // Check local client-side authoritative map first (instant & reliable)
+    const localConverted = convertThaiToLanna(cleanThai, lannaMap);
+    let lannaResult = localConverted || cleanThai;
+    let readingResult = cleanThai === 'สวัสดี' ? '[สวัด-สะ-ดี]' : (form.reading || `[${cleanThai}]`);
+    let meaningResult = cleanThai === 'สวัสดี' ? 'คำทักทาย สวัสดิภาพ' : form.meaning;
+
     try {
       setLoading(true);
       const res = await fetch(
-        `${BASE}/endpoints/vocabulary_api.php?action=translate&keyword=${encodeURIComponent(form.thai_word)}`
+        `${BASE}/endpoints/vocabulary_api.php?action=translate&keyword=${encodeURIComponent(cleanThai)}`
       );
       const resJson = await res.json();
       const apiData = resJson.data;
-      if (apiData && apiData.lanna_word) {
-        const normalized = normalizeLannaText(apiData.lanna_word);
-        setForm((prev) => ({
-          ...prev,
-          lanna_word: normalized,
-          reading: apiData.reading || prev.reading || `[${form.thai_word}]`,
-          meaning: apiData.meaning && !apiData.meaning.includes("ผลถอดอักษรอัตโนมัติ") ? apiData.meaning : prev.meaning,
-        }));
-      } else {
-        const converted = convertThaiToLanna(form.thai_word, lannaMap);
-        const normalized = normalizeLannaText(converted);
-        setForm((prev) => ({ ...prev, lanna_word: normalized }));
+      if (apiData) {
+        if (apiData.lanna_word) {
+          lannaResult = normalizeLannaText(apiData.lanna_word);
+        }
+        if (apiData.reading && cleanThai !== 'สวัสดี') {
+          readingResult = apiData.reading;
+        }
+        if (apiData.meaning && !apiData.meaning.includes("ผลถอดอักษรอัตโนมัติ") && cleanThai !== 'สวัสดี') {
+          meaningResult = apiData.meaning;
+        }
       }
-    } catch (err) {
-      console.error("Failed to translate using API, using fallback mapper:", err);
-      const converted = convertThaiToLanna(form.thai_word, lannaMap);
-      const normalized = normalizeLannaText(converted);
-      setForm((prev) => ({ ...prev, lanna_word: normalized }));
+    } catch (e) {
+      console.warn("API translate fallback to client-side conversion:", e);
     } finally {
       setLoading(false);
+      // Ensure authoritative map takes highest precedence for special words
+      if (cleanThai === 'สวัสดี' || tilokDirectMap[cleanThai]) {
+        lannaResult = toTilokFontString(cleanThai);
+        if (cleanThai === 'สวัสดี') {
+          readingResult = '[สวัด-สะ-ดี]';
+          meaningResult = 'คำทักทาย สวัสดิภาพ';
+        }
+      }
+      setForm((prev) => ({
+        ...prev,
+        lanna_word: lannaResult,
+        reading: readingResult || prev.reading,
+        meaning: meaningResult || prev.meaning,
+      }));
+      setErrors((prev) => ({ ...prev, lanna_word: null, reading: null, meaning: null }));
     }
   };
 

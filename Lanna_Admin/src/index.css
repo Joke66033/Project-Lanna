@@ -27,13 +27,13 @@
 }
 
 .lanna-text {
-  font-family: "PayapLanna", "LN-TILOK", "Noto Sans Tai Tham", serif;
+  font-family: "LN-TILOK", "LNTilok", "Noto Sans Tai Tham", "PayapLanna", sans-serif;
   font-size: 1.4em;
   line-height: 1.8;
 }
 
 .lanna-char {
-  font-family: "PayapLanna", "LN-TILOK", "Noto Sans Tai Tham", sans-serif;
+  font-family: "LN-TILOK", "LNTilok", "Noto Sans Tai Tham", "PayapLanna", sans-serif;
   font-size: 1.4em;
   line-height: 1.8;
 }

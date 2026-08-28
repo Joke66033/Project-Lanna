@@ -972,8 +972,12 @@ class _ProfileContentState extends State<ProfileContent>
           ],
         ),
       ),
-    );
-  }
+    ),
+  ],
+),
+),
+);
+}
 
   // ===== Avatar helpers =====
 

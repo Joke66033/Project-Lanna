@@ -93,9 +93,9 @@ List<List<Offset>>? getConsonantStrokePaths(String char) {
       return [
         [const Offset(18.0, 41.0), const Offset(20.0, 36.0), const Offset(24.0, 37.0), const Offset(23.0, 43.0), const Offset(19.0, 42.0), const Offset(21.0, 29.0), const Offset(26.0, 23.0), const Offset(32.0, 32.0), const Offset(38.0, 23.0), const Offset(43.0, 29.0), const Offset(43.0, 43.0), const Offset(35.0, 55.0), const Offset(23.0, 55.0), const Offset(18.0, 47.0), const Offset(25.0, 43.0), const Offset(42.0, 43.0), const Offset(47.0, 52.0), const Offset(53.0, 56.0), const Offset(59.0, 48.0), const Offset(57.0, 32.0), const Offset(60.0, 24.0), const Offset(67.0, 24.0), const Offset(70.0, 36.0), const Offset(70.0, 49.0), const Offset(76.0, 56.0), const Offset(81.0, 48.0), const Offset(78.0, 32.0), const Offset(81.0, 24.0), const Offset(88.0, 24.0), const Offset(91.0, 36.0), const Offset(86.0, 52.0)],
       ];
-    case 'ᨦ': // งะ (ตรงตามรูปภาพต้นแบบ 100%: หัวกลมซ้าย จงอยปากบน ข้ามโดมบน ลงเสาขวา ตวัดหางล่าง)
+    case 'ᨦ': // งะ (ตรงตามรูปภาพต้นแบบ 100%: ม้วนหัวก้นหอยล่างซ้าย พุ่งขึ้นทำหงอนบน โค้งข้ามโดมบน ลงเสาขวา ตวัดหางล่าง)
       return [
-        [const Offset(36.0, 52.0), const Offset(32.0, 46.0), const Offset(36.0, 38.0), const Offset(46.0, 32.0), const Offset(38.0, 42.0), const Offset(46.0, 32.0), const Offset(58.0, 30.0), const Offset(70.0, 38.0), const Offset(72.0, 54.0), const Offset(66.0, 68.0), const Offset(52.0, 72.0), const Offset(42.0, 68.0)],
+        [const Offset(48.0, 56.0), const Offset(44.0, 62.0), const Offset(34.0, 60.0), const Offset(28.0, 52.0), const Offset(30.0, 42.0), const Offset(38.0, 34.0), const Offset(46.0, 26.0), const Offset(58.0, 26.0), const Offset(70.0, 36.0), const Offset(74.0, 52.0), const Offset(70.0, 66.0), const Offset(56.0, 72.0), const Offset(42.0, 70.0)],
       ];
     case 'ᨧ': // จ๋ะ (ตรงตามรูปภาพต้นแบบ 100%: ทรงเมล็ดถั่วแนวนอน วนหัวตาในซ้าย ลากโค้งท้องอ่างล่าง ขึ้นขวา วนปิดหลังคาบนซ้าย)
       return [

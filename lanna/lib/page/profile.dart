@@ -525,29 +525,8 @@ class _ProfileContentState extends State<ProfileContent>
       );
     }
 
-    final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
-
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF7), // Light warm Lanna background color
-      bottomNavigationBar: isKeyboardOpen
-          ? null
-          : BottomNav(
-              index: widget.isGuest ? 4 : 4,
-              isGuest: widget.isGuest,
-              onLoginTap: () => Navigator.pushNamed(context, '/login'),
-              onTap: (tabId) {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => HomeShell(
-                      isGuest: widget.isGuest,
-                      initialTab: tabId,
-                    ),
-                  ),
-                  (route) => false,
-                );
-              },
-            ),
       body: SafeArea(
         bottom: false,
         child: Column(

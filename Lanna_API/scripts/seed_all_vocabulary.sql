@@ -1,46 +1,25 @@
 -- ========================================================
--- SQL SEED SCRIPT FOR ALL 6,000+ LANNA VOCABULARY & CATEGORIES
+-- SQL SEED SCRIPT FOR ALL 6,000+ LANNA VOCABULARY
 -- ========================================================
 
-
-CREATE TABLE IF NOT EXISTS `category_vocab` (
-  `category_vocab_id` CHAR(6) NOT NULL PRIMARY KEY,
-  `name` VARCHAR(100) NOT NULL,
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS `vocabulary` (
-  `vocab_id` CHAR(6) NOT NULL PRIMARY KEY,
-  `lanna_word` VARCHAR(100) NOT NULL,
-  `reading` VARCHAR(100) NOT NULL,
-  `thai_word` VARCHAR(100) NOT NULL,
-  `meaning` TEXT NULL,
-  `category_vocab_id` CHAR(6) NULL,
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX (`thai_word`),
-  INDEX (`lanna_word`),
-  INDEX (`category_vocab_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 1. SEED CATEGORIES
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0001', 'คำทักทายและการสนทนา') ON DUPLICATE KEY UPDATE `name`='คำทักทายและการสนทนา';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0002', 'อาหารและเครื่องดื่ม') ON DUPLICATE KEY UPDATE `name`='อาหารและเครื่องดื่ม';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0003', 'วันในสัปดาห์') ON DUPLICATE KEY UPDATE `name`='วันในสัปดาห์';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0004', 'เดือน') ON DUPLICATE KEY UPDATE `name`='เดือน';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0005', 'ปีนักษัตร') ON DUPLICATE KEY UPDATE `name`='ปีนักษัตร';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0006', 'วันดีวันเสีย') ON DUPLICATE KEY UPDATE `name`='วันดีวันเสีย';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0007', 'สัตว์') ON DUPLICATE KEY UPDATE `name`='สัตว์';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0008', 'พืชและสมุนไพร') ON DUPLICATE KEY UPDATE `name`='พืชและสมุนไพร';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0009', 'เครื่องใช้และอุปกรณ์') ON DUPLICATE KEY UPDATE `name`='เครื่องใช้และอุปกรณ์';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0010', 'สถานที่และธรรมชาติ') ON DUPLICATE KEY UPDATE `name`='สถานที่และธรรมชาติ';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0011', 'ร่างกายและสุขภาพ') ON DUPLICATE KEY UPDATE `name`='ร่างกายและสุขภาพ';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0012', 'เครื่องแต่งกาย') ON DUPLICATE KEY UPDATE `name`='เครื่องแต่งกาย';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0013', 'ประเพณีและวัฒนธรรม') ON DUPLICATE KEY UPDATE `name`='ประเพณีและวัฒนธรรม';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0014', 'ตัวเลขและการนับ') ON DUPLICATE KEY UPDATE `name`='ตัวเลขและการนับ';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0015', 'คำกริยาและการกระทำ') ON DUPLICATE KEY UPDATE `name`='คำกริยาและการกระทำ';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0016', 'คำคุณศัพท์และลักษณะ') ON DUPLICATE KEY UPDATE `name`='คำคุณศัพท์และลักษณะ';
-INSERT INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0017', 'คำศัพท์ทั่วไป') ON DUPLICATE KEY UPDATE `name`='คำศัพท์ทั่วไป';
+-- 1. SEED CATEGORIES (INSERT IGNORE to prevent duplicate key errors)
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0001', 'คำทักทายและการสนทนา');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0002', 'อาหารและเครื่องดื่ม');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0003', 'วันในสัปดาห์');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0004', 'เดือน');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0005', 'ปีนักษัตร');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0006', 'วันดีวันเสีย');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0007', 'สัตว์');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0008', 'พืชและสมุนไพร');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0009', 'เครื่องใช้และอุปกรณ์');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0010', 'สถานที่และธรรมชาติ');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0011', 'ร่างกายและสุขภาพ');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0012', 'เครื่องแต่งกาย');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0013', 'ประเพณีและวัฒนธรรม');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0014', 'ตัวเลขและการนับ');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0015', 'คำกริยาและการกระทำ');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0016', 'คำคุณศัพท์และลักษณะ');
+INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0017', 'คำศัพท์ทั่วไป');
 
 -- 2. SEED VOCABULARY
 INSERT INTO `vocabulary` (`vocab_id`, `lanna_word`, `reading`, `thai_word`, `meaning`, `category_vocab_id`) VALUES ('V00001', 'สสดี', '[สวัด-สะ-ดี]', 'สวัสดี', 'คำทักทาย สวัสดิภาพ', 'CV0001') ON DUPLICATE KEY UPDATE `lanna_word`='สสดี', `reading`='[สวัด-สะ-ดี]', `meaning`='คำทักทาย สวัสดิภาพ', `category_vocab_id`='CV0001';

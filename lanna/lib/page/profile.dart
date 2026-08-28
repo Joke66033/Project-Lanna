@@ -965,20 +965,15 @@ class _ProfileContentState extends State<ProfileContent>
                     ),
                   ),
 
-                  const SizedBox(height: 80), // extra padding for bottom navigation
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
-            const SizedBox(height: 80), // extra padding for bottom navigation
           ],
         ),
       ),
-    ),
-  ],
-),
-),
-);
-}
+    );
+  }
 
   // ===== Avatar helpers =====
 

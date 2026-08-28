@@ -475,8 +475,6 @@ class _TranslatePageState extends State<TranslatePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _languageToggle(),
-                    const SizedBox(height: 16),
                     _inputBox(),
                     const SizedBox(height: 16),
                     FilledButton.icon(
@@ -504,107 +502,6 @@ class _TranslatePageState extends State<TranslatePage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // ================= LANGUAGE TOGGLE =================
-  Widget _languageToggle() {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5EFE9), // Soft warm cream grey
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth / 2;
-          return Stack(
-            children: [
-              // Sliding Active Tab Indicator
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeInOutCubic,
-                left: _thaiToLanna ? 4 : width - 4,
-                top: 4,
-                bottom: 4,
-                width: width,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: kPrimaryOrange,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: kPrimaryOrange.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Tab text buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        if (_thaiToLanna) return;
-                        setState(() {
-                          _thaiToLanna = true;
-                          _resultText = '';
-                          _matchingDictItem = null;
-                          _isFavorite = false;
-                        });
-                      },
-                      child: Center(
-                        child: AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 200),
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: _thaiToLanna
-                                ? Colors.white
-                                : const Color(0xFF7A5C3A),
-                          ),
-                          child: const Text('ไทย → ล้านนา'),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        if (!_thaiToLanna) return;
-                        setState(() {
-                          _thaiToLanna = false;
-                          _resultText = '';
-                          _matchingDictItem = null;
-                          _isFavorite = false;
-                        });
-                      },
-                      child: Center(
-                        child: AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 200),
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: !_thaiToLanna
-                                ? Colors.white
-                                : const Color(0xFF7A5C3A),
-                          ),
-                          child: const Text('ล้านนา → ไทย'),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
       ),
     );
   }

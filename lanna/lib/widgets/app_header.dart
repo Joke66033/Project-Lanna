@@ -15,16 +15,14 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: Container(
-        height: 58,
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: const BoxDecoration(
-          color: Colors.transparent,
-        ),
-        child: Stack(
+    return Container(
+      height: 48,
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
+      ),
+      child: Stack(
           alignment: Alignment.center,
           children: [
             // ===== ปุ่มย้อนกลับ =====

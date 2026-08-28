@@ -2,7 +2,9 @@
 -- SQL SEED SCRIPT FOR ALL 6,000+ LANNA VOCABULARY
 -- ========================================================
 
--- 1. SEED CATEGORIES (INSERT IGNORE to prevent duplicate key errors)
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- 1. SEED CATEGORIES
 INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0001', 'คำทักทายและการสนทนา');
 INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0002', 'อาหารและเครื่องดื่ม');
 INSERT IGNORE INTO `category_vocab` (`category_vocab_id`, `name`) VALUES ('CV0003', 'วันในสัปดาห์');
@@ -6039,3 +6041,5 @@ INSERT INTO `vocabulary` (`vocab_id`, `lanna_word`, `reading`, `thai_word`, `mea
 INSERT INTO `vocabulary` (`vocab_id`, `lanna_word`, `reading`, `thai_word`, `meaning`, `category_vocab_id`) VALUES ('V06015', 'ᩋᩱ᩵ᩅᩋᨠ', '[ไอ่ - วอก]', 'ไอ่วอก', 'ว. ได้ลิง คำด่าเชิงหยอก แต่ก็ถือว่าเจ็บแสบแล้ว', 'CV0017') ON DUPLICATE KEY UPDATE `lanna_word`='ᩋᩱ᩵ᩅᩋᨠ', `reading`='[ไอ่ - วอก]', `meaning`='ว. ได้ลิง คำด่าเชิงหยอก แต่ก็ถือว่าเจ็บแสบแล้ว', `category_vocab_id`='CV0017';
 INSERT INTO `vocabulary` (`vocab_id`, `lanna_word`, `reading`, `thai_word`, `meaning`, `category_vocab_id`) VALUES ('V06016', 'ᩋᩱ᩵ᩋ᩶ᩣᨿ', '[ไอ่ - อ้าย]', 'ไอ่อ้าย', 'น. อ้ายห่า คำด่าเชิงหยอก', 'CV0017') ON DUPLICATE KEY UPDATE `lanna_word`='ᩋᩱ᩵ᩋ᩶ᩣᨿ', `reading`='[ไอ่ - อ้าย]', `meaning`='น. อ้ายห่า คำด่าเชิงหยอก', `category_vocab_id`='CV0017';
 INSERT INTO `vocabulary` (`vocab_id`, `lanna_word`, `reading`, `thai_word`, `meaning`, `category_vocab_id`) VALUES ('V06017', 'ᩋᩱ᩶', '[ไอ้]', 'ไอ้', 'ดู ไอ่', 'CV0017') ON DUPLICATE KEY UPDATE `lanna_word`='ᩋᩱ᩶', `reading`='[ไอ้]', `meaning`='ดู ไอ่', `category_vocab_id`='CV0017';
+
+SET FOREIGN_KEY_CHECKS = 1;

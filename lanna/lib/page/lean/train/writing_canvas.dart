@@ -323,7 +323,7 @@ class _WritingPainter extends CustomPainter {
         );
       }
 
-      // 3. วาดเส้นประสีน้ำเงินตรงกลางร่องเส้นเขียน (Dashed Guideline)
+      // 3. วาดเส้นประสีเข้มคมชัดตรงกลางร่องเส้นเขียน (Dashed Guideline)
       for (final stroke in orderData.strokes) {
         final strokePath = buildStrokePath(
           stroke.points,
@@ -334,65 +334,87 @@ class _WritingPainter extends CustomPainter {
           canvas,
           strokePath,
           Paint()
-            ..color = stroke.color.withValues(alpha: isCurrent ? 0.95 : 0.62)
-            ..strokeWidth = isCurrent ? 3.5 : 2.8
+            ..color = const Color(0xFF333333).withValues(alpha: isCurrent ? 0.90 : 0.45)
+            ..strokeWidth = isCurrent ? 3.2 : 2.4
             ..strokeCap = StrokeCap.round
             ..strokeJoin = StrokeJoin.round
             ..style = PaintingStyle.stroke,
-          dashLength: isCurrent ? 7 : 5,
+          dashLength: isCurrent ? 6 : 5,
           gapLength: isCurrent ? 4 : 5,
         );
       }
 
-      // 4. วาดจุดเริ่มต้นวงกลมหมายเลข 1, 2, ... และลูกศรทิศทางการเขียน
+      // 4. วาดจุดบอกตำแหน่งแต่ละช่วง (Numbered Checkpoints 1, 2, 3, 4) พร้อมลูกศรสีแดงตามรอย
+      int globalStepNumber = 1;
       for (final stroke in orderData.strokes) {
-        final startPt = strokeTransform(stroke.start);
+        if (stroke.points.isEmpty) continue;
         final isCurrent = stroke.order == completedStrokeCount + 1;
-        final markerFill = Paint()
-          ..color = stroke.color.withValues(alpha: isCurrent ? 1 : 0.2);
-        final markerBorder = Paint()
-          ..color = Colors.white
-          ..strokeWidth = 1.8
-          ..style = PaintingStyle.stroke;
-        canvas.drawCircle(startPt, 10, markerFill);
-        canvas.drawCircle(startPt, 10, markerBorder);
 
-        final numPainter = TextPainter(
-          text: TextSpan(
-            text: '${stroke.order}',
-            style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.bold,
-              color: isCurrent ? Colors.white : stroke.color,
-              fontFamily: 'sans-serif',
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-        );
-        numPainter.layout();
-        numPainter.paint(
-          canvas,
-          Offset(
-            startPt.dx - numPainter.width / 2,
-            startPt.dy - numPainter.height / 2,
-          ),
-        );
+        // คำนวณความยาวสะสมของเส้นเพื่อกระจายจุด Checkpoints 1, 2, 3, 4 ตามสัดส่วน
+        final transformedPoints = stroke.points.map(strokeTransform).toList();
+        final List<double> cumulativeLengths = [0.0];
+        for (int i = 0; i < transformedPoints.length - 1; i++) {
+          final dist = (transformedPoints[i + 1] - transformedPoints[i]).distance;
+          cumulativeLengths.add(cumulativeLengths.last + dist);
+        }
+        final double totalLength = cumulativeLengths.last;
 
-        if (stroke.points.length > 1) {
-          var directionPoint = stroke.points[1];
-          for (final candidate in stroke.points.skip(1)) {
-            directionPoint = candidate;
-            if ((candidate - stroke.start).distance >= 10) break;
+        // กำหนดจำนวนจุดบอกตำแหน่งตามความยาวเส้น (เส้นสั้น 2 จุด, เส้นยาว 3-4 จุด)
+        final int checkpointCount = totalLength > 180 ? 4 : (totalLength > 90 ? 3 : 2);
+        final List<double> fractions = [];
+        if (checkpointCount == 2) {
+          fractions.addAll([0.0, 0.65]);
+        } else if (checkpointCount == 3) {
+          fractions.addAll([0.0, 0.40, 0.75]);
+        } else {
+          fractions.addAll([0.0, 0.30, 0.60, 0.85]);
+        }
+
+        for (final frac in fractions) {
+          final double targetDist = totalLength * frac;
+          // หาตำแหน่งและทิศทางบนเส้น
+          int segmentIdx = 0;
+          for (int i = 0; i < cumulativeLengths.length - 1; i++) {
+            if (targetDist >= cumulativeLengths[i] && targetDist <= cumulativeLengths[i + 1]) {
+              segmentIdx = i;
+              break;
+            }
           }
-          final arrowEnd = strokeTransform(directionPoint);
-          _drawDirectionArrow(
+          final p1 = transformedPoints[segmentIdx];
+          final p2 = transformedPoints[math.min(segmentIdx + 1, transformedPoints.length - 1)];
+          final segLen = (p2 - p1).distance;
+          final segFrac = segLen > 0 ? ((targetDist - cumulativeLengths[segmentIdx]) / segLen).clamp(0.0, 1.0) : 0.0;
+          final pos = Offset.lerp(p1, p2, segFrac)!;
+
+          // คำนวณเวกเตอร์ทิศทางไปข้างหน้า
+          Offset forwardDir = const Offset(1, 0);
+          final nextIdx = math.min(segmentIdx + 1, transformedPoints.length - 1);
+          if ((transformedPoints[nextIdx] - pos).distance > 2) {
+            forwardDir = (transformedPoints[nextIdx] - pos);
+          } else if (segmentIdx > 0) {
+            forwardDir = (pos - transformedPoints[segmentIdx - 1]);
+          }
+          final unitDir = forwardDir / math.max(0.001, forwardDir.distance);
+
+          // วาดวงกลมสีเขียวสดใสพร้อมตัวเลขสีขาว (เหมือนสมุดคัดลายมือ)
+          _drawCheckpointBadge(
             canvas,
-            startPt,
-            arrowEnd,
-            color: stroke.color,
+            center: pos,
+            number: globalStepNumber++,
+            direction: unitDir,
             isCurrent: isCurrent,
           );
         }
+
+        // วาดจุดสิ้นสุดปลายเส้นเป็นวงกลมสีดำทึบ
+        final endPt = transformedPoints.last;
+        canvas.drawCircle(
+          endPt,
+          4.5,
+          Paint()
+            ..color = const Color(0xFF2D3748).withValues(alpha: isCurrent ? 0.95 : 0.40)
+            ..style = PaintingStyle.fill,
+        );
       }
     } else {
       // Fallback ถ้าไม่มีข้อมูลเส้น ให้แสดงตัวอักษรจางๆ กึ่งกลาง
@@ -456,45 +478,90 @@ class _WritingPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _WritingPainter oldDelegate) => true;
 
-  void _drawDirectionArrow(
-    Canvas canvas,
-    Offset start,
-    Offset rawEnd, {
-    required Color color,
+  /// วาดป้ายตัวเลขบอกลำดับ (วงกลมสีเขียว + ตัวเลขสีขาว) พร้อมลูกศรสีแดงชี้ทิศทางตามแบบสมุดคัดลายมือ
+  void _drawCheckpointBadge(
+    Canvas canvas, {
+    required Offset center,
+    required int number,
+    required Offset direction,
     required bool isCurrent,
   }) {
-    final vector = rawEnd - start;
-    if (vector.distance < 3) return;
-    final unit = vector / vector.distance;
-    final lineStart = start + unit * 11;
-    final lineEnd = start + unit * math.min(vector.distance, 27);
-    final arrowColor = color.withValues(alpha: isCurrent ? 1 : 0.72);
-    final paint = Paint()
-      ..color = arrowColor
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(lineStart, lineEnd, paint);
+    // 1. วาดวงกลมสีเขียวเหมือนสมุดคัดลายมือเด็ก (Green Badge)
+    final badgeRadius = isCurrent ? 8.5 : 7.5;
+    final badgeColor = const Color(0xFF48BB78).withValues(alpha: isCurrent ? 1.0 : 0.65);
 
-    const headLength = 6.0;
-    const headAngle = math.pi / 6;
-    final angle = math.atan2(unit.dy, unit.dx);
-    final left =
-        lineEnd -
-        Offset(
-          math.cos(angle - headAngle) * headLength,
-          math.sin(angle - headAngle) * headLength,
-        );
-    final right =
-        lineEnd -
-        Offset(
-          math.cos(angle + headAngle) * headLength,
-          math.sin(angle + headAngle) * headLength,
-        );
-    final arrowHead = Path()
+    // วงกลมพื้นหลัง
+    canvas.drawCircle(
+      center,
+      badgeRadius,
+      Paint()..color = badgeColor,
+    );
+
+    // ขอบขาวบางๆ เพื่อความคมชัด
+    canvas.drawCircle(
+      center,
+      badgeRadius,
+      Paint()
+        ..color = Colors.white.withValues(alpha: isCurrent ? 0.95 : 0.70)
+        ..strokeWidth = 1.2
+        ..style = PaintingStyle.stroke,
+    );
+
+    // 2. ตัวเลขลำดับสีขาวคมชัด
+    final numPainter = TextPainter(
+      text: TextSpan(
+        text: '$number',
+        style: TextStyle(
+          fontSize: isCurrent ? 9.0 : 8.0,
+          fontWeight: FontWeight.w900,
+          color: Colors.white,
+          fontFamily: 'sans-serif',
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    numPainter.layout();
+    numPainter.paint(
+      canvas,
+      Offset(
+        center.dx - numPainter.width / 2,
+        center.dy - numPainter.height / 2,
+      ),
+    );
+
+    // 3. วาดหัวลูกศรสีแดงชี้ทิศทางตามแนวการลากเส้น (Red Direction Arrow)
+    final arrowTip = center + direction * (badgeRadius + 6.5);
+    final arrowBase = center + direction * (badgeRadius + 1.5);
+    final arrowColor = const Color(0xFFE53E3E).withValues(alpha: isCurrent ? 1.0 : 0.65);
+
+    final angle = math.atan2(direction.dy, direction.dx);
+    const headLength = 5.0;
+    const headAngle = math.pi / 4.5;
+
+    final left = arrowTip - Offset(
+      math.cos(angle - headAngle) * headLength,
+      math.sin(angle - headAngle) * headLength,
+    );
+    final right = arrowTip - Offset(
+      math.cos(angle + headAngle) * headLength,
+      math.sin(angle + headAngle) * headLength,
+    );
+
+    final arrowPath = Path()
+      ..moveTo(arrowBase.dx, arrowBase.dy)
+      ..lineTo(arrowTip.dx, arrowTip.dy)
       ..moveTo(left.dx, left.dy)
-      ..lineTo(lineEnd.dx, lineEnd.dy)
+      ..lineTo(arrowTip.dx, arrowTip.dy)
       ..lineTo(right.dx, right.dy);
-    canvas.drawPath(arrowHead, paint);
+
+    canvas.drawPath(
+      arrowPath,
+      Paint()
+        ..color = arrowColor
+        ..strokeWidth = 1.8
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..style = PaintingStyle.stroke,
+    );
   }
 }

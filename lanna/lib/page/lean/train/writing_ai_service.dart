@@ -5,6 +5,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import 'glyph_layout.dart';
+import 'stroke_data.dart';
+import 'stroke_order_model.dart';
 
 class WritingAIService {
   static Future<double> analyze({
@@ -36,7 +38,7 @@ class WritingAIService {
     var userArea = 0;
     var coveredTarget = 0;
     var accurateUser = 0;
-    const tolerance = 7;
+    const tolerance = 12;
 
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
@@ -73,20 +75,65 @@ class WritingAIService {
   }) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final glyph = await rasterizeWritingGlyph(
-      character: character,
-      fontFamily: fontFamily,
-    );
-    paintRasterizedWritingGlyph(
-      canvas: canvas,
-      size: size,
-      glyph: glyph,
-      color: Colors.white,
-      padding: writingGuidePadding,
-      sizeFactor: 1,
-      maxExtent: maxGlyphExtent,
-      targetInkArea: targetGlyphInkArea,
-    );
+
+    final orderData = getCharacterStrokeOrder(character);
+    if (orderData != null && orderData.strokes.isNotEmpty) {
+      double minX = 100.0, minY = 100.0, maxX = 0.0, maxY = 0.0;
+      bool hasPoints = false;
+      for (final stroke in orderData.strokes) {
+        for (final pt in stroke.points) {
+          hasPoints = true;
+          if (pt.dx < minX) minX = pt.dx;
+          if (pt.dy < minY) minY = pt.dy;
+          if (pt.dx > maxX) maxX = pt.dx;
+          if (pt.dy > maxY) maxY = pt.dy;
+        }
+      }
+
+      final double charWidth = hasPoints ? math.max(20.0, maxX - minX) : 60.0;
+      final double charHeight = hasPoints ? math.max(20.0, maxY - minY) : 60.0;
+      final double charCenterX = hasPoints ? (minX + maxX) / 2.0 : 50.0;
+      final double charCenterY = hasPoints ? (minY + maxY) / 2.0 : 50.0;
+
+      final double targetSize = size.shortestSide * 0.54;
+      final double scaleFactor = targetSize / math.max(charWidth, charHeight);
+
+      Offset strokeTransform(Offset point) {
+        final double scaledX = (point.dx - charCenterX) * scaleFactor;
+        final double scaledY = (point.dy - charCenterY) * scaleFactor;
+        return Offset(
+          size.width / 2.0 + scaledX,
+          size.height / 2.0 + scaledY,
+        );
+      }
+
+      final paint = Paint()
+        ..color = Colors.white
+        ..strokeWidth = 20
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..style = PaintingStyle.stroke;
+
+      for (final stroke in orderData.strokes) {
+        final strokePath = buildStrokePath(stroke.points, strokeTransform);
+        canvas.drawPath(strokePath, paint);
+      }
+    } else {
+      final glyph = await rasterizeWritingGlyph(
+        character: character,
+        fontFamily: fontFamily,
+      );
+      paintRasterizedWritingGlyph(
+        canvas: canvas,
+        size: size,
+        glyph: glyph,
+        color: Colors.white,
+        padding: writingGuidePadding,
+        sizeFactor: 1,
+        maxExtent: maxGlyphExtent,
+        targetInkArea: targetGlyphInkArea,
+      );
+    }
     return _pictureToAlpha(recorder.endRecording(), size);
   }
 
@@ -98,7 +145,7 @@ class WritingAIService {
     final canvas = Canvas(recorder);
     final paint = Paint()
       ..color = Colors.white
-      ..strokeWidth = 10
+      ..strokeWidth = 18
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
     Offset scale(Offset point) => Offset(

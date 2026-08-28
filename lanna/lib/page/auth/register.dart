@@ -245,29 +245,14 @@ class _RegisterPageState extends State<RegisterPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      const SizedBox(height: 16),
-                      // Shadowed Logo Card
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFFDFB),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFEADBC8), width: 1.2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          height: 100,
-                        ),
+                      // Logo without border, enlarged
+                      Image.asset(
+                        'assets/images/logo.png',
+                        height: 145,
+                        fit: BoxFit.contain,
                       ),
 
-                      const SizedBox(height: 36),
+                      const SizedBox(height: 24),
 
                       const Text(
                         'สมัครสมาชิก',

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 264,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 264 (หน้าไฟล์ 286) ครบทั้งสองคอลัมน์; แยกกลุ่มศัพท์บาลี/สันสกฤต บัวระ… จากกลุ่ม บ่า… และไม่รวมคำเทียบตัวหนาในเนื้อหาเป็นหัวคำซ้ำ"
+}

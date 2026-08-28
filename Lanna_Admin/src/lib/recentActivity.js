@@ -33,30 +33,53 @@ export function trackRecentActivity(type, id) {
 
 export function sortRecentData(dataList, type, idField = "id") {
   try {
+    if (!Array.isArray(dataList)) return dataList;
     const key = `recent_${type}`;
     const recentIds = JSON.parse(localStorage.getItem(key) || "[]").map((x) => String(x).trim());
-    if (!recentIds.length || !Array.isArray(dataList)) return dataList;
-
     const recentSet = new Set(recentIds);
-    const recentItems = [];
-    const otherItems = [];
 
-    dataList.forEach((item) => {
-      const itemId = getItemId(item, idField);
-      if (itemId && recentSet.has(itemId)) {
-        recentItems.push(item);
-      } else {
-        otherItems.push(item);
-      }
-    });
+    const parseTime = (item) => {
+      const val = item?.updated_at || item?.created_at || item?.timestamp;
+      if (!val) return 0;
+      const t = new Date(val).getTime();
+      return isNaN(t) ? 0 : t;
+    };
 
-    recentItems.sort((a, b) => {
+    const parseNumId = (item, field) => {
+      const idStr = getItemId(item, field);
+      const match = String(idStr).match(/\d+/);
+      return match ? parseInt(match[0], 10) : 0;
+    };
+
+    return [...dataList].sort((a, b) => {
       const idA = getItemId(a, idField);
       const idB = getItemId(b, idField);
-      return recentIds.indexOf(idA) - recentIds.indexOf(idB);
-    });
+      const isRecentA = Boolean(idA && recentSet.has(idA));
+      const isRecentB = Boolean(idB && recentSet.has(idB));
 
-    return [...recentItems, ...otherItems];
+      // 1. อันดับแรก: รายการที่เพิ่งกดเพิ่มหรือแก้ไขในหน้าผู้ดูแล (Recent Action)
+      if (isRecentA && isRecentB) {
+        return recentIds.indexOf(idA) - recentIds.indexOf(idB);
+      }
+      if (isRecentA) return -1;
+      if (isRecentB) return 1;
+
+      // 2. อันดับสอง: เรียงตามเวลาที่มีการอัปเดต/เพิ่มล่าสุด (updated_at / created_at DESC)
+      const timeA = parseTime(a);
+      const timeB = parseTime(b);
+      if (timeA > 0 && timeB > 0 && timeA !== timeB) {
+        return timeB - timeA;
+      }
+
+      // 3. อันดับสาม: เรียงตามลำดับตัวเลขของไอดีจากมากไปน้อย (เช่น AR0012, AR0011 ... AR0001)
+      const numA = parseNumId(a, idField);
+      const numB = parseNumId(b, idField);
+      if (numA !== numB) {
+        return numB - numA;
+      }
+
+      return 0;
+    });
   } catch (e) {
     return dataList;
   }

@@ -96,10 +96,10 @@ Path buildStrokePath(List<Offset> points, Offset Function(Offset) transform) {
     // Keep short stroke tails close to their control points so they do not
     // overshoot and curl upward at the end.
     path.cubicTo(
-      p1.dx + (p2.dx - p0.dx) / 9,
-      p1.dy + (p2.dy - p0.dy) / 9,
-      p2.dx - (p3.dx - p1.dx) / 9,
-      p2.dy - (p3.dy - p1.dy) / 9,
+      p1.dx + (p2.dx - p0.dx) / 6,
+      p1.dy + (p2.dy - p0.dy) / 6,
+      p2.dx - (p3.dx - p1.dx) / 6,
+      p2.dy - (p3.dy - p1.dy) / 6,
       p2.dx,
       p2.dy,
     );

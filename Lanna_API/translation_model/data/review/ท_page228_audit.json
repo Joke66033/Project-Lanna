@@ -1,0 +1,13 @@
+{
+  "pdf_page": 228,
+  "expected_headwords": 22,
+  "verified_headwords": 22,
+  "expected_entries": 22,
+  "verified_entries": 22,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจภาพหน้าพิมพ์ 228 (หน้าไฟล์ 250) ครบทั้งสองคอลัมน์; ผนวกความหมายเพิ่มเติมของ เทื่อ เข้าหัวคำหน้า 227 แล้ว"
+}

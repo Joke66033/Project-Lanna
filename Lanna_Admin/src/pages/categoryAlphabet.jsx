@@ -173,7 +173,8 @@ export default function CategoryAlphabet() {
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
-      alert("Error adding category: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -218,7 +219,8 @@ export default function CategoryAlphabet() {
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
-      alert("Error updating category: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }

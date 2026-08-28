@@ -1,0 +1,13 @@
+{
+  "pdf_page": 23,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 21,
+  "verified_entries": 21,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 21 รายการจากหน้า 23 รวมพยัญชนะ ก และสำนวนยาวเป็นหัวคำเดียวตามภาพ"
+}

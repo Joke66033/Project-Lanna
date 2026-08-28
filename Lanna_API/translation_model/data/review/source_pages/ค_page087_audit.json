@@ -1,0 +1,13 @@
+{
+  "pdf_page": 87,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 24 รายการและ 25 ระเบียนจากภาพหน้า 87; คี่ มี 2 ระเบียนต่างความหมาย"
+}

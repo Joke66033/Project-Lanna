@@ -3,10 +3,10 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lanna/services/lanna_char_service.dart';
 import 'package:lanna/services/article_service.dart';
 import 'package:lanna/models/article_model.dart';
+import 'package:lanna/models/category_model.dart';
 import '../learning_navigation.dart';
 import 'lanna_glyph_card.dart';
 import 'char_detail_page.dart';
-import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
 import 'package:lanna/services/character_stroke_service.dart';
 
@@ -29,10 +29,12 @@ class LannaNumber {
 
 class NumberGroup {
   final String name;
+  final String categoryCharId;
   final List<LannaNumber> numbers;
 
   const NumberGroup({
     required this.name,
+    required this.categoryCharId,
     required this.numbers,
   });
 }
@@ -49,16 +51,44 @@ class NumberPage extends StatefulWidget {
   State<NumberPage> createState() => _NumberPageState();
 }
 
-class _NumberPageState extends State<NumberPage> {
+class _NumberPageState extends State<NumberPage> with SingleTickerProviderStateMixin {
   late final FlutterTts _tts;
+  TabController? _tabController;
 
   final LannaCharService _charService = LannaCharService();
   final ArticleService _articleService = ArticleService();
 
   List<NumberGroup> _groups = [];
-  ArticleModel? _article;
+  String _currentCategoryId = 'CL0007';
+  final Map<String, ArticleModel?> _articlesMap = {};
   bool _isLoading = true;
   String? _errorMsg;
+
+  static const List<LannaNumber> _defaultThamNumbers = [
+    LannaNumber(char: '᪀', reading: 'ศูนย์', thai: '๐ (ศูนย์)', description: 'เลขศูนย์ในธัมม์'),
+    LannaNumber(char: '᪁', reading: 'หนึ่ง', thai: '๑ (หนึ่ง)', description: 'เลขหนึ่งในธัมม์'),
+    LannaNumber(char: '᪂', reading: 'สอง', thai: '๒ (สอง)', description: 'เลขสองในธัมม์'),
+    LannaNumber(char: '᪃', reading: 'สาม', thai: '๓ (สาม)', description: 'เลขสามในธัมม์'),
+    LannaNumber(char: '᪄', reading: 'สี่', thai: '๔ (สี่)', description: 'เลขสี่ในธัมม์'),
+    LannaNumber(char: '᪅', reading: 'ห้า', thai: '๕ (ห้า)', description: 'เลขห้าในธัมม์'),
+    LannaNumber(char: '᪆', reading: 'หก', thai: '๖ (หก)', description: 'เลขหกในธัมม์'),
+    LannaNumber(char: '᪇', reading: 'เจ็ด', thai: '๗ (เจ็ด)', description: 'เลขเจ็ดในธัมม์'),
+    LannaNumber(char: '᪈', reading: 'แปด', thai: '๘ (แปด)', description: 'เลขแปดในธัมม์'),
+    LannaNumber(char: '᪉', reading: 'เก้า', thai: '๙ (เก้า)', description: 'เลขเก้าในธัมม์'),
+  ];
+
+  static const List<LannaNumber> _defaultHoraNumbers = [
+    LannaNumber(char: '᪐', reading: 'ศูนย์โหรา', thai: '๐ (ศูนย์)', description: 'เลขศูนย์โหรา'),
+    LannaNumber(char: '᪑', reading: 'หนึ่งโหรา', thai: '๑ (หนึ่ง)', description: 'เลขหนึ่งโหรา'),
+    LannaNumber(char: '᪒', reading: 'สองโหรา', thai: '๒ (สอง)', description: 'เลขสองโหรา'),
+    LannaNumber(char: '᪓', reading: 'สามโหรา', thai: '๓ (สาม)', description: 'เลขสามโหรา'),
+    LannaNumber(char: '᪔', reading: 'สี่โหรา', thai: '๔ (สี่)', description: 'เลขสี่โหรา'),
+    LannaNumber(char: '᪕', reading: 'ห้าโหรา', thai: '๕ (ห้า)', description: 'เลขห้าโหรา'),
+    LannaNumber(char: '᪖', reading: 'หกโหรา', thai: '๖ (หก)', description: 'เลขหกโหรา'),
+    LannaNumber(char: '᪗', reading: 'เจ็ดโหรา', thai: '๗ (เจ็ด)', description: 'เลขเจ็ดโหรา'),
+    LannaNumber(char: '᪘', reading: 'แปดโหรา', thai: '๘ (แปด)', description: 'เลขแปดโหรา'),
+    LannaNumber(char: '᪙', reading: 'เก้าโหรา', thai: '๙ (เก้า)', description: 'เลขเก้าโหรา'),
+  ];
 
   @override
   void initState() {
@@ -83,7 +113,23 @@ class _NumberPageState extends State<NumberPage> {
   @override
   void dispose() {
     _tts.stop();
+    _tabController?.removeListener(_handleTabChange);
+    _tabController?.dispose();
     super.dispose();
+  }
+
+  void _handleTabChange() {
+    if (_tabController != null && !_tabController!.indexIsChanging) {
+      final index = _tabController!.index;
+      if (index >= 0 && index < _groups.length) {
+        final newCatId = _groups[index].categoryCharId;
+        if (_currentCategoryId != newCatId) {
+          setState(() {
+            _currentCategoryId = newCatId;
+          });
+        }
+      }
+    }
   }
 
   Future<void> _loadData() async {
@@ -92,23 +138,43 @@ class _NumberPageState extends State<NumberPage> {
       _errorMsg = null;
     });
     try {
-      // 1. ดึงหมวดหมู่ย่อยทั้งหมดของ LC004 จาก DB (CL0007 เลขในธัมม์, CL0014 เลขโหรา)
-      final subCategories = await _charService.getCategoriesByLearningCode('LC004');
-      final List<String> catIds = subCategories.map((c) => c.categoryCharId).toList();
-
-      // 2. ดึงบทความอธิบายตัวเลข
-      final nArticles = await _articleService.getAllArticles(
-        categoryCharId: catIds.isNotEmpty ? catIds.join(',') : 'CL0007,CL0014',
-      );
-      if (nArticles.isNotEmpty && nArticles.first.content.trim().isNotEmpty) {
-        _article = nArticles.first;
-      } else {
-        _article = null;
+      var subCategories = await _charService.getCategoriesByLearningCode('LC004');
+      if (subCategories.isEmpty) {
+        final allCats = await _charService.getAllCategories();
+        subCategories = allCats.where((c) => 
+          (c.learningCategoryCode != null && c.learningCategoryCode!.trim().toUpperCase() == 'LC004') || 
+          c.categoryCharId.toUpperCase() == 'CL0007' || 
+          c.categoryCharId.toUpperCase() == 'CL0014' ||
+          c.name.contains('เลข')
+        ).toList();
       }
+      final List<String> catIds = subCategories.map((c) => c.categoryCharId).toList();
+      final String effectiveCatIds = catIds.isNotEmpty ? catIds.join(',') : 'CL0007,CL0014';
 
-      // 3. ดึงตัวเลขทั้งหมดจาก API
+      final nArticles = await _articleService.getAllArticles(
+        categoryCharId: effectiveCatIds,
+      );
+      _articlesMap.clear();
+      for (var art in nArticles) {
+        if (art.categoryCharId != null && art.content.trim().isNotEmpty) {
+          _articlesMap[art.categoryCharId!] = art;
+        }
+      }
+      _articlesMap.putIfAbsent('CL0007', () => const ArticleModel(
+        articleId: 'AR0007',
+        title: 'เลขในธัมม์ คืออะไร?',
+        content: 'เลขในธัมม์ หรือตัวเลขธัมม์ เป็นชุดตัวเลขที่ใช้บันทึกในคัมภีร์ใบลานและพับสาทางพระพุทธศาสนา วรรณกรรม และเอกสารโบราณล้านนา',
+        categoryCharId: 'CL0007',
+      ));
+      _articlesMap.putIfAbsent('CL0014', () => const ArticleModel(
+        articleId: 'AR0014',
+        title: 'เลขโหรา คืออะไร?',
+        content: 'เลขโหรา หรือตัวเลขโหราศาสตร์ ใช้บันทึกเอกสารทางโลก การทำนายปฏิทิน ฤกษ์ยาม และกฎหมายโบราณ มีรูปแบบคล้ายคลึงกับตัวเลขไทยโบราณ',
+        categoryCharId: 'CL0014',
+      ));
+
       final apiNumbers = await _charService.getAllCharacters(
-        categoryCharId: catIds.isNotEmpty ? catIds.join(',') : null,
+        categoryCharId: effectiveCatIds,
       );
 
       final Map<String, List<LannaNumber>> dynamicMap = {};
@@ -126,31 +192,51 @@ class _NumberPageState extends State<NumberPage> {
           description: 'ตัวเลขล้านนาตัว ${c.thaiEquivalent}',
         );
 
-        final catId = c.categoryCharId;
+        final catId = c.categoryCharId.trim().toUpperCase();
         dynamicMap.putIfAbsent(catId, () => []).add(numItem);
       }
 
       final List<NumberGroup> groups = [];
-      for (var cat in subCategories) {
-        final list = dynamicMap[cat.categoryCharId] ?? [];
-        if (list.isNotEmpty) {
-          groups.add(NumberGroup(
-            name: cat.name,
-            numbers: list,
-          ));
-        }
-      }
+      
+      final listTham = dynamicMap['CL0007'] ?? [];
+      final nameTham = subCategories.firstWhere((s) => s.categoryCharId.toUpperCase() == 'CL0007', orElse: () => const CategoryCharModel(categoryCharId: 'CL0007', name: 'เลขในธัมม์')).name;
+      groups.add(NumberGroup(
+        name: nameTham,
+        categoryCharId: 'CL0007',
+        numbers: listTham.isNotEmpty ? listTham : _defaultThamNumbers,
+      ));
 
-      // Fallback if subCategories is empty
-      if (groups.isEmpty) {
-        final allNums = dynamicMap.values.expand((element) => element).toList();
-        if (allNums.isNotEmpty) {
-          groups.add(NumberGroup(name: 'ตัวเลข', numbers: allNums));
+      final listHora = dynamicMap['CL0014'] ?? [];
+      final nameHora = subCategories.firstWhere((s) => s.categoryCharId.toUpperCase() == 'CL0014', orElse: () => const CategoryCharModel(categoryCharId: 'CL0014', name: 'เลขโหรา')).name;
+      groups.add(NumberGroup(
+        name: nameHora,
+        categoryCharId: 'CL0014',
+        numbers: listHora.isNotEmpty ? listHora : _defaultHoraNumbers,
+      ));
+
+      for (var cat in subCategories) {
+        final upId = cat.categoryCharId.toUpperCase();
+        if (upId != 'CL0007' && upId != 'CL0014') {
+          final listOther = dynamicMap[upId] ?? [];
+          if (listOther.isNotEmpty) {
+            groups.add(NumberGroup(
+              name: cat.name,
+              categoryCharId: cat.categoryCharId,
+              numbers: listOther,
+            ));
+          }
         }
       }
 
       setState(() {
         _groups = groups;
+        _tabController?.removeListener(_handleTabChange);
+        _tabController?.dispose();
+        _tabController = TabController(length: _groups.length, vsync: this);
+        _tabController!.addListener(_handleTabChange);
+        if (_groups.isNotEmpty) {
+          _currentCategoryId = _groups.first.categoryCharId;
+        }
         _isLoading = false;
       });
     } catch (e) {
@@ -219,7 +305,10 @@ class _NumberPageState extends State<NumberPage> {
             }
           },
         ),
-        bottom: PreferredSize(preferredSize: const Size.fromHeight(1.5), child: Container(color: const Color(0xFFEADBC8), height: 1.5)),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.5),
+          child: Container(color: const Color(0xFFEADBC8), height: 1.5),
+        ),
         centerTitle: true,
         title: const Text(
           'ตัวเลขล้านนา',
@@ -230,52 +319,81 @@ class _NumberPageState extends State<NumberPage> {
           ),
         ),
       ),
-      body: _groups.isEmpty
-          ? const SizedBox.shrink()
-          : NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) {
-                return [
-                  if (_article != null)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                        child: _IntroCard(article: _article),
-                      ),
-                    ),
-                ];
-              },
-              body: PaginatedLannaGrid<LannaNumber>(
-                items: _groups.first.numbers,
-                pageSize: 16,
-                itemBuilder: (context, number, globalIndex) {
-                  final initialIndex = allNumbersForTrain.indexWhere((n) => n.char == number.char);
-                  return GestureDetector(
-                    onTap: () => pushLearningPage(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CharDetailPage(
-                          char: number.char,
-                          reading: number.reading,
-                          thai: number.thai,
-                          description: number.description,
-                          isGuest: widget.isGuest,
-                          writingType: WritingType.number,
-                          allChars: allNumbersForTrain
-                              .map((n) => {'char': n.char, 'label': n.reading})
-                              .toList(),
-                          initialWritingIndex: initialIndex >= 0 ? initialIndex : 0,
-                          categoryName: 'ตัวเลขล้านนา',
-                        ),
-                      ),
-                    ),
-                    child: LannaGlyphCard(
-                      glyph: number.char,
-                      thaiEquivalent: number.thai,
-                    ),
-                  );
-                },
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: _IntroCard(
+                  article: _articlesMap[_currentCategoryId],
+                  categoryId: _currentCategoryId,
+                ),
               ),
             ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SliverTabBarDelegate(
+                TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
+                  indicatorColor: const Color(0xFFE16905),
+                  indicatorWeight: 3.5,
+                  indicatorSize: TabBarIndicatorSize.label,
+                  labelColor: const Color(0xFFE16905),
+                  labelStyle: const TextStyle(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  unselectedLabelColor: const Color(0xFF7A5C3A),
+                  unselectedLabelStyle: const TextStyle(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  tabs: _groups.map((g) => Tab(text: g.name)).toList(),
+                ),
+              ),
+            ),
+          ];
+        },
+        body: TabBarView(
+          controller: _tabController,
+          children: _groups.map((group) {
+            return PaginatedLannaGrid<LannaNumber>(
+              items: group.numbers,
+              pageSize: 16,
+              itemBuilder: (context, number, globalIndex) {
+                final initialIndex = allNumbersForTrain.indexWhere((n) => n.char == number.char);
+                return GestureDetector(
+                  onTap: () => pushLearningPage(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CharDetailPage(
+                        char: number.char,
+                        reading: number.reading,
+                        thai: number.thai,
+                        description: number.description,
+                        isGuest: widget.isGuest,
+                        writingType: WritingType.number,
+                        allChars: allNumbersForTrain
+                            .map((n) => {'char': n.char, 'label': n.reading})
+                            .toList(),
+                        initialWritingIndex: initialIndex >= 0 ? initialIndex : 0,
+                        categoryName: group.name,
+                      ),
+                    ),
+                  ),
+                  child: LannaGlyphCard(
+                    glyph: number.char,
+                    thaiEquivalent: number.thai,
+                  ),
+                );
+              },
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
@@ -385,11 +503,35 @@ class _NumberPageState extends State<NumberPage> {
 /// ============================================================================
 class _IntroCard extends StatelessWidget {
   final ArticleModel? article;
-  const _IntroCard({this.article});
+  final String categoryId;
+  const _IntroCard({this.article, required this.categoryId});
+
+  String _getFallbackTitle() {
+    switch (categoryId) {
+      case 'CL0007':
+        return 'เลขในธัมม์ คืออะไร?';
+      case 'CL0014':
+        return 'เลขโหรา คืออะไร?';
+      default:
+        return 'ตัวเลขล้านนา คืออะไร?';
+    }
+  }
+
+  String _getFallbackContent() {
+    switch (categoryId) {
+      case 'CL0007':
+        return 'เลขในธัมม์ หรือตัวเลขธัมม์ เป็นชุดตัวเลขที่ใช้บันทึกในคัมภีร์ใบลานและพับสาทางพระพุทธศาสนา วรรณกรรม และเอกสารโบราณล้านนา';
+      case 'CL0014':
+        return 'เลขโหรา หรือตัวเลขโหราศาสตร์ ใช้บันทึกเอกสารทางโลก การทำนายปฏิทิน ฤกษ์ยาม และกฎหมายโบราณ มีรูปแบบคล้ายคลึงกับตัวเลขไทยโบราณ';
+      default:
+        return 'ตัวเลขในภาษาล้านนามี ๒ ชุด คือ "เลขในธัมม์" นิยมใช้เขียนในคัมภีร์ใบลาน และ "เลขโหรา" นิยมใช้ในการคำนวณปฏิทินและฤกษ์ยาม มีรูปแบบ ๐-๙ เทียบเท่าเลขไทยและเลขอารบิก';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (article == null) return const SizedBox.shrink();
+    final title = article?.title.isNotEmpty == true ? article!.title : _getFallbackTitle();
+    final content = article?.content.isNotEmpty == true ? article!.content : _getFallbackContent();
 
     return Container(
       width: double.infinity,
@@ -411,21 +553,23 @@ class _IntroCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.info_outline, color: Color(0xFF6B3A2A), size: 22),
+              const Icon(Icons.menu_book, color: Color(0xFF6B3A2A), size: 22),
               const SizedBox(width: 8),
-              Text(
-                article!.title,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF6B3A2A),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF6B3A2A),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            article!.content,
+            content,
             style: const TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w500,
@@ -491,7 +635,7 @@ class _NumberCard extends StatelessWidget {
                     number.char,
                     style: const TextStyle(
                       fontSize: 28,
-                      fontFamily: 'PayapLanna',
+                      fontFamily: 'LNTilok',
                       color: Color(0xFF924E19),
                       fontWeight: FontWeight.bold,
                     ),
@@ -713,7 +857,7 @@ class _NumberStrokeOrderBottomSheetState extends State<NumberStrokeOrderBottomSh
             widget.number.char,
             style: const TextStyle(
               fontSize: 27,
-              fontFamily: 'PayapLanna',
+              fontFamily: 'LNTilok',
               color: Color(0xFF924E19),
               fontWeight: FontWeight.bold,
             ),
@@ -959,4 +1103,27 @@ class NumberStrokePainter extends CustomPainter {
 
 List<List<Offset>> getStrokePaths(String char) {
   return getStrokeData(char);
+}
+
+class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+  _SliverTabBarDelegate(this.tabBar);
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: const Color(0xFFFFFBF7),
+      child: tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverTabBarDelegate oldDelegate) {
+    return false;
+  }
 }

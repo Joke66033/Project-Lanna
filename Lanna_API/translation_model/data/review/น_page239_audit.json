@@ -1,0 +1,13 @@
+{
+  "pdf_page": 239,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 21,
+  "verified_entries": 21,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 239 (หน้าไฟล์ 261) ครบทั้งสองคอลัมน์; คงรูปสะกดหัวคำตามต้นฉบับ รวมคำซ้อนที่มีรูปใกล้กัน"
+}

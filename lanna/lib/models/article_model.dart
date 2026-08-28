@@ -8,7 +8,7 @@ class ArticleModel {
   final String? authorId;
   final String? createdAt;
 
-  ArticleModel({
+  const ArticleModel({
     required this.articleId,
     required this.title,
     required this.content,

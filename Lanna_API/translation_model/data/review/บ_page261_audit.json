@@ -1,0 +1,13 @@
+{
+  "pdf_page": 261,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 21,
+  "verified_entries": 21,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 261 (หน้าไฟล์ 283) ครบทั้งสองคอลัมน์; ความหมายหัวคำ บะ ต่อเนื่องไปหน้าพิมพ์ 262 และทำเครื่องหมายไว้สำหรับรวมข้อความ"
+}

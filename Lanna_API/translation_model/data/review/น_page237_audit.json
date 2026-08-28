@@ -1,0 +1,13 @@
+{
+  "pdf_page": 237,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 21,
+  "verified_entries": 21,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจภาพหน้าพิมพ์ 237 (หน้าไฟล์ 259) ครบทั้งสองคอลัมน์ พร้อมคำอ่าน ความหมาย หมวดหมู่ และอักษรล้านนา; ไม่นับข้อความต่อเนื่องของ น่อ จากหน้า 236 เป็นหัวคำใหม่"
+}

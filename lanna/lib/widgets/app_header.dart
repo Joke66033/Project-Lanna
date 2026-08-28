@@ -97,9 +97,9 @@ class AppHeader extends StatelessWidget {
                         child: ClipOval(
                           child: (avatarUrl != null && avatarUrl.isNotEmpty)
                               ? Image.network(
-                                  avatarUrl.contains('?') 
-                                      ? '$avatarUrl&t=${DateTime.now().millisecondsSinceEpoch}' 
-                                      : '$avatarUrl?t=${DateTime.now().millisecondsSinceEpoch}',
+                                  resolveProfileAvatarUrl(avatarUrl).contains('?') 
+                                      ? '${resolveProfileAvatarUrl(avatarUrl)}&t=${DateTime.now().millisecondsSinceEpoch}' 
+                                      : '${resolveProfileAvatarUrl(avatarUrl)}?t=${DateTime.now().millisecondsSinceEpoch}',
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) => const Icon(
                                     Icons.person,

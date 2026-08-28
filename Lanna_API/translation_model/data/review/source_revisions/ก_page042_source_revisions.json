@@ -1,0 +1,12 @@
+[
+  {
+    "thai":"กิ",
+    "expected_verified_page":42,
+    "source_page":42,
+    "pronunciation":"[กิ]",
+    "meaning":"ว. สั้น สุ่น มักใช้กับเขาสัตว์",
+    "category":"ลักษณะและอาการ",
+    "context_pages":[42],
+    "reason":"ปรับคำอ่านและนิยามให้ตรงข้อความในภาพต้นฉบับหน้า 42"
+  }
+]

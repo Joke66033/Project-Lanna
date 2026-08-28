@@ -6,7 +6,6 @@ import 'package:lanna/models/article_model.dart';
 import '../learning_navigation.dart';
 import 'lanna_glyph_card.dart';
 import 'char_detail_page.dart';
-import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
 import 'package:lanna/services/character_stroke_service.dart';
 
@@ -121,6 +120,24 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
           _articlesMap[art.categoryCharId!] = art;
         }
       }
+      _articlesMap.putIfAbsent('CL0001', () => const ArticleModel(
+        articleId: 'AR0001',
+        title: 'พยัญชนะในวรรค คืออะไร?',
+        content: 'พยัญชนะในวรรค (ตั๋วเมือง) นิยมเขียนตามระบบอักขรวิธีของภาษาบาลี-สันสกฤต โดยแบ่งออกเป็น 5 วรรค คือ วรรคกะ วรรคจะ วรรคฏะ วรรคตะ และวรรคปะ วรรคละ 5 ตัว รวมทั้งสิ้น 25 ตัว แต่ละวรรคมีเสียงอ่านและเทียบอักษรไทยเฉพาะของตนเอง ใช้ผสมคำและเขียนบันทึกเรื่องราวต่างๆ ในแถบภาคเหนือ',
+        categoryCharId: 'CL0001',
+      ));
+      _articlesMap.putIfAbsent('CL0002', () => const ArticleModel(
+        articleId: 'AR0002',
+        title: 'พยัญชนะนอกวรรค คืออะไร?',
+        content: 'พยัญชนะนอกวรรค หรือที่เรียกว่า "เศษวรรค" คือกลุ่มพยัญชนะที่อยู่นอกระบบวรรค 5 วรรคตามหลักบาลีสันสกฤต มีทั้งสิ้น 8 ตัว ได้แก่ ย ร ล ว ส ห ฬ อ',
+        categoryCharId: 'CL0002',
+      ));
+      _articlesMap.putIfAbsent('CL0003', () => const ArticleModel(
+        articleId: 'AR0003',
+        title: 'พยัญชนะเพิ่มเติม คืออะไร?',
+        content: 'พยัญชนะเพิ่มเติมคือกลุ่มพยัญชนะที่นักปราชญ์ล้านนาประดิษฐ์ขึ้นเพื่อใช้เขียนคำในภาษาไทยวนหรือภาษาพื้นเมืองล้านนาที่ไม่มีในภาษาบาลีสันสกฤต',
+        categoryCharId: 'CL0003',
+      ));
 
       // 2. ดึงอักขระพยัญชนะทั้งหมดตามกลุ่ม
       final apiConsonants = await _charService.getAllCharacters(categoryCharId: 'CL0001,CL0002,CL0003');
@@ -266,6 +283,7 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
                 TabBar(
                   controller: _tabController,
                   isScrollable: true,
+                  tabAlignment: TabAlignment.start,
                   indicatorColor: const Color(0xFFE16905),
                   indicatorWeight: 3.5,
                   indicatorSize: TabBarIndicatorSize.label,

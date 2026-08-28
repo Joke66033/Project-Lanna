@@ -1,0 +1,13 @@
+{
+  "pdf_page": 245,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 245 (หน้าไฟล์ 267) ครบทั้งสองคอลัมน์; คงรูปสะกดคำถิ่น น้ำตายวา น้ำโตะ และ น้ำทะถิ ตามต้นฉบับ"
+}

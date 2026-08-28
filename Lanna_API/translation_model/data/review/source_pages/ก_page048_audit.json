@@ -1,0 +1,13 @@
+{
+  "pdf_page": 48,
+  "expected_headwords": 25,
+  "verified_headwords": 25,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 25 รายการจากภาพหน้า 48 แก้ข้อมูลเดิม 3 คำ คืนสถานะเก้ากอง และแยกความหมายย่อยตามต้นฉบับ"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 59,
+  "expected_headwords": 22,
+  "verified_headwords": 22,
+  "expected_entries": 22,
+  "verified_entries": 22,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำหมวด ข จำนวน 22 รายการจากภาพต้นฉบับหน้า 59 และแยกความหมายตามชนิดคำของ ของ ช่อง ข้อง และ ขอด"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 57,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอด 25 รายการพจนานุกรมจากภาพหน้า 57 เป็นหัวคำค้น 24 รูป โดยรวม ขวง สองคำอ่านและสองความหมายไว้ในระเบียนเดียว"
+}

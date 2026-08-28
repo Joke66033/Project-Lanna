@@ -1,0 +1,13 @@
+{
+  "pdf_page": 37,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำใหม่ 20 รายการจากภาพหน้า 37; ต้นหน้ามีความหมายที่ 3–4 ของ กัด ต่อจากหน้า 36 และไม่นับเป็นหัวคำใหม่"
+}

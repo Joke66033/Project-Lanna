@@ -1,0 +1,13 @@
+{
+  "pdf_page": 278,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 278 (หน้าไฟล์ 300) ครบทั้งสองคอลัมน์; แยกกลุ่มรูปใกล้กัน ปลอก/ปล่อง/ปล้อง ตามรูปวรรณยุกต์และความหมายในต้นฉบับ"
+}

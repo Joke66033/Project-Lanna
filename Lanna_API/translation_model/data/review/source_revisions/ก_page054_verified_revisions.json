@@ -1,0 +1,4 @@
+[
+  {"thai":"ไก่ชน","expected_verified_page":54,"lanna":"ᩱᨠ᩵ᨩᩫ᩠ᨶ","pronunciation":"[ไก่ - จน]","meaning":"น. ไก่ที่เลี้ยงไว้สำหรับชน","category":"สัตว์","source_type":"source_dictionary_image","source_id":"lanna_dictionary_drive_672","source_page":54,"reason":"ปรับคำอ่านและนิยามให้ตรงรายการหน้า 54"},
+  {"thai":"ไก้","expected_verified_page":54,"lanna":"ᩱᨠ᩶","pronunciation":"[ไก้]","meaning":"น. กระจง สัตว์เคี้ยวเอื้องตัวเล็กที่สุดแต่ไม่มีเขา","category":"สัตว์","source_type":"source_dictionary_image","source_id":"lanna_dictionary_drive_672","source_page":54,"reason":"ปรับนิยามให้ตรงข้อความฉบับพจนานุกรมหน้า 54"}
+]

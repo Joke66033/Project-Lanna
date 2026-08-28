@@ -1,0 +1,13 @@
+{
+  "pdf_page": 287,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 287 (หน้าไฟล์ 309) ครบทั้งสองคอลัมน์ รวม 24 หัวคำ"
+}

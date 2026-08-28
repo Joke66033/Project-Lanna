@@ -1,0 +1,13 @@
+{
+  "pdf_page": 258,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 258 (หน้าไฟล์ 280) ครบทั้งสองคอลัมน์; แยกคำประสมที่พิมพ์ตัวหนาออกจากคำอธิบายและคำเทียบ"
+}

@@ -12,7 +12,7 @@ import {
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity";
-import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
+import { SuccessModal, ConfirmDeleteModal, WarningModal } from "../components/AlertModals.jsx";
 
 const getApiBase = () => {
   if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
@@ -51,6 +51,9 @@ export default function Articles() {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [successText, setSuccessText] = useState("");
+
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningText, setWarningText] = useState("");
 
   // หมวดหมู่อักขระจาก category_lanna_char
   const [charCategories, setCharCategories] = useState([]);
@@ -390,7 +393,8 @@ export default function Articles() {
       setCurrentPage(1);
       fetchData(1, "", "all", "all");
     } catch (err) {
-      alert("Error adding article: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มเนื้อหา");
+      setShowWarning(true);
     } finally {
       setSubmitting(false);
     }
@@ -452,7 +456,8 @@ export default function Articles() {
       setCurrentPage(1);
       fetchData(1, "", "all", "all");
     } catch (err) {
-      alert("Error updating article: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขเนื้อหา");
+      setShowWarning(true);
     } finally {
       setSubmitting(false);
     }
@@ -477,9 +482,9 @@ export default function Articles() {
       setShowSuccess(true);
       fetchData();
     } catch (err) {
-      alert("Error deleting article: " + err.message);
-
-
+      setShowDelete(false);
+      setWarningText(err.message || "ไม่สามารถลบข้อมูลได้");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -848,6 +853,14 @@ export default function Articles() {
         isOpen={showSuccess}
         onClose={() => setShowSuccess(false)}
         message={successText}
+      />
+
+      {/* WARNING MODAL */}
+      <WarningModal
+        isOpen={showWarning}
+        onClose={() => setShowWarning(false)}
+        title="ไม่สามารถดำเนินการได้"
+        message={warningText}
       />
     </div>
   );

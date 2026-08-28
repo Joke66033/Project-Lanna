@@ -1,0 +1,13 @@
+{
+  "pdf_page": 181,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 21,
+  "verified_entries": 21,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 181 (หน้าไฟล์ 203) หมวด ต ช่วง ต๋อย–ตะไหล; หัวคำ ตะ มี 2 บทนิยามในหน้าเดียว รวมเป็น 1 ระเบียน"
+}

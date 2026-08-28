@@ -1,0 +1,12 @@
+[
+  {
+    "thai": "กงปิดฝ้าย",
+    "lanna": "ᨠᩫ᩠ᨦᨸᩥ᩠ᨯᨺ᩶ᩣ᩠ᨿ",
+    "pdf_page": 23,
+    "decision": "source_image_verified",
+    "manual_source_page": true,
+    "checked_fields": ["thai", "lanna_glyph_shape", "pronunciation", "meaning"],
+    "category": "สิ่งของและเครื่องมือ",
+    "note": "ตรวจจากภาพความละเอียดสูงหน้า 23 หลังบัญชีหัวคำพบว่า OCR อ่าน ดีด เป็น ปิด"
+  }
+]

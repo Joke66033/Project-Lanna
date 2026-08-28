@@ -19,6 +19,13 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: "Noto Sans Tai Tham";
+  src: url("/fonts/NotoSansTaiTham.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 .lanna-text {
   font-family: "PayapLanna", "LN-TILOK", "Noto Sans Tai Tham", serif;
   font-size: 1.4em;

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 288,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 288 (หน้าไฟล์ 310) ครบทั้งสองคอลัมน์ 23 หน้าที่คำ รวมเป็น 21 หัวคำ โดย ปาง และ ปาน มีหัวคำซ้ำคนละสองหน้าที่คำ"
+}

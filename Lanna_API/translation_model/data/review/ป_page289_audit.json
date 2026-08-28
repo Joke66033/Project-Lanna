@@ -1,0 +1,13 @@
+{
+  "pdf_page": 289,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 289 (หน้าไฟล์ 311) ครบ 25 หน้าที่คำ รวม 23 หัวคำ; ป่าย มี 3 ความหมาย และ ป้า เพิ่มคำอ้างอิงจากหัวคำเดิม"
+}

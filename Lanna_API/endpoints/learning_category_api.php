@@ -46,15 +46,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $catCode = $categories[$i]['category_code'] ?? '';
                 if ($catCode !== '') {
                     $subCatsRes = dbSelect('category_lanna_char', 'category_char_id', ['learning_category_code' => 'eq.' . rawurlencode($catCode)]);
+                    $subIds = [];
                     if (!$subCatsRes['error'] && !empty($subCatsRes['data'])) {
                         $subIds = array_column($subCatsRes['data'], 'category_char_id');
-                        if (!empty($subIds)) {
-                            $subIdStrs = array_map(function($id) { return rawurlencode($id); }, $subIds);
-                            $inFilter = 'in.(' . implode(',', $subIdStrs) . ')';
-                            $charCountRes = dbSelect('lanna_char', 'char_id', ['category_char_id' => $inFilter]);
-                            if (!$charCountRes['error'] && is_array($charCountRes['data'])) {
-                                $categories[$i]['total_items'] = count($charCountRes['data']);
-                            }
+                    }
+                    
+                    if (empty($subIds)) {
+                        if ($catCode === 'LC001') $subIds = ['CL0001', 'CL0002', 'CL0003'];
+                        else if ($catCode === 'LC002') $subIds = ['CL0004', 'CL0005'];
+                        else if ($catCode === 'LC003') $subIds = ['CL0006'];
+                        else if ($catCode === 'LC004') $subIds = ['CL0007'];
+                        else if ($catCode === 'LC005') $subIds = ['CL0008', 'CL0009', 'CL0010'];
+                    }
+
+                    if (!empty($subIds)) {
+                        $subIdStrs = array_map(function($id) { return rawurlencode($id); }, $subIds);
+                        $inFilter = 'in.(' . implode(',', $subIdStrs) . ')';
+                        $charCountRes = dbSelect('lanna_char', 'char_id', ['category_char_id' => $inFilter]);
+                        if (!$charCountRes['error'] && is_array($charCountRes['data'])) {
+                            $categories[$i]['total_items'] = count($charCountRes['data']);
                         }
                     }
                 }

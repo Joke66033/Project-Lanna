@@ -58,21 +58,28 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch ($action) {
 
         case 'create':
-            // 1. ดึง ID ล่าสุดเพื่อดึงรูปแบบตัวนำหน้ารหัส (Prefix) และบวกเพิ่ม 1
-            $listRes = dbSelect('category_lanna_char', 'category_char_id', [], 'category_char_id.desc', 1);
-            if ($listRes['error']) { jsonError($listRes['error']['message']); break; }
-
-            $nextNumber = 1;
-            $prefix = 'CL'; // ใช้ CL เป็นค่าเริ่มต้นตามโครงสร้าง DB จริง
-            $list = $listRes['data'] ?? [];
-            if (!empty($list)) {
-                $lastId = trim($list[0]['category_char_id'] ?? '');
-                if (preg_match('/([A-Za-z]+)(\d+)/', $lastId, $m)) {
-                    $prefix = $m[1];
-                    $nextNumber = (int)$m[2] + 1;
+            // 1. ดึง ID ทั้งหมดเพื่อหาค่าตัวเลขสูงสุดและสร้างรหัสถัดไป (CL####)
+            $allRes = dbSelect('category_lanna_char', 'category_char_id');
+            $maxNum = 0;
+            $prefix = 'CL';
+            if (!empty($allRes['data'])) {
+                foreach ($allRes['data'] as $row) {
+                    $cId = trim($row['category_char_id'] ?? '');
+                    if (preg_match('/^([A-Za-z]+)(\d+)$/', $cId, $matches)) {
+                        $prefix = $matches[1];
+                        $num = (int)$matches[2];
+                        if ($num > $maxNum) {
+                            $maxNum = $num;
+                        }
+                    } elseif (preg_match('/(\d+)/', $cId, $matches)) {
+                        $num = (int)$matches[1];
+                        if ($num > $maxNum) {
+                            $maxNum = $num;
+                        }
+                    }
                 }
             }
-            $nextId = $prefix . str_pad((string)$nextNumber, 4, '0', STR_PAD_LEFT);
+            $nextId = $prefix . str_pad((string)($maxNum + 1), 4, '0', STR_PAD_LEFT);
 
             // 2. INSERT ข้อมูลพร้อมกับ ID และรหัสหมวดหมู่หลัก (learning_category_code)
             $finalData = [

@@ -1,0 +1,41 @@
+{
+  "rows": 886,
+  "verification_statuses": {
+    "auto_checked_needs_expert": 166,
+    "rejected": 3,
+    "source_image_verified": 715,
+    "verified_alias_to_source": 2
+  },
+  "source_search_statuses": {
+    "not_located_after_dual_ocr_needs_manual_review": 166,
+    "reviewed_rejected": 3,
+    "source_image_verified": 715,
+    "verified_alias_to_source": 2
+  },
+  "verified_rows": 715,
+  "verified_alias_rows": 2,
+  "verified_with_reviewed_category": 715,
+  "verified_without_reviewed_category": 0,
+  "reviewed_category_counts": {
+    "การกระทำ": 97,
+    "ความคิดและอารมณ์": 6,
+    "คำศัพท์ทั่วไป": 75,
+    "ธรรมชาติและสิ่งแวดล้อม": 8,
+    "บุคคลและเครือญาติ": 18,
+    "ประสาทสัมผัส": 1,
+    "พืชและเกษตร": 88,
+    "ภาษาและอักษร": 10,
+    "ร่างกายและสุขภาพ": 29,
+    "ลักษณะและอาการ": 112,
+    "ศาสนาและความเชื่อ": 30,
+    "ศิลปะ ดนตรี และการละเล่น": 30,
+    "สถานที่และชุมชน": 27,
+    "สัตว์": 43,
+    "สิ่งของและเครื่องมือ": 83,
+    "อาหารและเครื่องดื่ม": 21,
+    "เครื่องแต่งกาย": 14,
+    "เวลาและจำนวน": 23
+  },
+  "false_positive_pdf_pages": 57,
+  "pending_with_page_suggestions": 0
+}

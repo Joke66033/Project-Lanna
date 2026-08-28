@@ -1,0 +1,13 @@
+{
+  "pdf_page": 238,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 238 (หน้าไฟล์ 260) ครบทั้งสองคอลัมน์; แยก นักแท้นักว่า และ นักแต๊ะนักว่า เป็นคนละหัวคำตามต้นฉบับ"
+}

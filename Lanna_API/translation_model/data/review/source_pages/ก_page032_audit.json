@@ -1,0 +1,13 @@
+{
+  "pdf_page": 32,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำใหม่ 24 รายการจากภาพหน้า 32; บรรทัดต้นหน้าเป็นนิยามต่อของ กวยตีนช้าง จากหน้า 31 และไม่นับเป็นหัวคำใหม่"
+}

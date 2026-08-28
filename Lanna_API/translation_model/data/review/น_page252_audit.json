@@ -1,0 +1,13 @@
+{
+  "pdf_page": 252,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 252 (หน้าไฟล์ 274) ครบทั้งสองคอลัมน์; แยก เนือง/เนื่อง และกลุ่ม แน/แน่/แน้/แน่ง ตามเสียง วรรณยุกต์ และความหมายต้นฉบับ"
+}

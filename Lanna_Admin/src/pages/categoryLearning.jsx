@@ -3,7 +3,7 @@ import { Plus, Pencil, Trash2, Search, RotateCcw } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import Pagination from "../components/Pagination.jsx";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
-import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
+import { SuccessModal, ConfirmDeleteModal, WarningModal } from "../components/AlertModals.jsx";
 
 const getApiBase = () => {
   if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
@@ -49,6 +49,9 @@ export default function CategoryLearning() {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [successText, setSuccessText] = useState("");
+
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningText, setWarningText] = useState("");
 
   const fetchData = async (page = currentPage, searchQuery = search, statusFilter = selectedStatus) => {
     setLoading(true);
@@ -182,7 +185,8 @@ export default function CategoryLearning() {
       setCurrentPage(1);
       fetchData(1, "", "all");
     } catch (err) {
-      alert("เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่: " + (err.message || err));
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -239,7 +243,8 @@ export default function CategoryLearning() {
       setCurrentPage(1);
       fetchData(1, "", "all");
     } catch (err) {
-      alert("เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -295,7 +300,9 @@ export default function CategoryLearning() {
       setData((prev) => prev.filter((item) => item.category_code !== code));
       fetchData();
     } catch (err) {
-      alert(err.message || err);
+      setShowDelete(false);
+      setWarningText(err.message || "ไม่สามารถลบข้อมูลได้");
+      setShowWarning(true);
     } finally {
       setLoading(false);
       setDeleteItem(null);
@@ -597,6 +604,14 @@ export default function CategoryLearning() {
         isOpen={showSuccess}
         onClose={() => setShowSuccess(false)}
         message={successText}
+      />
+
+      {/* WARNING MODAL */}
+      <WarningModal
+        isOpen={showWarning}
+        onClose={() => setShowWarning(false)}
+        title="ไม่สามารถดำเนินการได้"
+        message={warningText}
       />
     </div>
   );

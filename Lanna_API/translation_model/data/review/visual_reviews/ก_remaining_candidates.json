@@ -1,0 +1,22 @@
+[
+  {"thai":"กล้วยไข่","lanna":"ᨠ᩠᩶ᩃ᩠ᩅᨿᩱᨡ᩵","pdf_page":26,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการกล้วยไข่ตรงกับภาพต้นฉบับ"},
+  {"thai":"กลองปู่เจ่","lanna":"ᨠ᩠ᩃ᩠ᩋᨦᨸᩪ᩵ᩮᨧ᩵","pdf_page":28,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการกลองปู่เจ่ตรงกับภาพต้นฉบับ"},
+  {"thai":"กล้องเอิ้น","lanna":"ᨠ᩠᩶ᩃ᩠ᩋᨦᩮᩋᩥ᩠᩶ᨶ","pdf_page":29,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการกล้องเอิ้นตรงกับภาพต้นฉบับ"},
+  {"thai":"กลั้นเข้า","lanna":"ᨠᩢ᩠᩶ᩃᩁᩮᨡᩢ᩶ᩣ","pdf_page":30,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการกลั้นเข้าตรงกับภาพต้นฉบับ"},
+  {"thai":"ก่อแป้น","lanna":"ᨠᩴ᩠᩵ᩋᩯᨸ᩠᩶ᨶ","pdf_page":33,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการก่อแป้นตรงกับภาพต้นฉบับ"},
+  {"thai":"ก่อนเนิ้น","lanna":"ᨠ᩠᩵ᩋᩁᩮᨶᩥ᩠᩶ᨶ","pdf_page":34,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการก่อนเนิ้นตรงกับภาพต้นฉบับ"},
+  {"thai":"ก้อมด้อม","lanna":"ᨠ᩠᩶ᩋᨾᨯ᩠᩶ᩋᨾ","pdf_page":34,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการก้อมด้อมตรงกับภาพต้นฉบับ"},
+  {"thai":"กั้น","lanna":"ᨠᩢ᩠᩶ᨶ","pdf_page":37,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการกั้นตรงกับภาพต้นฉบับ"},
+  {"thai":"กั้นฝ้า","lanna":"ᨠᩢ᩠᩶ᨶᨺ᩶ᩣ","pdf_page":37,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการกั้นฝ้าตรงกับภาพต้นฉบับ"},
+  {"thai":"กา","lanna":"ᨠᩣ","pdf_page":38,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการกาตรงกับภาพต้นฉบับหน้า 38"},
+  {"thai":"กา","lanna":"ᨠᩣ","pdf_page":77,"decision":"evidence_false_positive","note":"หน้า 77 อยู่ในหมวดอื่น ไม่ใช่รายการกาที่ใช้ยืนยัน"},
+  {"thai":"กา","lanna":"ᨠᩣ","pdf_page":104,"decision":"evidence_false_positive","note":"หน้า 104 อยู่ในหมวดอื่น ไม่ใช่รายการกาที่ใช้ยืนยัน"},
+  {"thai":"กาพูด","lanna":"ᨠᩣᨻᩪᨯ","pdf_page":38,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการกาพูดตรงกับภาพต้นฉบับ"},
+  {"thai":"เก่เด่","lanna":"ᩮᨠ᩵ᩮᨯ᩵","pdf_page":47,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการเก่เด่ตรงกับภาพต้นฉบับ"},
+  {"thai":"แก้","lanna":"ᩯᨠ᩶","pdf_page":49,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการแก้ตรงกับภาพต้นฉบับ"},
+  {"thai":"ไก่ชน","lanna":"ᩱᨠ᩵ᨩᩫ᩠ᨶ","pdf_page":54,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบรายการไก่ชนตรงกับภาพต้นฉบับ"},
+  {"thai":"ไก่","lanna":"ᩱᨠ᩵","pdf_page":31,"decision":"evidence_false_positive","note":"หน้า 31 ไม่มีหัวคำไก่ เป็นผลจับคู่ OCR ผิดหน้า"},
+  {"thai":"กาด","lanna":"ᨠᩣ᩠ᨯ","pdf_page":40,"decision":"evidence_false_positive","note":"หน้า 40 ไม่มีหัวคำกาดเดี่ยว เป็นผลจับคู่บริบทผิด"},
+  {"thai":"เก้า","lanna":"ᩮᨠᩢ᩶ᩣ","pdf_page":100,"decision":"evidence_false_positive","note":"หน้า 100 อยู่ในหมวด ค ไม่ใช่หัวคำเก้า"},
+  {"thai":"กี่","lanna":"ᨠᩦ᩵","pdf_page":109,"decision":"evidence_false_positive","note":"หน้า 109 อยู่ในหมวด ค ไม่ใช่หัวคำกี่"}
+]

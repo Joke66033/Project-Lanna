@@ -12,9 +12,38 @@ import 'package:lanna/services/auth_provider.dart';
 import 'package:lanna/models/user_model.dart';
 import 'package:lanna/core/api_config.dart';
 import 'package:lanna/widgets/app_header.dart';
+import 'package:lanna/widgets/bottom.dart';
+import 'package:lanna/page/home_shell.dart';
 
 const Color kPrimaryOrange = Color(0xFFE16905);
 const Color kInputBg = Color(0xFFF5F5F5);
+
+String resolveProfileAvatarUrl(String? avatarUrl) {
+  if (avatarUrl == null || avatarUrl.trim().isEmpty) return '';
+  String raw = avatarUrl.trim();
+  String filename = '';
+  
+  if (raw.contains('filename=')) {
+    final uri = Uri.tryParse(raw);
+    if (uri != null && uri.queryParameters.containsKey('filename')) {
+      filename = uri.queryParameters['filename']!;
+    }
+  }
+  
+  if (filename.isEmpty) {
+    if (raw.contains('/') || raw.contains(r'\')) {
+      filename = raw.split(RegExp(r'[/\\]')).last;
+    } else {
+      filename = raw;
+    }
+  }
+  
+  filename = filename.split('?').first;
+  if (filename.isEmpty) return raw;
+  
+  return '${ApiConfig.baseUrl}/endpoints/users_api.php?action=getAvatar&filename=${Uri.encodeComponent(filename)}';
+}
+
 
 class ProfileContent extends StatefulWidget {
   final bool isGuest;
@@ -461,7 +490,7 @@ class _ProfileContentState extends State<ProfileContent>
           bottom: false,
           child: Column(
             children: [
-              const AppHeader(title: 'เข้าสู่ระบบ'),
+              AppHeader(title: 'เข้าสู่ระบบ', onBack: () => Navigator.maybePop(context)),
               Expanded(
                 child: Center(
                   child: ElevatedButton(
@@ -496,13 +525,34 @@ class _ProfileContentState extends State<ProfileContent>
       );
     }
 
+    final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF7), // Light warm Lanna background color
+      bottomNavigationBar: isKeyboardOpen
+          ? null
+          : BottomNav(
+              index: widget.isGuest ? 4 : 4,
+              isGuest: widget.isGuest,
+              onLoginTap: () => Navigator.pushNamed(context, '/login'),
+              onTap: (tabId) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => HomeShell(
+                      isGuest: widget.isGuest,
+                      initialTab: tabId,
+                    ),
+                  ),
+                  (route) => false,
+                );
+              },
+            ),
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            const AppHeader(title: 'โปรไฟล์'),
+            AppHeader(title: 'โปรไฟล์', onBack: () => Navigator.maybePop(context)),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -977,7 +1027,7 @@ class _ProfileContentState extends State<ProfileContent>
 
     final avatarUrl = _user?.avatar;
     if (avatarUrl != null && avatarUrl.isNotEmpty) {
-      // 1. Check if the path is a local file path and exists on disk
+      // If local file on device exists (Mobile)
       if (!kIsWeb && !avatarUrl.startsWith('http://') && !avatarUrl.startsWith('https://')) {
         final localFile = File(avatarUrl);
         if (localFile.existsSync()) {
@@ -990,40 +1040,16 @@ class _ProfileContentState extends State<ProfileContent>
             ),
           );
         }
+      }
 
-        // 2. If it does not exist locally, treat it as a relative server path
-        // router expects format: /LANNA/lanna/assets/images/profile/filename
-        String relativePath = avatarUrl;
-        if (relativePath.contains('\\') || relativePath.contains('/')) {
-          final filename = relativePath.split(RegExp(r'[/\\]')).last;
-          relativePath = '/LANNA/lanna/assets/images/profile/$filename';
-        } else {
-          relativePath = '/LANNA/lanna/assets/images/profile/$relativePath';
-        }
-
-        final resolvedUrl = '${ApiConfig.baseUrl}$relativePath';
-        return _buildNetworkAvatar(resolvedUrl);
-      } else {
-        // 3. Absolute URL from server, normalize host/port
-        String resolvedUrl = avatarUrl;
-        if (!kIsWeb) {
-          try {
-            final uri = Uri.parse(resolvedUrl);
-            final baseUri = Uri.parse(ApiConfig.baseUrl);
-            resolvedUrl = uri.replace(
-              scheme: baseUri.scheme,
-              host: baseUri.host,
-              port: baseUri.port,
-            ).toString();
-          } catch (e) {
-            debugPrint('Error parsing avatarUrl URI: $e');
-          }
-        }
+      // Always resolve through the PHP getAvatar endpoint with CORS headers
+      final resolvedUrl = resolveProfileAvatarUrl(avatarUrl);
+      if (resolvedUrl.isNotEmpty) {
         return _buildNetworkAvatar(resolvedUrl);
       }
     }
 
-    // Fallback: show first letter of username on orange background
+    // Fallback: show person icon or first letter of username on orange background
     final initial = (_user != null && _user!.name.trim().isNotEmpty)
         ? _user!.name.trim()[0].toUpperCase()
         : '?';

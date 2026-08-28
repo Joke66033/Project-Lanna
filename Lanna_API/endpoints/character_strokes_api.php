@@ -73,9 +73,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             jsonOk($res['data']);
             break;
 
+        case 'getByCategory':
+            $category = $_GET['category'] ?? $_GET['cat'] ?? '';
+            $filters = [];
+            if ($category !== '') {
+                $filters['category'] = 'eq.' . $category;
+            }
+            $res = dbSelect('character_strokes', '*', $filters, 'stroke_id.asc');
+            if ($res['error']) { jsonError($res['error']['message']); break; }
+            jsonOk($res['data']);
+            break;
+
         default:
-            jsonError('Unknown action');
-    }
+            $res = dbSelect('character_strokes', '*', [], 'stroke_id.asc');
+            if ($res['error']) { jsonError($res['error']['message']); break; }
+            jsonOk($res['data']);
+            break;
 }
 
 // ===== POST =====

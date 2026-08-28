@@ -1,0 +1,13 @@
+{
+  "pdf_page": 209,
+  "expected_headwords": 22,
+  "verified_headwords": 22,
+  "expected_entries": 22,
+  "verified_entries": 22,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดจากภาพหน้าพิมพ์ 209 (หน้าไฟล์ 231) ครบทั้งสองคอลัมน์ ตั้งแต่ ถุก ๆ ถิก ๆ ถึง เถิงขนาด"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 249,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 249 (หน้าไฟล์ 271) ครบทั้งสองคอลัมน์หลังข้อความต่อเนื่องของน้ำเหมือง; นิด ซ้ำหัวคำหน้า 241 แต่เป็นความหมายเพิ่ม จึงต้องผสานหลายความหมาย"
+}

@@ -97,6 +97,28 @@ SPECIAL_TO_TAI_THAM = {
     0x00BB: 0x1A58,
 }
 
+# Reverse map for displaying Unicode database values with LN-TILOK-6.10.ttf.
+TAI_THAM_TO_LEGACY = {}
+for _legacy, _tai in {**THAI_TO_TAI_THAM, **SPECIAL_TO_TAI_THAM}.items():
+    TAI_THAM_TO_LEGACY.setdefault(_tai, _legacy)
+TAI_THAM_TO_LEGACY[0x1A60] = 0x0E2F  # SAKOT / LN-TILOK paiyannoi key
+
+
+def convert_tai_tham_to_ln_tilok(value: str) -> tuple[str, list[str]]:
+    """Convert Unicode Tai Tham text to LN-TILOK legacy keyboard codes."""
+    output: list[str] = []
+    warnings: list[str] = []
+    for character in unicodedata.normalize("NFC", value or ""):
+        codepoint = ord(character)
+        legacy = TAI_THAM_TO_LEGACY.get(codepoint)
+        if legacy is None:
+            output.append(character)
+            if codepoint >= 0x1A20 and codepoint <= 0x1AAF:
+                warnings.append(f"unmapped_U+{codepoint:04X}")
+        else:
+            output.append(chr(legacy))
+    return "".join(output), sorted(set(warnings))
+
 CONSONANTS = set(range(0x1A20, 0x1A55))
 MOVE_AFTER_SUBJOINED = {0x1A62, 0x1A65, 0x1A66, 0x1A67, 0x1A68}
 GLYPH_BASE_RE = re.compile(r"(?:^|\.)E([0-9A-F]{2})(?:\.|$)", re.IGNORECASE)
@@ -120,13 +142,45 @@ def convert_ln_tilok(
 
     output: list[str] = []
     warnings: list[str] = []
-    for source_character in unicodedata.normalize("NFC", value or ""):
+    source_text = unicodedata.normalize("NFC", value or "")
+    source_index = 0
+    while source_index < len(source_text):
+        source_character = source_text[source_index]
         source = ord(source_character)
+
+        # LN TILOK types the visual medial-ra sign with the legacy key sequence
+        # "ระฯ" *before* its host consonant.  Unicode Tai Tham instead stores
+        # the host first and U+1A55 MEDIAL RA after it.  For example the source
+        # dictionary encodes ครก as "ระฯค฿กฯ", which must become
+        # KHA + MEDIAL RA + O + SAKOT + KA, not an independent leading "ra".
+        if (
+            source_text.startswith("ระฯ", source_index)
+            and source_index + 3 < len(source_text)
+            and ord(source_text[source_index + 3]) in THAI_TO_TAI_THAM
+            and THAI_TO_TAI_THAM[ord(source_text[source_index + 3])] in CONSONANTS
+        ):
+            output.extend(
+                [
+                    chr(THAI_TO_TAI_THAM[ord(source_text[source_index + 3])]),
+                    "\u1A55",
+                ]
+            )
+            source_index += 4
+            continue
+
+        # LN TILOK uses the Thai SARA AM key for the Lanna /am/ cluster.
+        # Tai Tham has no precomposed AM character; Unicode encodes it as
+        # VOWEL SIGN AA followed by SIGN MAI KANG (L2/19-365).
+        if source == 0x0E33:
+            output.extend(["\u1A63", "\u1A74"])
+            source_index += 1
+            continue
 
         # Keep text that is already encoded as Unicode Tai Tham unchanged.
         # Some dictionary rows mix legacy LN Tilok code points with Unicode.
         if 0x1A20 <= source <= 0x1AAF:
             output.append(source_character)
+            source_index += 1
             continue
 
         if source == 0x0E2F:  # paiyannoi is the LN Tilok subjoining control
@@ -136,6 +190,7 @@ def convert_ln_tilok(
             )
             if target_index is None:
                 warnings.append("orphan_subjoining_control")
+                source_index += 1
                 continue
             consonant = output.pop(target_index)
             movable = []
@@ -143,11 +198,13 @@ def convert_ln_tilok(
                 movable.append(output.pop(target_index - 1))
                 target_index -= 1
             output[target_index:target_index] = [SAKOT, consonant, *reversed(movable)]
+            source_index += 1
             continue
 
         target = THAI_TO_TAI_THAM.get(source) or SPECIAL_TO_TAI_THAM.get(source)
         if target:
             output.append(chr(target))
+            source_index += 1
             continue
 
         glyph_name = cmap.get(source) if cmap else None
@@ -160,12 +217,14 @@ def convert_ln_tilok(
                     _insert_subjoined(output, chr(base_target), warnings)
                 else:
                     output.append(chr(base_target))
+                source_index += 1
                 continue
 
         if source_character.isspace() or source_character in ",;:()[]{}-/":
             output.append(source_character)
         else:
             warnings.append(f"unmapped_U+{source:04X}")
+        source_index += 1
 
     converted = unicodedata.normalize("NFC", "".join(output)).strip()
     if not any(0x1A20 <= ord(character) <= 0x1AAF for character in converted):

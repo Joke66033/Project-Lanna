@@ -1,0 +1,13 @@
+{
+  "pdf_page": 274,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 274 (หน้าไฟล์ 296) ครบทั้งสองคอลัมน์; แยก เบือ/เบื่อ/เบื้อ และ แบน/แบ่น/แบ้น ตามรูปคำและวรรณยุกต์ในต้นฉบับ"
+}

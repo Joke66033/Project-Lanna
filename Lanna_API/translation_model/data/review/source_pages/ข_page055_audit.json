@@ -1,0 +1,13 @@
+{
+  "pdf_page": 55,
+  "expected_headwords": 26,
+  "verified_headwords": 26,
+  "expected_entries": 26,
+  "verified_entries": 26,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำหมวด ข ชุดแรก 26 รายการจากภาพต้นฉบับหน้า 55 รวมระเบียนอธิบายพยัญชนะ ข และคำหลายความหมาย"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 26,
+  "expected_headwords": 25,
+  "verified_headwords": 25,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 25 รายการจากภาพหน้า 26; แยก 2 ความหมายของกลวง และปรับ 3 ระเบียนเดิมให้ตรงภาพ"
+}

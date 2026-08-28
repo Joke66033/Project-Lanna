@@ -1,0 +1,13 @@
+{
+  "pdf_page": 101,
+  "expected_headwords": 27,
+  "verified_headwords": 27,
+  "expected_entries": 27,
+  "verified_entries": 27,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำหมวด ง จากภาพหน้า 101 ซึ่งมีชื่อพืชและชื่องูหลายชนิด ต้องรักษาการสะกดชื่อเฉพาะตามต้นฉบับ"
+}

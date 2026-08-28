@@ -1,0 +1,13 @@
+{
+  "pdf_page": 266,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 266 (หน้าไฟล์ 288) ครบทั้งสองคอลัมน์; แยกคำซ้อน/คำเลียนเสียงท้ายหน้าออกจากชื่อพืช และคงคำส่งดูตามต้นฉบับ"
+}

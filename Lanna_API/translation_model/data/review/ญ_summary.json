@@ -1,0 +1,29 @@
+{
+  "rows": 14,
+  "verification_statuses": {
+    "source_image_verified": 14
+  },
+  "source_search_statuses": {
+    "source_image_verified": 14
+  },
+  "verified_rows": 14,
+  "verified_alias_rows": 0,
+  "verified_with_reviewed_category": 14,
+  "verified_without_reviewed_category": 0,
+  "reviewed_category_counts": {
+    "ครอบครัวและเครือญาติ": 2,
+    "ความรู้และปัญญา": 1,
+    "ความรู้และวิธีการ": 1,
+    "จำนวน": 1,
+    "บุคคลและเพศ": 1,
+    "ประเทศและชนชาติ": 2,
+    "ภาษาและความรู้": 1,
+    "ภาษาและอักษร": 1,
+    "ศาสนาและการปฏิบัติ": 1,
+    "ศาสนาและความรู้": 1,
+    "ศาสนาและจิตใจ": 1,
+    "ศาสนาและธรรมะ": 1
+  },
+  "false_positive_pdf_pages": 0,
+  "pending_with_page_suggestions": 0
+}

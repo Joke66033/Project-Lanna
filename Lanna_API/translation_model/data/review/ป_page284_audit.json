@@ -1,0 +1,13 @@
+{
+  "pdf_page": 284,
+  "expected_headwords": 22,
+  "verified_headwords": 22,
+  "expected_entries": 22,
+  "verified_entries": 22,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 284 (หน้าไฟล์ 306) ครบทั้งสองคอลัมน์; ยืนยันหัวคำ ปะแหล่ จากภาพขยาย และแยกชุดคำ ปั๊ก/ปัด ตามหัวคำต้นฉบับ"
+}

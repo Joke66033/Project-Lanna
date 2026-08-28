@@ -1,0 +1,19 @@
+{
+  "rows": 2,
+  "verification_statuses": {
+    "source_image_verified": 2
+  },
+  "source_search_statuses": {
+    "source_image_verified": 2
+  },
+  "verified_rows": 2,
+  "verified_alias_rows": 0,
+  "verified_with_reviewed_category": 2,
+  "verified_without_reviewed_category": 0,
+  "reviewed_category_counts": {
+    "ภาษาและอักษร": 1,
+    "ศาสนาและบุคคล": 1
+  },
+  "false_positive_pdf_pages": 0,
+  "pending_with_page_suggestions": 0
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 257,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 257 (หน้าไฟล์ 279) ครบทั้งสองคอลัมน์; แยกจุดเปลี่ยนจากกลุ่ม บ่… ไปยัง บก/บง/บ้ง และแยกชื่อสัตว์แต่ละหัวคำ"
+}

@@ -6,7 +6,6 @@ import 'package:lanna/models/article_model.dart';
 import '../learning_navigation.dart';
 import 'lanna_glyph_card.dart';
 import 'char_detail_page.dart';
-import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
 import 'package:lanna/services/character_stroke_service.dart';
 
@@ -121,6 +120,18 @@ class _VowelPageState extends State<VowelPage> with SingleTickerProviderStateMix
           _articlesMap[art.categoryCharId!] = art;
         }
       }
+      _articlesMap.putIfAbsent('CL0005', () => const ArticleModel(
+        articleId: 'AR0005',
+        title: 'สระจม (สระน้อย) คืออะไร?',
+        content: 'สระจม หรือสระน้อย ชาวล้านนาเรียกว่าอย่างว่า "ไม้" หมายถึง รูปสระที่ไม่สามารถออกเสียงตามลำพังได้ ต้องประสมเข้ากับพยัญชนะต้นเสมอ เช่น ไม้กิ๊ ไม้กึ ไม้กุ',
+        categoryCharId: 'CL0005',
+      ));
+      _articlesMap.putIfAbsent('CL0004', () => const ArticleModel(
+        articleId: 'AR0004',
+        title: 'สระลอย (สระหลวง) คืออะไร?',
+        content: 'สระลอยหรือสระหลวง คือกลุ่มอักขระที่มีเสียงสระอยู่ในตัวเอง สามารถเขียนลอยๆ โดดเดี่ยวและออกเสียงได้ทันทีโดยไม่ต้องมีพยัญชนะต้น',
+        categoryCharId: 'CL0004',
+      ));
 
       // 2. ดึงสระทั้งหมดจาก API เฉพาะกลุ่ม CL0004 และ CL0005
       final apiVowels = await _charService.getAllCharacters(categoryCharId: 'CL0004,CL0005');
@@ -263,6 +274,8 @@ class _VowelPageState extends State<VowelPage> with SingleTickerProviderStateMix
               delegate: _SliverTabBarDelegate(
                 TabBar(
                   controller: _tabController,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
                   indicatorColor: const Color(0xFFE16905),
                   indicatorWeight: 3.5,
                   indicatorSize: TabBarIndicatorSize.label,
@@ -534,7 +547,7 @@ class _VowelCard extends StatelessWidget {
                     vowel.char,
                     style: const TextStyle(
                       fontSize: 28,
-                      fontFamily: 'PayapLanna',
+                      fontFamily: 'LNTilok',
                       color: Color(0xFF924E19),
                       fontWeight: FontWeight.bold,
                     ),
@@ -756,7 +769,7 @@ class _VowelStrokeOrderBottomSheetState extends State<VowelStrokeOrderBottomShee
             widget.vowel.char,
             style: const TextStyle(
               fontSize: 27,
-              fontFamily: 'PayapLanna',
+              fontFamily: 'LNTilok',
               color: Color(0xFF924E19),
               fontWeight: FontWeight.bold,
             ),

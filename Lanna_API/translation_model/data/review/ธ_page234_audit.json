@@ -1,0 +1,13 @@
+{
+  "pdf_page": 234,
+  "expected_headwords": 5,
+  "verified_headwords": 5,
+  "expected_entries": 5,
+  "verified_entries": 5,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจภาพหน้าพิมพ์ 234 (หน้าไฟล์ 256) ครบคอลัมน์ซ้าย พร้อมคำอ่าน ความหมาย หมวดหมู่ และอักษรล้านนา; หน้านี้เป็นหน้าสุดท้ายของหมวด ธ"
+}

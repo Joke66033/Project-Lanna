@@ -1,0 +1,13 @@
+{
+  "pdf_page": 263,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 21,
+  "verified_entries": 21,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 263 (หน้าไฟล์ 285) ครบทั้งสองคอลัมน์; ข้อความต้นหน้าเป็นส่วนต่อของ บัวไกวก้าน และรวมกลับหน้าก่อนแล้ว; แยก บัวพิตถา (คำส่งดู) จาก บัวพิตรา"
+}

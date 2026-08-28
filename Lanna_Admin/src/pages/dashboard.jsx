@@ -22,7 +22,18 @@ const BASE = getApiBase();
 
 async function apiFetch(url) {
   const res = await fetch(url);
-  return res.json();
+  const contentType = res.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    const text = await res.text();
+    // Strip HTML tags for cleaner error message
+    const clean = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
+    throw new Error(`API ตอบกลับไม่ถูกต้อง (${url.split('/').pop()}): ${clean || 'ไม่ทราบสาเหตุ'}`);
+  }
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.message || data?.error || `HTTP ${res.status}`);
+  }
+  return data;
 }
 
 const getInitDate = (daysAgo) => {
@@ -322,9 +333,10 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className="p-12 text-center text-red-600 bg-[#f9f7f4] min-h-screen flex flex-col items-center justify-center">
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-red-200 max-w-md">
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-red-200 max-w-md w-full">
           <p className="font-bold text-lg">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>
-          <p className="text-sm text-gray-500 mt-2">{error}</p>
+          <p className="text-sm text-gray-500 mt-2 break-all">{error}</p>
+          <p className="text-xs text-gray-400 mt-3">กรุณาตรวจสอบว่า API server ทำงานปกติ และ endpoint ส่ง JSON กลับมาถูกต้อง</p>
           <button
             onClick={fetchData}
             className="mt-6 px-6 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-semibold"

@@ -20,7 +20,8 @@ class TranslateLogService {
   /// Create new log entry
   Future<void> createLog(String userId, String inputText, String outputText, {String? categoryVocabId, String? translateType}) async {
     final body = {
-      'category_vocab_id': categoryVocabId ?? 'CV0001',
+      if (categoryVocabId != null && categoryVocabId.isNotEmpty && categoryVocabId.startsWith('CV'))
+        'category_vocab_id': categoryVocabId,
       'translate_type': translateType ?? 'text',
       'input_text': inputText,
       'output_text': outputText,

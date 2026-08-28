@@ -1,0 +1,13 @@
+{
+  "pdf_page": 203,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 203 (หน้าไฟล์ 225) หมวด ถ ช่วง ถนัด–ถ้วยเบี้ยว และตรวจหน้าพิมพ์ 204 ว่าเริ่มหัวคำใหม่ ถ้วยแบน"
+}

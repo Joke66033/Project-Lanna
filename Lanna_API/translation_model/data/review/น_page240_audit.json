@@ -1,0 +1,13 @@
+{
+  "pdf_page": 240,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 240 (หน้าไฟล์ 262) ครบทั้งสองคอลัมน์; แยกหัวคำเสียงและรูปสะกดใกล้กันตามต้นฉบับ"
+}

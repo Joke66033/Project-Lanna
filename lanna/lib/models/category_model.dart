@@ -1,16 +1,19 @@
 class CategoryCharModel {
   final String categoryCharId;
   final String name;
+  final String? learningCategoryCode;
 
-  CategoryCharModel({
+  const CategoryCharModel({
     required this.categoryCharId,
     required this.name,
+    this.learningCategoryCode,
   });
 
   factory CategoryCharModel.fromJson(Map<String, dynamic> json) {
     return CategoryCharModel(
       categoryCharId: json['category_char_id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
+      learningCategoryCode: json['learning_category_code']?.toString(),
     );
   }
 
@@ -18,6 +21,7 @@ class CategoryCharModel {
     return {
       'category_char_id': categoryCharId,
       'name': name,
+      if (learningCategoryCode != null) 'learning_category_code': learningCategoryCode,
     };
   }
 }
@@ -26,7 +30,7 @@ class CategoryVocabModel {
   final String categoryVocabId;
   final String name;
 
-  CategoryVocabModel({
+  const CategoryVocabModel({
     required this.categoryVocabId,
     required this.name,
   });
@@ -53,7 +57,7 @@ class CategoryModel {
   final bool isActive;
   final int totalItems;
 
-  CategoryModel({
+  const CategoryModel({
     required this.categoryCode,
     required this.title,
     required this.description,

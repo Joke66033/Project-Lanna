@@ -1,0 +1,13 @@
+{
+  "pdf_page": 222,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดจากภาพหน้าพิมพ์ 222 (หน้าไฟล์ 244) ครบทั้งสองคอลัมน์ ตั้งแต่ ทีด ถึง ทือค่า"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 96,
+  "expected_headwords": 1,
+  "verified_headwords": 1,
+  "expected_entries": 1,
+  "verified_entries": 1,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้า 96 แล้ว รับรองระเบียนตัวอักษร ฆ; ไม่มีหัวคำศัพท์อื่น"
+}

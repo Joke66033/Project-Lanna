@@ -1,0 +1,13 @@
+{
+  "pdf_page": 74,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจหัวคำ 19 รายการ พร้อม glyph คำอ่าน ความหมาย หมวดหมู่ และข้อความต่อของ คราบ จากหน้า 73 ครบแล้ว"
+}

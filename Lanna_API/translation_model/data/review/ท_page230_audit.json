@@ -1,0 +1,13 @@
+{
+  "pdf_page": 230,
+  "expected_headwords": 16,
+  "verified_headwords": 16,
+  "expected_entries": 16,
+  "verified_entries": 16,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจภาพหน้าพิมพ์ 230 (หน้าไฟล์ 252) ครบทั้งสองคอลัมน์ พร้อมคำอ่าน ความหมาย หมวดหมู่ และอักษรล้านนา; หน้านี้เป็นหน้าสุดท้ายของหมวด ท"
+}

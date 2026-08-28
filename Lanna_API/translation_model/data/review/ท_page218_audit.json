@@ -1,0 +1,13 @@
+{
+  "pdf_page": 218,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดจากภาพหน้าพิมพ์ 218 (หน้าไฟล์ 240) ครบทั้งสองคอลัมน์; ความหมาย ทานซอม ต่อเนื่องไปต้นหน้าพิมพ์ 219"
+}

@@ -1,0 +1,35 @@
+{
+  "rows": 274,
+  "verification_statuses": {
+    "source_image_verified": 274
+  },
+  "source_search_statuses": {
+    "source_image_verified": 274
+  },
+  "verified_rows": 274,
+  "verified_alias_rows": 0,
+  "verified_with_reviewed_category": 274,
+  "verified_without_reviewed_category": 0,
+  "reviewed_category_counts": {
+    "การกระทำ": 25,
+    "ความคิดและอารมณ์": 15,
+    "คำศัพท์ทั่วไป": 33,
+    "ธรรมชาติและสิ่งแวดล้อม": 5,
+    "บุคคลและเครือญาติ": 9,
+    "ประสาทสัมผัส": 3,
+    "พืชและเกษตร": 17,
+    "ภาษาและอักษร": 9,
+    "ร่างกายและสุขภาพ": 29,
+    "ลักษณะและอาการ": 26,
+    "ศาสนาและความเชื่อ": 18,
+    "ศิลปะ ดนตรี และการละเล่น": 3,
+    "สถานที่และชุมชน": 19,
+    "สัตว์": 6,
+    "สิ่งของและเครื่องมือ": 36,
+    "อาหารและเครื่องดื่ม": 4,
+    "เครื่องแต่งกาย": 8,
+    "เวลาและจำนวน": 9
+  },
+  "false_positive_pdf_pages": 0,
+  "pending_with_page_suggestions": 0
+}

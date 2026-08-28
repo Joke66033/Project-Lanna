@@ -1,0 +1,13 @@
+{
+  "pdf_page": 251,
+  "expected_headwords": 25,
+  "verified_headwords": 25,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 251 (หน้าไฟล์ 273) ครบทั้งสองคอลัมน์; นูน ซ้ำจากหน้า 250 แต่เพิ่มความหมายชื่อแมลง จึงต้องผสานหลายความหมาย"
+}

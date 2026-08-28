@@ -1,0 +1,13 @@
+{
+  "pdf_page": 214,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดจากภาพหน้าพิมพ์ 214 (หน้าไฟล์ 236) ครบทั้งสองคอลัมน์; ความหมายหัวคำ ทอง ต่อเนื่องจากท้ายคอลัมน์ซ้ายไปต้นคอลัมน์ขวา"
+}

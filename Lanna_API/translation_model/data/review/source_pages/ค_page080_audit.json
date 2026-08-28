@@ -1,0 +1,13 @@
+{
+  "pdf_page": 80,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 23 รายการและ 24 ระเบียนจากภาพหน้า 80; คะทั่ง มี 2 ความหมาย"
+}

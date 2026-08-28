@@ -1,0 +1,4 @@
+[
+  {"thai":"กล้องมูยา","lanna":"ᨠ᩠᩶ᩃ᩠ᩋᨦᨾᩪᩋ᩠ᨿᩣ","pdf_page":29,"decision":"source_image_verified","category":"สิ่งของและเครื่องมือ","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"หลังแก้หัวคำจากค่าภายนอก ตรวจภาพหน้า 29 พบกล้องมูยา หมายถึงกล้องสูบยาเส้นตรงกัน"},
+  {"thai":"แกนคอ","lanna":"ᩯᨠ᩠ᨶᨤᩴ᩠ᩋ","pdf_page":50,"decision":"source_image_verified","category":"ร่างกายและสุขภาพ","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"หลังแก้หัวคำ ตรวจภาพหน้า 50 พบแกนคอ หมายถึงลูกกระเดือกตรงกัน"}
+]

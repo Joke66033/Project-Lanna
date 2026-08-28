@@ -1,0 +1,13 @@
+[
+  {
+    "thai": "ก่า",
+    "lanna": "ᨠ᩵ᩣ",
+    "pdf_page": 39,
+    "decision": "source_image_verified",
+    "reconsider_false_positive": true,
+    "reconsider_note": "ภาพความละเอียดสูงแสดงหัวคำ ก่า ชัดเจน; การตัดสินผลบวกลวงเดิมเกิดจากการอ่านภาพผิด",
+    "checked_fields": ["thai", "lanna_glyph_shape", "pronunciation", "meaning"],
+    "category": "เวลาและจำนวน",
+    "note": "ตรวจภาพหน้า 39 และแก้ความหมายตามต้นฉบับแล้ว"
+  }
+]

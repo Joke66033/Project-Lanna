@@ -1,0 +1,13 @@
+{
+  "pdf_page": 225,
+  "expected_headwords": 26,
+  "verified_headwords": 26,
+  "expected_entries": 26,
+  "verified_entries": 26,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจภาพหน้าพิมพ์ 225 (หน้าไฟล์ 247) ครบทั้งสองคอลัมน์ พร้อมคำอ่าน ความหมาย หมวดหมู่ และอักษรล้านนา"
+}

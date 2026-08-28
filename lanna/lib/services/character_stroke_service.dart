@@ -15,17 +15,22 @@ class CharacterStrokeService {
 
   /// Get all character strokes from database
   Future<List<CharacterStrokeModel>> getAllStrokes({String? category}) async {
-    String url = '${ApiConfig.characterStrokes}?action=getAll';
-    if (category != null && category.isNotEmpty) {
-      url += '&category=$category';
+    try {
+      String url = '${ApiConfig.characterStrokes}?action=getAll';
+      if (category != null && category.isNotEmpty) {
+        url += '&category=$category';
+      }
+      final data = await ApiService.get(url);
+      if (data == null || data is! List) return [];
+      final list = data.map((x) => CharacterStrokeModel.fromJson(x as Map<String, dynamic>)).toList();
+      for (var item in list) {
+        _cache[item.charSymbol] = item;
+      }
+      return list;
+    } catch (e) {
+      debugPrint('CharacterStrokeService: getAllStrokes error: $e');
+      return [];
     }
-    final data = await ApiService.get(url);
-    if (data == null) return [];
-    final list = (data as List).map((x) => CharacterStrokeModel.fromJson(x)).toList();
-    for (var item in list) {
-      _cache[item.charSymbol] = item;
-    }
-    return list;
   }
 
   /// Get stroke data by specific character symbol (e.g. 'ᨠ', 'ᨡ')
@@ -37,13 +42,15 @@ class CharacterStrokeService {
     try {
       final encodedChar = Uri.encodeComponent(cleanChar);
       final data = await ApiService.get('${ApiConfig.characterStrokes}?action=getByChar&char=$encodedChar');
-      if (data == null) return null;
-      final model = CharacterStrokeModel.fromJson(data);
-      _cache[cleanChar] = model;
-      return model;
+      if (data != null && data is Map<String, dynamic>) {
+        final model = CharacterStrokeModel.fromJson(data);
+        _cache[cleanChar] = model;
+        return model;
+      }
     } catch (e) {
-      return null;
+      debugPrint('CharacterStrokeService: getByChar unavailable, fallback to local: $e');
     }
+    return null;
   }
 
   /// Create new character stroke data
@@ -68,11 +75,15 @@ class CharacterStrokeService {
   }
 }
 
-/// Global helper function to get stroke paths for drawing from database cache or local stroke_data fallback
+/// Global helper function to get stroke paths for drawing from local stroke_data or database cache fallback
 List<List<Offset>> getStrokeData(String charSymbol) {
+  final local = sd.getStrokeData(charSymbol);
+  if (local.isNotEmpty && local.first.isNotEmpty) {
+    return local;
+  }
   final cached = CharacterStrokeService.getCachedStroke(charSymbol);
   if (cached != null && cached.strokePaths.isNotEmpty) {
     return cached.strokePaths;
   }
-  return sd.getStrokeData(charSymbol);
+  return local;
 }

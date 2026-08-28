@@ -1,0 +1,13 @@
+{
+  "pdf_page": 198,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 198 (หน้าไฟล์ 220) หมวด ต ช่วง เตือน–แต่งบุญ และตรวจหน้าพิมพ์ 199 ว่าเริ่มหัวคำใหม่ แต่งแปลง"
+}

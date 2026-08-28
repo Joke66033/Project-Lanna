@@ -1,0 +1,13 @@
+{
+  "pdf_page": 220,
+  "expected_headwords": 25,
+  "verified_headwords": 25,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดจากภาพหน้าพิมพ์ 220 (หน้าไฟล์ 242) ครบทั้งสองคอลัมน์; หัวคำ ที เพิ่มความหมายคำนามต่อจากคำกริยาในหน้าพิมพ์ 219"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 73,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 21,
+  "verified_entries": 21,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจหัวคำ 21 รายการ พร้อม glyph คำอ่าน ความหมาย หมวดหมู่ และคำ คราบ ซึ่งความหมายต่อหน้า 74 ครบแล้ว"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 233,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจภาพหน้าพิมพ์ 233 (หน้าไฟล์ 255) ครบทั้งสองคอลัมน์ พร้อมคำอ่าน ความหมาย หมวดหมู่ และอักษรล้านนา; หมวด ธ ยังต่อหน้า 234"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 269,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 269 (หน้าไฟล์ 291) ครบทั้งสองคอลัมน์; แยก บาย/บ่าย/บ้าย ตามวรรณยุกต์และหน้าที่คำ และแยกชื่อพรรณไม้แต่ละหัวคำ"
+}

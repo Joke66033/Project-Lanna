@@ -386,42 +386,43 @@ class _DictionaryPageState extends State<DictionaryPage> {
   Widget _buildCategoryChips() {
     return SizedBox(
       height: 44,
-      child: ListView.builder(
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(left: 16),
-        itemCount: _categories.length,
-        itemBuilder: (_, i) {
-          final cat = _categories[i];
-          final active = cat == _selectedCategory;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              selected: active,
-              showCheckmark: false,
-              selectedColor: _kPrimary,
-              backgroundColor: const Color(0xFFFFFBF7),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-                side: BorderSide(
-                  color: active ? _kPrimary : const Color(0xFFEADBC8),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: _categories.map((cat) {
+            final active = cat == _selectedCategory;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: ChoiceChip(
+                selected: active,
+                showCheckmark: false,
+                selectedColor: _kPrimary,
+                backgroundColor: const Color(0xFFFFFBF7),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(
+                    color: active ? _kPrimary : const Color(0xFFEADBC8),
+                  ),
                 ),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              label: Text(
-                cat,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: active ? Colors.white : const Color(0xFF7A5C3A),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                label: Text(
+                  cat,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: active ? Colors.white : const Color(0xFF7A5C3A),
+                  ),
                 ),
+                onSelected: (_) => setState(() {
+                  _selectedCategory = cat;
+                  _currentPage = 1;
+                }),
               ),
-              onSelected: (_) => setState(() {
-                _selectedCategory = cat;
-                _currentPage = 1;
-              }),
-            ),
-          );
-        },
+            );
+          }).toList(),
+        ),
       ),
     );
   }
@@ -651,7 +652,7 @@ class _DictCard extends StatelessWidget {
             Text(
               item.lanna,
               style: const TextStyle(
-                fontFamily: 'PayapLanna',
+                fontFamily: 'LNTilok',
                 fontSize: 17,
                 color: Color(0xFF924E19),
                 fontWeight: FontWeight.bold,

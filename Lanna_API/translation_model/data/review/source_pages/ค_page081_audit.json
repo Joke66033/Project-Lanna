@@ -1,0 +1,13 @@
+{
+  "pdf_page": 81,
+  "expected_headwords": 22,
+  "verified_headwords": 22,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 22 รายการและตรวจพบ 23 ระเบียนจากภาพหน้า 81; คันธะ มี 2 ระเบียน และ คาถามหาสันติ่งหลวง มีข้อความต่อหน้า 82"
+}

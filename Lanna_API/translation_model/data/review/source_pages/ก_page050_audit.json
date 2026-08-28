@@ -1,0 +1,13 @@
+{
+  "pdf_page": 50,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำใหม่ 20 รายการจากหน้า 50; ไม่นับข้อความต่อเนื่องของแกงฮังเลเชียงแสนจากหน้า 49"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 248,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 248 (หน้าไฟล์ 270) ครบทั้งสองคอลัมน์; แยกศัพท์อาหาร วัตถุดิบ แหล่งน้ำ ภาชนะ และสำนวนตามต้นฉบับ"
+}

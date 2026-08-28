@@ -8,7 +8,7 @@ import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
 import { getCategoryStyle } from "../lib/categoryColors.js";
 import LannaText from "../components/LannaText.jsx";
 import { loadLannaMap, convertThaiToLanna } from "../lib/thaiToLanna.js";
-import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
+import { SuccessModal, ConfirmDeleteModal, WarningModal } from "../components/AlertModals.jsx";
 
 const getApiBase = () => {
   if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
@@ -211,6 +211,9 @@ export default function AlphabetPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successText, setSuccessText] = useState("");
 
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningText, setWarningText] = useState("");
+
   const [showDelete, setShowDelete] = useState(false);
   const [deleteItem, setDeleteItem] = useState(null);
 
@@ -293,7 +296,8 @@ export default function AlphabetPage() {
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
-      alert("Error adding Lanna char: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มอักขระ");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -349,7 +353,8 @@ export default function AlphabetPage() {
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
-      alert("Error updating Lanna char: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขอักขระ");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -380,7 +385,9 @@ export default function AlphabetPage() {
       setShowSuccess(true);
       fetchData();
     } catch (err) {
-      alert("Error deleting Lanna char: " + err.message);
+      setShowDelete(false);
+      setWarningText(err.message || "ไม่สามารถลบข้อมูลได้");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -695,6 +702,14 @@ export default function AlphabetPage() {
         isOpen={showSuccess}
         onClose={() => setShowSuccess(false)}
         message={successText}
+      />
+
+      {/* WARNING MODAL */}
+      <WarningModal
+        isOpen={showWarning}
+        onClose={() => setShowWarning(false)}
+        title="ไม่สามารถดำเนินการได้"
+        message={warningText}
       />
     </div>
   );

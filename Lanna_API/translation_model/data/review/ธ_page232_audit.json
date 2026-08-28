@@ -1,0 +1,13 @@
+{
+  "pdf_page": 232,
+  "expected_headwords": 10,
+  "verified_headwords": 10,
+  "expected_entries": 10,
+  "verified_entries": 10,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจภาพหน้าพิมพ์ 232 (หน้าไฟล์ 254) ครบทั้งสองคอลัมน์ พร้อมคำอ่าน ความหมาย หมวดหมู่ และอักษรล้านนา; เก็บรายการคัมภีร์ตามเดือน ปี และวันเกิดครบโดยไม่ย่อ"
+}

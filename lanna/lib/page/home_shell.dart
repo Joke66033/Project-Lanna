@@ -46,10 +46,7 @@ class _HomeShellState extends State<HomeShell> {
     final authProvider = context.read<AuthProvider>();
     final bool isGuest = !authProvider.isLoggedIn && widget.isGuest;
     if (isGuest && tab == 4) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-      );
+      _showLoginRequiredDialog(context);
       return;
     }
     if (tab == 2) {

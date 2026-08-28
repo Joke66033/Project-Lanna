@@ -1,8 +1,10 @@
+import { toTilokFontString, tilokDirectMap } from "./thaiToLanna.js";
+
 export function normalizeLannaText(text) {
   if (!text) return "";
-  return String(text).trim();
+  return toTilokFontString(text);
 }
 
 export async function loadLannaMap() {
-  return {};
+  return tilokDirectMap;
 }

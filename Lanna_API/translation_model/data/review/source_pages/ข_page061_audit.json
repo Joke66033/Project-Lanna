@@ -1,0 +1,13 @@
+{
+  "pdf_page": 61,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำหมวด ข จำนวน 19 รายการจากภาพต้นฉบับหน้า 61 และแยกความหมายของ ขะแชะ กับ ขะด้าง"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 262,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 262 (หน้าไฟล์ 284) ครบทั้งสองคอลัมน์; ข้อความต้นหน้าเป็นส่วนต่อของ บะ และได้รวมกลับเข้าระเบียนหน้า 261 แล้ว"
+}

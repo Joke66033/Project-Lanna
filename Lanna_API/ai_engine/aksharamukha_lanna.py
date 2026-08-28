@@ -83,7 +83,7 @@ _RESIDUAL_THAI_TO_TAI_THAM = {
     "\u0e4c": "\u1a7a",  # ์
 }
 
-_PASSTHROUGH = set(" \t\r\n.,!?;:()[]{}'\"-/")
+_PASSTHROUGH = set(" \t\r\n.,!?;:()[]{}'\"-/ๆ")
 
 
 @dataclass(frozen=True)

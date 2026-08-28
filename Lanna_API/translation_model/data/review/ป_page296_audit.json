@@ -1,0 +1,13 @@
+{
+  "pdf_page": 296,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 21,
+  "verified_entries": 21,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 296 (หน้าไฟล์ 318) ครบทั้งสองคอลัมน์ 21 หัวคำ และอ่านข้อความ เปนผอมเปนด้อง ที่ต่อข้ามคอลัมน์ครบ"
+}

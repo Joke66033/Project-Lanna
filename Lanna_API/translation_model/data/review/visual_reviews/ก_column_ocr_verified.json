@@ -1,0 +1,4 @@
+[
+  {"thai":"กึ่งดึ่ง","lanna":"ᨠᩧ᩠᩵ᨦᨯᩧ᩠᩵ᨦ","pdf_page":45,"decision":"source_image_verified","category":"ลักษณะและอาการ","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"OCR แยกคอลัมน์พบหัวคำกึ่งดึ่ง และตรวจภาพหน้า 45 แล้วทั้งรูปอักษร คำอ่าน และความหมายตรงกัน"},
+  {"thai":"แกนพาง","lanna":"ᩯᨠ᩠ᨶᨻᩣ᩠ᨦ","pdf_page":50,"decision":"source_image_verified","category":"สิ่งของและเครื่องมือ","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"OCR แยกคอลัมน์พบหัวคำแกนพาง และตรวจภาพหน้า 50 ว่าหมายถึงจุกอุดขวดตรงกัน"}
+]

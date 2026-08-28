@@ -1,0 +1,16 @@
+[
+  {"thai":"กลองตะหลดปด","lanna":"ᨠ᩠ᩃ᩠ᩋᨦᨲᩉᩫ᩠ᩃᨯᨸᩫ᩠ᨯ","pdf_page":27,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 27 พบหัวคำ รูปอักษร คำอ่าน และความหมายตรงกัน"},
+  {"thai":"กลองปู่ชา","lanna":"ᨠ᩠ᩃ᩠ᩋᨦᨸᩪ᩵ᨩᩣ","pdf_page":28,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 28 พบรายการกลองปู่ชาตรงต้นฉบับ"},
+  {"thai":"กลองอุ่นเมือง","lanna":"ᨠ᩠ᩃ᩠ᩋᨦᩋᩩ᩵ᩁᩮᨾ᩠ᩋᩥᨦ","pdf_page":28,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 28 พบรายการกลองอุ่นเมืองตรงต้นฉบับ"},
+  {"thai":"กาด","lanna":"ᨠᩣ᩠ᨯ","pdf_page":39,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 39 พบหัวคำกาดเดี่ยวตรงต้นฉบับ"},
+  {"thai":"กาดก้อม","lanna":"ᨠᩣ᩠ᨯᨠ᩠᩶ᩋᨾ","pdf_page":39,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 39 พบรายการกาดก้อมตรงต้นฉบับ"},
+  {"thai":"กาดงัวกาดฅวาย","lanna":"ᨠᩣ᩠ᨯᨦᩫ᩠ᩅᨠᩣ᩠ᨯᨤ᩠ᩅᩣ᩠ᨿ","pdf_page":39,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 39 พบรายการกาดงัวกาดฅวายตรงต้นฉบับ"},
+  {"thai":"กาน","lanna":"ᨠᩣ᩠ᨶ","pdf_page":40,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 40 พบรายการกานตรงต้นฉบับ"},
+  {"thai":"ก้านบ่าพล้าว","lanna":"ᨠ᩶ᩣ᩠ᨶ᩠ᨷ᩵ᩣᨻ᩠᩶ᩃᩣ᩠ᩅ","pdf_page":40,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 40 พบรายการก้านบ่าพล้าวตรงต้นฉบับ"},
+  {"thai":"กินดอง","lanna":"ᨠ᩠ᨶᩥᨯ᩠ᩋᨦ","pdf_page":43,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 43 พบรายการกินดองตรงต้นฉบับ"},
+  {"thai":"กินเข้า","lanna":"ᨠ᩠ᨶᩥᩮᨡᩢ᩶ᩣ","pdf_page":43,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 43 พบรายการกินเข้าตรงต้นฉบับ"},
+  {"thai":"กินเข้าบ่เผื่อน้ำ","lanna":"ᨠ᩠ᨶᩥᩮᨡᩢ᩶ᩣᨷᩴ᩵ᩮᨹᩥ᩠᩵ᩋᩋ᩠ᨶᩣᩴ᩶","pdf_page":43,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 43 พบรายการกินเข้าบ่เผื่อน้ำตรงต้นฉบับ"},
+  {"thai":"กินแหนง","lanna":"ᨠ᩠ᨶᩥᩯᩉ᩠ᨶᨦ","pdf_page":44,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 44 พบรายการกินแหนงตรงต้นฉบับ"},
+  {"thai":"กี่","lanna":"ᨠᩦ᩵","pdf_page":44,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 44 พบหัวคำกี่และรูปอักษรตรงต้นฉบับ"},
+  {"thai":"กึ่งดึ่งก่างด่าง","lanna":"ᨠᩧ᩠᩵ᨦᨯᩧ᩠᩵ᨦᨠ᩵ᩣ᩠ᨦᨯ᩵ᩣ᩠ᨦ","pdf_page":45,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรวจภาพหน้า 45 พบรายการกึ่งดึ่งก่างด่างตรงต้นฉบับ"}
+]

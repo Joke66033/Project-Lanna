@@ -1,0 +1,13 @@
+{
+  "pdf_page": 36,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอด 23 รายการพจนานุกรมจากภาพหน้า 36 เป็นคำค้น 24 รูป เพราะบรรทัด กะหลอม, กลอม ระบุหัวคำพ้องสองรูปและคำอ่านสองแบบโดยใช้อักษรล้านนารูปเดียวกัน; ระเบียน กัด มีสี่ความหมายรวมข้อความต่อเนื่องหน้า 37"
+}

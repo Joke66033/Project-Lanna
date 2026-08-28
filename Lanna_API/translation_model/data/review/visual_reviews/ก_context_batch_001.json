@@ -1,0 +1,32 @@
+[
+  {
+    "thai": "กะวุกกะวุ้ย",
+    "lanna": "ᨠᩡᩅᩩᨠᨠᩡᩅᩩ᩠᩶ᨿ",
+    "pdf_page": 35,
+    "decision": "source_image_verified",
+    "manual_source_page": true,
+    "checked_fields": ["thai", "lanna_glyph_shape", "pronunciation", "meaning"],
+    "category": "ลักษณะและอาการ",
+    "note": "ตรวจภาพความละเอียดสูงหน้า 35"
+  },
+  {
+    "thai": "ก่องต่อง",
+    "lanna": "ᨠ᩠᩵ᩋᨦᨲ᩠᩵ᩋᨦ",
+    "pdf_page": 34,
+    "decision": "source_image_verified",
+    "manual_source_page": true,
+    "checked_fields": ["thai", "lanna_glyph_shape", "pronunciation", "meaning"],
+    "category": "ลักษณะและอาการ",
+    "note": "ตรวจภาพความละเอียดสูงหน้า 34 หลังแก้ตัว ด เป็น ต"
+  },
+  {
+    "thai": "แก้งก้น",
+    "lanna": "ᩯᨠ᩠᩶ᨦᨠ᩶ᩫ᩠ᨶ",
+    "pdf_page": 50,
+    "decision": "source_image_verified",
+    "manual_source_page": true,
+    "checked_fields": ["thai", "lanna_glyph_shape", "pronunciation", "meaning"],
+    "category": "การกระทำ",
+    "note": "ตรวจภาพความละเอียดสูงหน้า 50"
+  }
+]

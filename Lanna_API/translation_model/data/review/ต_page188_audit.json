@@ -1,0 +1,13 @@
+{
+  "pdf_page": 188,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 188 (หน้าไฟล์ 210) หมวด ต ช่วง ตายพราย–ตำบน"
+}

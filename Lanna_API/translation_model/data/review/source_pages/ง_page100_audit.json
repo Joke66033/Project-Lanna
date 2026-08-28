@@ -1,0 +1,13 @@
+{
+  "pdf_page": 100,
+  "expected_headwords": 28,
+  "verified_headwords": 28,
+  "expected_entries": 29,
+  "verified_entries": 29,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้า 100; หัวคำ งิ ปรากฏสองตำแหน่งเป็นสองความหมาย จึงต้องรวมเป็นหนึ่งหัวคำสอง senses"
+}

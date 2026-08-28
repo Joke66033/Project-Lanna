@@ -1,0 +1,4 @@
+[
+  {"thai":"กะบี้","expected_verified_page":35,"source_page":35,"lanna":"ᨠᩡᨷᩦ᩶","pronunciation":"[กะ - บี้]","meaning":"น. แมลงปอ - ดูเพิ่มเติม ก่ำบี้","category":"สัตว์","context_pages":[35],"reason":"ยืนยันระเบียนรอตรวจจากภาพหน้า 35 และปรับคำอ่านกับนิยามให้ตรงต้นฉบับ","promote_pending":true},
+  {"thai":"กะวุกกะวุ้ย","expected_verified_page":35,"source_page":35,"pronunciation":"[กะ - วุก - กะ - วุ้ย]","meaning":"ว. มอมแมม เปรอะเปื้อนไปทั่ว","category":"ลักษณะและอาการ","context_pages":[35],"reason":"ปรับคำอ่าน นิยาม และหลักฐานหน้า 35 ให้สอดคล้องกัน"}
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "thai": "ก่ายขัว",
+    "expected_verified_page": 41,
+    "source_page": 41,
+    "pronunciation": "[ก่าย - ขัว]",
+    "meaning": "ก. ใช้ไม้พาดทำสะพาน",
+    "category": "การกระทำ",
+    "context_pages": [41],
+    "reason": "ปรับรูปแบบคำอ่านและนิยามให้ตรงภาพต้นฉบับหน้า 41"
+  }
+]

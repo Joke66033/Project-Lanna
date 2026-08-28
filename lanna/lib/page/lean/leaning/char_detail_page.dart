@@ -304,8 +304,8 @@ class _CharDetailPageState extends State<CharDetailPage>
             style: const TextStyle(
               fontSize: 56,
               height: 1.15,
-              fontFamily: 'PayapLanna',
-              fontFamilyFallback: ['PayapLanna', 'THSarabunNew', 'sans-serif'],
+              fontFamily: 'LNTilok',
+              fontFamilyFallback: ['LNTilok', 'THSarabunNew', 'sans-serif'],
               color: Color(0xFF924E19),
               fontWeight: FontWeight.normal,
             ),
@@ -848,7 +848,7 @@ class _LocalStrokePainter extends CustomPainter {
     );
     final glyphLayout = layoutWritingGlyph(
       character: char,
-      fontFamily: 'PayapLanna',
+      fontFamily: 'LNTilok',
       size: size,
       padding: writingExamplePadding,
     );
@@ -856,17 +856,33 @@ class _LocalStrokePainter extends CustomPainter {
     // Mapping them through the font's selection box compresses some wide
     // Lanna characters into a tall, narrow shape. Map them directly into the
     // fixed writing square so every character keeps its authored proportions.
+    // คำนวณ Bounding Box ของตัวอักษรเพื่อจัดกึ่งกลางและปรับขนาดให้ออกมาสวยงาม เต็มกรอบ พอดีเสมอ
+    double minX = 100.0, minY = 100.0, maxX = 0.0, maxY = 0.0;
+    bool hasPoints = false;
+    for (final stroke in strokes) {
+      for (final pt in stroke) {
+        hasPoints = true;
+        if (pt.dx < minX) minX = pt.dx;
+        if (pt.dy < minY) minY = pt.dy;
+        if (pt.dx > maxX) maxX = pt.dx;
+        if (pt.dy > maxY) maxY = pt.dy;
+      }
+    }
+
+    final double charWidth = hasPoints ? math.max(20.0, maxX - minX) : 60.0;
+    final double charHeight = hasPoints ? math.max(20.0, maxY - minY) : 60.0;
+    final double charCenterX = hasPoints ? (minX + maxX) / 2.0 : 50.0;
+    final double charCenterY = hasPoints ? (minY + maxY) / 2.0 : 50.0;
+
+    final double targetSize = size.shortestSide * (isFloatingVowelOrMark ? 0.36 : 0.52);
+    final double scale = targetSize / math.max(charWidth, charHeight);
+
     Offset strokeScale(Offset point) {
-      // ᨥ is a naturally wide, low glyph. Its generated centre-line data was
-      // normalized independently on both axes, which stretched it vertically.
-      final adjustedPoint = char == 'ᨥ'
-          ? Offset(50 + (point.dx - 50) * 1.10, 50 + (point.dy - 50) * 0.58)
-          : point;
+      final double scaledX = (point.dx - charCenterX) * scale;
+      final double scaledY = (point.dy - charCenterY) * scale;
       return Offset(
-        glyphLayout.contentRect.left +
-            adjustedPoint.dx * glyphLayout.contentRect.width / 100,
-        glyphLayout.contentRect.top +
-            adjustedPoint.dy * glyphLayout.contentRect.height / 100,
+        size.width / 2.0 + scaledX,
+        size.height / 2.0 + scaledY,
       );
     }
 
@@ -876,7 +892,7 @@ class _LocalStrokePainter extends CustomPainter {
       // This removes font-metric offsets: the dark line now overlays it exactly.
       final guidePaint = Paint()
         ..color = const Color(0xFFD9D2CB)
-        ..strokeWidth = 7
+        ..strokeWidth = 4.5
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
         ..style = PaintingStyle.stroke;
@@ -900,7 +916,7 @@ class _LocalStrokePainter extends CustomPainter {
     // stroke, not a horizontal colour reveal over the font glyph.
     final completedPaint = Paint()
       ..color = const Color(0xFF924E19)
-      ..strokeWidth = 7
+      ..strokeWidth = 4.5
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;
@@ -1092,7 +1108,7 @@ class _StrokeDetailSheetState extends State<_StrokeDetailSheet>
             widget.char,
             style: const TextStyle(
               fontSize: 27,
-              fontFamily: 'PayapLanna',
+              fontFamily: 'LNTilok',
               color: Color(0xFF924E19),
               fontWeight: FontWeight.bold,
             ),

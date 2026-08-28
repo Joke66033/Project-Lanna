@@ -3,6 +3,10 @@
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING & ~E_DEPRECATED);
 ini_set('display_errors', '0');
 
+// Start output buffering to catch any accidental output (PHP errors, BOM, whitespace)
+// before JSON headers are sent. The buffer is cleaned in setCorsHeaders().
+ob_start();
+
 // ===== PHP 8.0+ Polyfills for PHP 7.x Compatibility =====
 if (!function_exists('str_contains')) {
     function str_contains(string $haystack, string $needle): bool {
@@ -99,6 +103,10 @@ function getPrimaryKeyField(string $table): string {
 
 // ===== CORS Headers =====
 function setCorsHeaders(): void {
+    // Clean any accidental output (PHP warnings, whitespace, BOM) before headers
+    if (ob_get_level() > 0) {
+        ob_clean();
+    }
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
     header("Access-Control-Allow-Origin: $origin");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");

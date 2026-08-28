@@ -49,9 +49,9 @@ class LannaGlyphCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 44,
                     height: 1.15,
-                    fontFamily: 'PayapLanna',
+                    fontFamily: 'LNTilok',
                     fontFamilyFallback: [
-                      'PayapLanna',
+                      'LNTilok',
                       'THSarabunNew',
                       'sans-serif',
                     ],

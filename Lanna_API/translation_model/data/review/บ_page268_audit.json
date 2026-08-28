@@ -1,0 +1,13 @@
+{
+  "pdf_page": 268,
+  "expected_headwords": 18,
+  "verified_headwords": 18,
+  "expected_entries": 18,
+  "verified_entries": 18,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 268 (หน้าไฟล์ 290) ครบทั้งสองคอลัมน์; ข้อความต้นหน้าเป็นส่วนต่อของ บาก และรวมกลับหน้าก่อนแล้ว; ตรวจแยกเครื่องหมายเสียงของ บาง/บ่าง/บิ้ง"
+}

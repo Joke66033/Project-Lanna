@@ -213,7 +213,8 @@ export default function CategoryLannaChar() {
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
-      alert("Error adding category: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -251,21 +252,23 @@ export default function CategoryLannaChar() {
       const { data: updatedItem, error: resError } = resJson;
       if (resError) throw resError;
 
+      // Track ก่อน fetchData เพื่อให้ sortRecentData เรียงรายการที่แก้ไขขึ้นอันดับ 1
+      const updatedObj = updatedItem || { category_char_id: targetId, id: targetId, name: form.name, learning_category_code: form.learning_category_code };
+      const editCatId = updatedObj?.category_char_id || targetId;
+      trackRecentActivity("category_lanna_char", editCatId);
+
       setShowEdit(false);
       setOriginalForm(null);
       setForm({ name: "", learning_category_code: "" });
       setSuccessText("แก้ไขหมวดหมู่สำเร็จ");
       setShowSuccess(true);
 
-      // Prepend to state
-      const updatedObj = updatedItem || { category_char_id: targetId, id: targetId, name: form.name, learning_category_code: form.learning_category_code };
-      const editCatId = updatedObj?.category_char_id || targetId;
-      trackRecentActivity("category_lanna_char", editCatId);
-      setData((prev) => [updatedObj, ...prev.filter((i) => (i.category_char_id || i.id) !== editCatId)]);
+      // รีเซ็ตหน้าเป็น 1 แล้ว fetch ใหม่พร้อม search/filter ปัจจุบัน
       setCurrentPage(1);
-      fetchData(1);
+      await fetchData(1, search, selectedLearningCategory);
     } catch (err) {
-      alert("Error updating category: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -504,7 +507,7 @@ export default function CategoryLannaChar() {
             {/* SCROLLABLE BODY */}
             <div className="p-6 overflow-y-auto space-y-5 flex-1">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">ชื่อหมวดหมู่อักขระ *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">ชื่อหมวดหมู่อักขระ <span className="text-red-500">*</span></label>
                 <input
                   placeholder="ชื่อหมวดหมู่อักขระ"
                   value={form.name}

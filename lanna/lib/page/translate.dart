@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../services/lanna_transliterator.dart';
+import '../services/lanna_rules_data.dart';
 import '../services/favorite_store.dart';
 import '../services/api_service.dart';
 import '../services/vocabulary_service.dart';
@@ -165,16 +166,33 @@ class _TranslatePageState extends State<TranslatePage> {
     final hasLannaChar = RegExp(r'[\u1A20-\u1AAF]').hasMatch(normalizedInput);
     final hasThaiChar = RegExp(r'[\u0E00-\u0E7F]').hasMatch(normalizedInput);
 
+    // 0. ตรวจสอบจากฐานข้อมูลกฎอักขรวิธีและชื่อบ้านนามเมืองล้านนา (LannaRulesData) เป็นอันดับแรก
+    if (_thaiToLanna &&
+        (LannaRulesData.irregularSpellingMap.containsKey(input) ||
+            LannaRulesData.commonWordDefinitions.containsKey(input))) {
+      final lannaWord = LannaRulesData.irregularSpellingMap[input] ??
+          _conv.thaiToLanna(input);
+      matchedItem = LannaDictItem(
+        category: 'ชื่อบ้าน-นามเมือง / คำเฉพาะ',
+        lanna: lannaWord,
+        reading: LannaRulesData.commonWordReadings[input] ?? '[$input]',
+        thaiSound: input,
+        meaning: LannaRulesData.commonWordDefinitions[input] ?? '',
+      );
+    }
+
     // 1. ค้นหาคำตรงในพจนานุกรม
-    for (var item in _dictItems) {
-      final primaryCandidate = _thaiToLanna ? item.thaiSound : item.lanna;
-      final secondaryCandidate = _thaiToLanna ? item.lanna : item.thaiSound;
-      if (primaryCandidate.trim().toLowerCase() == normalizedInput) {
-        matchedItem = item;
-        break;
-      } else if (secondaryCandidate.trim().toLowerCase() == normalizedInput) {
-        matchedItem = item;
-        break;
+    if (matchedItem == null) {
+      for (var item in _dictItems) {
+        final primaryCandidate = _thaiToLanna ? item.thaiSound : item.lanna;
+        final secondaryCandidate = _thaiToLanna ? item.lanna : item.thaiSound;
+        if (primaryCandidate.trim().toLowerCase() == normalizedInput) {
+          matchedItem = item;
+          break;
+        } else if (secondaryCandidate.trim().toLowerCase() == normalizedInput) {
+          matchedItem = item;
+          break;
+        }
       }
     }
 
@@ -659,26 +677,19 @@ class _TranslatePageState extends State<TranslatePage> {
                   controller: _inputCtrl,
                   maxLines: null,
                   minLines: 1,
-                  style: TextStyle(
-                    fontSize: _thaiToLanna ? 16 : 22,
-                    height: _thaiToLanna ? 1.4 : 1.6,
-                    color: const Color(0xFF2D1A00),
-                    fontFamily: _thaiToLanna ? null : 'PayapLanna',
-                    fontFamilyFallback: _thaiToLanna
-                        ? null
-                        : const ['PayapLanna', 'PayapLanna'],
+                  style: const TextStyle(
+                    fontSize: 16,
+                    height: 1.4,
+                    color: Color(0xFF2D1A00),
+                    fontFamilyFallback: ['LNTilok'],
                   ),
                   decoration: InputDecoration(
                     hintText: _thaiToLanna
                         ? 'พิมพ์ข้อความภาษาไทยที่นี่...'
                         : 'พิมพ์ข้อความภาษาไทย หรือ อักขระล้านนา...',
                     hintStyle: TextStyle(
-                      fontSize: _thaiToLanna ? 14 : 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      fontFamily: _thaiToLanna ? null : 'PayapLanna',
-                      fontFamilyFallback: _thaiToLanna
-                          ? null
-                          : const ['PayapLanna', 'PayapLanna'],
                       color: const Color(0xFF7A5C3A).withValues(alpha: 0.5),
                     ),
                     border: InputBorder.none,
@@ -804,12 +815,19 @@ class _TranslatePageState extends State<TranslatePage> {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      dictItem?.lanna ?? _resultText,
+                      _thaiToLanna
+                          ? _conv.toTilokFontString(
+                              _inputCtrl.text.trim().isNotEmpty
+                                  ? _inputCtrl.text.trim()
+                                  : (dictItem?.lanna ?? _resultText),
+                            )
+                          : (dictItem?.thaiSound ?? _resultText),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 46,
                         height: 1.35,
-                        fontFamily: 'PayapLanna',
+                        fontFamily: 'LNTilok',
+                        fontFamilyFallback: ['LN TILOK', 'PayapLanna'],
                         color: Color(0xFFE16905),
                       ),
                     ),
@@ -843,9 +861,17 @@ class _TranslatePageState extends State<TranslatePage> {
             SizedBox(
               width: double.infinity,
               child: Text(
-                dictItem == null || dictItem.reading.isEmpty
-                    ? _inputCtrl.text.trim()
-                    : dictItem.reading,
+                LannaRulesData.commonWordReadings[_inputCtrl.text.trim()] ??
+                    (dictItem != null &&
+                            LannaRulesData.commonWordReadings.containsKey(
+                              dictItem.thaiSound.trim(),
+                            )
+                        ? LannaRulesData.commonWordReadings[dictItem.thaiSound.trim()]!
+                        : (dictItem == null || dictItem.reading.isEmpty
+                            ? '[${_inputCtrl.text.trim()}]'
+                            : (dictItem.reading.startsWith('[')
+                                ? dictItem.reading
+                                : '[${dictItem.reading}]'))),
                 textAlign: TextAlign.center,
                 softWrap: true,
                 style: const TextStyle(
@@ -880,9 +906,15 @@ class _TranslatePageState extends State<TranslatePage> {
             SizedBox(
               width: double.infinity,
               child: Text(
-                dictItem == null || dictItem.meaning.isEmpty
-                    ? 'ไม่พบความหมายในพจนานุกรม'
-                    : dictItem.meaning,
+                LannaRulesData.commonWordDefinitions[_inputCtrl.text.trim()] ??
+                    (dictItem != null &&
+                            LannaRulesData.commonWordDefinitions.containsKey(
+                              dictItem.thaiSound.trim(),
+                            )
+                        ? LannaRulesData.commonWordDefinitions[dictItem.thaiSound.trim()]!
+                        : (dictItem == null || dictItem.meaning.isEmpty
+                            ? 'ผลถอดอักษรอัตโนมัติ โปรดตรวจสอบ'
+                            : dictItem.meaning)),
                 textAlign: TextAlign.center,
                 softWrap: true,
                 style: const TextStyle(

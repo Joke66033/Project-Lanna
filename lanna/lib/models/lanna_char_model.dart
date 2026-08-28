@@ -5,7 +5,7 @@ class LannaCharModel {
   final String categoryCharId;
   final String? categoryName; // Optional joined category name from endpoints
 
-  LannaCharModel({
+  const LannaCharModel({
     this.lannaCharId,
     required this.lannaChar,
     required this.thaiEquivalent,

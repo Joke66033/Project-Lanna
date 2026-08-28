@@ -1,0 +1,13 @@
+{
+  "pdf_page": 217,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดจากภาพหน้าพิมพ์ 217 (หน้าไฟล์ 239) ครบทั้งสองคอลัมน์ ตั้งแต่ ทั่งแทง ถึง ทัสสะ"
+}

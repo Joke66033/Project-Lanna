@@ -11,7 +11,13 @@ class ArticleService {
     }
     final data = await ApiService.get(url);
     if (data == null) return [];
-    return (data as List).map((x) => ArticleModel.fromJson(x)).toList();
+    final list = (data as List).map((x) => ArticleModel.fromJson(x)).toList();
+
+    if (categoryCharId != null && categoryCharId.trim().isNotEmpty) {
+      final targetIds = categoryCharId.split(',').map((s) => s.trim().toUpperCase()).toSet();
+      return list.where((a) => a.categoryCharId != null && targetIds.contains(a.categoryCharId!.trim().toUpperCase())).toList();
+    }
+    return list;
   }
 
   /// Get article by ID

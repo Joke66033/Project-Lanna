@@ -47,10 +47,25 @@ class LearningCategoryService {
       final String url = '${ApiConfig.learningCategory}?action=getAll&only_active=true';
       final data = await ApiService.get(url);
       if (data != null && data is List && data.isNotEmpty) {
-        final categories = data
-            .map((x) => CategoryModel.fromJson(x))
-            .where((c) => c.isActive)
-            .toList();
+        final categories = data.map((x) {
+          var model = CategoryModel.fromJson(x);
+          if (model.totalItems <= 0) {
+            final fallback = defaultCategories.firstWhere(
+              (d) => d.categoryCode == model.categoryCode,
+              orElse: () => model,
+            );
+            if (fallback.totalItems > 0) {
+              model = CategoryModel(
+                categoryCode: model.categoryCode,
+                title: model.title,
+                description: model.description,
+                isActive: model.isActive,
+                totalItems: fallback.totalItems,
+              );
+            }
+          }
+          return model;
+        }).where((c) => c.isActive).toList();
         if (categories.isNotEmpty) {
           return categories;
         }

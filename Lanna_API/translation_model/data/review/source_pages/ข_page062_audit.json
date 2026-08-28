@@ -1,0 +1,13 @@
+{
+  "pdf_page": 62,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 22,
+  "verified_entries": 22,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอด 22 รายการพจนานุกรมจากภาพหน้า 62 เป็นหัวคำค้น 21 รูป โดยรวม ขะแนง สองชนิดคำและสองความหมายไว้ในระเบียนเดียว"
+}

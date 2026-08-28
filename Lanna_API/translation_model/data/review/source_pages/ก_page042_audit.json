@@ -1,0 +1,13 @@
+{
+  "pdf_page": 42,
+  "expected_headwords": 26,
+  "verified_headwords": 26,
+  "expected_entries": 26,
+  "verified_entries": 26,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจหัวคำ 26 รายการจากภาพต้นฉบับหน้า 42 รวมคำหลายความหมาย กำ และ กำเบ้อ"
+}

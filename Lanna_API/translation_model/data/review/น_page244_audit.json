@@ -1,0 +1,13 @@
+{
+  "pdf_page": 244,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 244 (หน้าไฟล์ 266) ครบทั้งสองคอลัมน์; แยก นำ/น่ำ/น้ำ และเก็บหัวคำอ้างข้าม น้ำคู เป็นระเบียนเฉพาะ"
+}

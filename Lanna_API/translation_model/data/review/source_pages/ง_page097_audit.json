@@ -1,0 +1,13 @@
+{
+  "pdf_page": 97,
+  "expected_headwords": 26,
+  "verified_headwords": 26,
+  "expected_entries": 26,
+  "verified_entries": 26,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจตัวอักษรกับหัวคำ 26 รายการจากภาพหน้า 97 รวมเครื่องหมายคำซ้ำล้านนาและแก้ SAKOT ซ้ำ"
+}

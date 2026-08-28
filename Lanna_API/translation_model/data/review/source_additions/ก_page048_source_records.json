@@ -1,0 +1,216 @@
+[
+  {
+    "thai": "เกลือก",
+    "lanna": "ᩮᨠᩨᩋ᩠ᨠ",
+    "pronunciation": "[เกื๋อก]",
+    "meaning": "ก. คลุกเคล้า, กลิ้งหรือเสือกตัวไปมา; เกือก ก็ว่า",
+    "initial": "ก",
+    "category": "การกระทำ",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกลื่อน",
+    "lanna": "ᩮᨠᩨ᩠᩵ᨶ",
+    "pronunciation": "[เกื๋อน]",
+    "meaning": "1. ก. พังลง, ทลายลงอย่างภูเขาทลาย 2. ว. เรี่ยราย, กระจายอยู่; เกื่อน ก็ว่า",
+    "initial": "ก",
+    "category": "ลักษณะและอาการ",
+    "pdf_page": 48,
+    "senses": [
+      {"sense_no": 1, "part_of_speech": "ก.", "pronunciation": "[เกื๋อน]", "meaning": "พังลง, ทลายลงอย่างภูเขาทลาย", "category": "การกระทำ", "source_page": 48},
+      {"sense_no": 2, "part_of_speech": "ว.", "pronunciation": "[เกื๋อน]", "meaning": "เรี่ยราย, กระจายอยู่; เกื่อน ก็ว่า", "category": "ลักษณะและอาการ", "source_page": 48}
+    ]
+  },
+  {
+    "thai": "เกวน",
+    "lanna": "ᩮᨠ᩠ᩅ᩠ᨶ",
+    "pronunciation": "[เกว๋น]",
+    "meaning": "น. ต้นตะขบบป่า - ต้นมีหนาม ผลกลม เมื่อสุกสีม่วงแดงหรือแดงเข้ม มีรสหวาน รากใช้ทำยาได้",
+    "initial": "ก",
+    "category": "พืชและเกษตร",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกวียน",
+    "lanna": "ᩮᨠ᩠ᩅ᩠ᨿ᩠ᨶ",
+    "pronunciation": "[เกวี๋ยน]",
+    "meaning": "น. เกวียน - ยานบรรทุกชนิดหนึ่ง มี ๒ ล้อ ใช้วัวหรือควายเทียม; เกียน ก็ว่า",
+    "initial": "ก",
+    "category": "สิ่งของและเครื่องมือ",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกสสนา",
+    "lanna": "ᩮᨠᩢ᩠ᨯᩈᩡᩉ᩠ᨶᩣ",
+    "pronunciation": "[เก็ด - สะ - หนา]",
+    "meaning": "น. ไม้กฤษณา - เนื้อไม้สีดำกลิ่นหอม ใช้ทำยาได้",
+    "initial": "ก",
+    "category": "พืชและเกษตร",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกาะ",
+    "lanna": "ᩮᨠᩣᩡ",
+    "pronunciation": "[เก๊าะ]",
+    "meaning": "1. น. เกาะ 2. ก. จับหรือยึดสิ่งใดไว้เพื่อทรงอยู่",
+    "initial": "ก",
+    "category": "คำศัพท์ทั่วไป",
+    "pdf_page": 48,
+    "senses": [
+      {"sense_no": 1, "part_of_speech": "น.", "pronunciation": "[เก๊าะ]", "meaning": "เกาะ", "category": "ธรรมชาติและสิ่งแวดล้อม", "source_page": 48},
+      {"sense_no": 2, "part_of_speech": "ก.", "pronunciation": "[เก๊าะ]", "meaning": "จับหรือยึดสิ่งใดไว้เพื่อทรงอยู่", "category": "การกระทำ", "source_page": 48}
+    ]
+  },
+  {
+    "thai": "เกาะกุมลุมลา",
+    "lanna": "ᩮᨠᩣᩡᨠᩩ᩠ᨾᩃᩩ᩠ᨾᩃᩣ",
+    "pronunciation": "[เก๊าะ - กุ่ม - ลุม - ลา]",
+    "meaning": "ก. รวมกันเป็นกลุ่มเป็นพวก",
+    "initial": "ก",
+    "category": "การกระทำ",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกาะค้อง",
+    "lanna": "ᩮᨠᩣᩡᨣ᩠ᩋ᩶ᨦ",
+    "pronunciation": "[เก๊าะ - ก๊อง]",
+    "meaning": "ก. ขี่หลังใช้มือโอบคอคร่อมหลัง; เก๊าะก๊อง ก็ว่า",
+    "initial": "ก",
+    "category": "การกระทำ",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิ่ง",
+    "lanna": "ᩮᨠᩥ᩠᩵ᨦ",
+    "pronunciation": "[เกิ่ง]",
+    "meaning": "ว. ครึ่ง, กึ่ง, กลาง",
+    "initial": "ก",
+    "category": "เวลาและจำนวน",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิ่งเก้ย",
+    "lanna": "ᩮᨠᩥ᩠᩵ᨦᩮᨠᩥ᩠᩶ᨿ",
+    "pronunciation": "[เกิ่ง - เก้ย]",
+    "meaning": "น. พระจันทร์",
+    "initial": "ก",
+    "category": "ธรรมชาติและสิ่งแวดล้อม",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิ่งฟ้าหล้าตอน",
+    "lanna": "ᩮᨠᩥ᩠᩵ᨦᨼ᩶ᩣᩉ᩠ᩃ᩶ᩣᨲ᩠ᩋ᩠ᨶ",
+    "pronunciation": "[เกิ่ง - ฟ้า - หล้า - ตอน]",
+    "meaning": "สำนวน. จวนเที่ยง, จวนจะบ่าย",
+    "initial": "ก",
+    "category": "เวลาและจำนวน",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิ่งๆ กลางๆ",
+    "lanna": "ᩮᨠᩥ᩠᩵ᨦᪧ ᨠᩖᩣ᩠ᨦᪧ",
+    "pronunciation": "[เกิ่ง - เกิ่ง - ก๋าง - ก๋าง]",
+    "meaning": "ว. ครึ่ง ๆ กลาง ๆ; เกิ่งก้างฮางมะ ก็ว่า",
+    "initial": "ก",
+    "category": "ลักษณะและอาการ",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิ้ง",
+    "lanna": "ᩮᨠᩥ᩠᩶ᨦ",
+    "pronunciation": "[เกิ้ง]",
+    "meaning": "1. น. บังสูรย์, สัปทน, ฉัตร 2. ก. กั้น, บัง, มุง, ปก, ปิด",
+    "initial": "ก",
+    "category": "คำศัพท์ทั่วไป",
+    "pdf_page": 48,
+    "senses": [
+      {"sense_no": 1, "part_of_speech": "น.", "pronunciation": "[เกิ้ง]", "meaning": "บังสูรย์, สัปทน, ฉัตร", "category": "สิ่งของและเครื่องมือ", "source_page": 48},
+      {"sense_no": 2, "part_of_speech": "ก.", "pronunciation": "[เกิ้ง]", "meaning": "กั้น, บัง, มุง, ปก, ปิด", "category": "การกระทำ", "source_page": 48}
+    ]
+  },
+  {
+    "thai": "เกิ้งเด้ง",
+    "lanna": "ᩮᨠᩥ᩠᩶ᨦᩮᨯ᩠᩶ᨦ",
+    "pronunciation": "[เกิ้ง - เด้ง]",
+    "meaning": "ว. ผอมสูง",
+    "initial": "ก",
+    "category": "ลักษณะและอาการ",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิด",
+    "lanna": "ᩮᨠᩥ᩠ᨯ",
+    "pronunciation": "[เกิด]",
+    "meaning": "ก. คลอด, มีขึ้น, เป็นขึ้น",
+    "initial": "ก",
+    "category": "การกระทำ",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิ๊ด",
+    "lanna": "ᩮᨠᩥ᩠᩶ᨯ",
+    "pronunciation": "[เกิ๊ด]",
+    "meaning": "ก. สกัดกั้น, ขวาง, ไม่ปล่อย, ดัก",
+    "initial": "ก",
+    "category": "การกระทำ",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิ๊ดเกิ้ง",
+    "lanna": "ᩮᨠᩥ᩠᩶ᨯᩮᨠᩥ᩠᩶ᨦ",
+    "pronunciation": "[เกิ๊ด - เกิ้ง]",
+    "meaning": "ก. ขัดขวาง, กีดกัน, กันท่า",
+    "initial": "ก",
+    "category": "การกระทำ",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิน",
+    "lanna": "ᩮᨠᩥ᩠ᨶ",
+    "pronunciation": "[เกิ๋น]",
+    "meaning": "1. น. พะอง - บันไดขนาดแคบและยาวที่มักยกย้ายไปเพื่อปีนขึ้นที่สูง 2. ว. พ้น, เลย, มากกว่าที่ประสงค์",
+    "initial": "ก",
+    "category": "คำศัพท์ทั่วไป",
+    "pdf_page": 48,
+    "senses": [
+      {"sense_no": 1, "part_of_speech": "น.", "pronunciation": "[เกิ๋น]", "meaning": "พะอง - บันไดขนาดแคบและยาวที่มักยกย้ายไปเพื่อปีนขึ้นที่สูง", "category": "สิ่งของและเครื่องมือ", "source_page": 48},
+      {"sense_no": 2, "part_of_speech": "ว.", "pronunciation": "[เกิ๋น]", "meaning": "พ้น, เลย, มากกว่าที่ประสงค์", "category": "ลักษณะและอาการ", "source_page": 48}
+    ]
+  },
+  {
+    "thai": "เกินเหลือ",
+    "lanna": "ᩮᨠᩥ᩠ᨶᩮᩉ᩠ᩃᩨᩋ",
+    "pronunciation": "[เกิ๋น - เหลือ]",
+    "meaning": "ก. ล่วงเกิน, ละลาบละล้วง",
+    "initial": "ก",
+    "category": "การกระทำ",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิบ",
+    "lanna": "ᩮᨠᩥ᩠ᨷ",
+    "pronunciation": "[เกิบ]",
+    "meaning": "น. เกือก, รองเท้า",
+    "initial": "ก",
+    "category": "เครื่องแต่งกาย",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิบตีน",
+    "lanna": "ᩮᨠᩥ᩠ᨷᨲᩦ᩠ᨶ",
+    "pronunciation": "[เกิบ - ตีน]",
+    "meaning": "น. เกือก, รองเท้า",
+    "initial": "ก",
+    "category": "เครื่องแต่งกาย",
+    "pdf_page": 48
+  },
+  {
+    "thai": "เกิ้ม",
+    "lanna": "ᩮᨠᩥ᩠᩶ᨾ",
+    "pronunciation": "[เกิ้ม]",
+    "meaning": "ว. ห่าม, ใกล้สุก เรียกมะขามที่ใกล้สุกว่า มะขามเกิ้ม",
+    "initial": "ก",
+    "category": "ลักษณะและอาการ",
+    "pdf_page": 48
+  }
+]

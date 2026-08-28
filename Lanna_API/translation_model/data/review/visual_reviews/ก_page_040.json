@@ -1,0 +1,11 @@
+[
+  {"thai":"กาดผี","lanna":"ᨠᩣ᩠ᨯᨹᩦ","pdf_page":40,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรงกับรายการ กาดผี หน้า 40 คอลัมน์ซ้าย"},
+  {"thai":"กาดลี","lanna":"ᨠᩣ᩠ᨯᩃᩦ","pdf_page":40,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรงกับรายการ กาดลี หน้า 40 คอลัมน์ซ้าย"},
+  {"thai":"กาดเช้า","lanna":"ᨠᩣ᩠ᨯᩮᨩᩢ᩶ᩣ","pdf_page":40,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรงกับรายการ กาดเช้า หน้า 40 คอลัมน์ซ้าย"},
+  {"thai":"กาดแลง","lanna":"ᨠᩣ᩠ᨯᩯᩃ᩠ᨦ","pdf_page":40,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรงกับรายการ กาดแลง หน้า 40 คอลัมน์ซ้าย"},
+  {"thai":"ก่าน","lanna":"ᨠ᩵ᩣ᩠ᨶ","pdf_page":40,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรงกับรายการ ก่าน หน้า 40 คอลัมน์ขวา"},
+  {"thai":"ก้าน","lanna":"ᨠ᩶ᩣ᩠ᨶ","pdf_page":40,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรงกับรายการ ก้าน หน้า 40 คอลัมน์ขวา"},
+  {"thai":"ก้านฝ้า","lanna":"ᨠ᩶ᩣ᩠ᨶᨺ᩶ᩣ","pdf_page":40,"decision":"source_image_verified","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"ตรงกับรายการ ก้านฝ้า หน้า 40 คอลัมน์ขวา"},
+  {"thai":"ก่านปล้อง","lanna":"ᨠ᩵ᩣ᩠ᨶ","pdf_page":40,"decision":"rejected","checked_fields":["thai","lanna_glyph_shape"],"note":"เป้าหมายขาดส่วนคำว่า ปล้อง ไม่ตรงรูปเต็มในพจนานุกรม"},
+  {"thai":"ก้านค้าว","lanna":"ᨠ᩶ᩣ᩠ᨶ᩠ᨣ᩶ᩣ᩠ᩅ","pdf_page":40,"decision":"rejected","checked_fields":["thai","lanna_glyph_shape"],"note":"มี SAKOT เกินหน้าพยัญชนะต้นพยางค์ ค้าว ไม่ตรงรูปในภาพ"}
+]

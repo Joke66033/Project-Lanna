@@ -10,7 +10,8 @@ class VocabularyService {
     final data = await ApiService.get(
       '${ApiConfig.vocabulary}?action=translate&keyword=$keyword',
     );
-    return Map<String, dynamic>.from(data as Map);
+    if (data == null || data is! Map) return {};
+    return Map<String, dynamic>.from(data);
   }
 
   /// Get all vocabulary items

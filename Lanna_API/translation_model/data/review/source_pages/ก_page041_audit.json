@@ -1,0 +1,13 @@
+{
+  "pdf_page": 41,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำใหม่ 20 รายการจากภาพหน้า 41; ไม่นับข้อความต่อเนื่องของ กาบ ซึ่งบันทึกเป็นความหมายที่ 2–3 ในระเบียนหน้า 40 แล้ว"
+}

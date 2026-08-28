@@ -12,7 +12,13 @@ class LannaCharService {
     }
     final data = await ApiService.get(url);
     if (data == null) return [];
-    return (data as List).map((x) => LannaCharModel.fromJson(x)).toList();
+    final list = (data as List).map((x) => LannaCharModel.fromJson(x)).toList();
+
+    if (categoryCharId != null && categoryCharId.trim().isNotEmpty) {
+      final targetIds = categoryCharId.split(',').map((s) => s.trim().toUpperCase()).toSet();
+      return list.where((c) => targetIds.contains(c.categoryCharId.trim().toUpperCase())).toList();
+    }
+    return list;
   }
 
   /// Get character by ID
@@ -54,7 +60,38 @@ class LannaCharService {
     final String url = '${ApiConfig.categoryLannaChar}?action=getAll&learning_category_code=$learningCategoryCode';
     final data = await ApiService.get(url);
     if (data == null) return [];
-    return (data as List).map((x) => CategoryCharModel.fromJson(x)).toList();
+    final allCats = (data as List).map((x) => CategoryCharModel.fromJson(x)).toList();
+
+    return allCats.where((cat) {
+      if (cat.learningCategoryCode != null && cat.learningCategoryCode!.trim().isNotEmpty) {
+        return cat.learningCategoryCode!.trim().toUpperCase() == learningCategoryCode.trim().toUpperCase();
+      }
+      final mappedCode = _mapCategoryCharIdToLearningCode(cat.categoryCharId, cat.name);
+      if (mappedCode != null) {
+        return mappedCode == learningCategoryCode.trim().toUpperCase();
+      }
+      return false;
+    }).toList();
+  }
+
+  static String? _mapCategoryCharIdToLearningCode(String categoryCharId, String name) {
+    final id = categoryCharId.trim().toUpperCase();
+    if (id == 'CL0001' || id == 'CL0002' || id == 'CL0003' || name.contains('พยัญชนะ')) {
+      return 'LC001';
+    }
+    if (id == 'CL0004' || id == 'CL0005' || name.contains('สระ')) {
+      return 'LC002';
+    }
+    if (id == 'CL0006' || name.contains('วรรณยุกต์')) {
+      return 'LC003';
+    }
+    if (id == 'CL0007' || name.contains('เลข')) {
+      return 'LC004';
+    }
+    if (id == 'CL0008' || id == 'CL0009' || id == 'CL0010' || name.contains('ตัวสะกด') || name.contains('ห นำ') || name.contains('ระวง')) {
+      return 'LC005';
+    }
+    return null;
   }
 
   /// Get character category by ID

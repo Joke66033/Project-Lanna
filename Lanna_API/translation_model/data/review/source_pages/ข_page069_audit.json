@@ -1,0 +1,13 @@
+{
+  "pdf_page": 69,
+  "expected_headwords": 2,
+  "verified_headwords": 2,
+  "expected_entries": 2,
+  "verified_entries": 2,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 2 รายการสุดท้ายของหมวด ข จากภาพหน้า 69; หน้าถัดไปเริ่มพยัญชนะ ฃ จึงถือว่าขอบเขตหมวด ข สิ้นสุดที่หน้านี้"
+}

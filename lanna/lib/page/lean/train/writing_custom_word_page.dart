@@ -235,7 +235,7 @@ class _WritingCustomWordPageState extends State<WritingCustomWordPage> {
                         textAlign: TextAlign.center,
                         softWrap: true,
                         style: const TextStyle(
-                          fontFamily: 'PayapLanna',
+                          fontFamily: 'LNTilok',
                           fontSize: 22,
                           color: _kPrimary,
                           fontWeight: FontWeight.bold,
@@ -299,7 +299,7 @@ class _WritingCustomWordPageState extends State<WritingCustomWordPage> {
                             key: _canvasKey,
                             guideChar: _lannaWord,
                             character: _lannaWord,
-                            fontFamily: 'PayapLanna',
+                            fontFamily: 'LNTilok',
                             showStrokeOrder: false,
                             showTracingGuide: true,
                             tracingText: _lannaWord,

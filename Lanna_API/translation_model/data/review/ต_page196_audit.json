@@ -1,0 +1,13 @@
+{
+  "pdf_page": 196,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 196 (หน้าไฟล์ 218) หมวด ต ช่วง เตมแต่–เตาะ และตรวจหน้าพิมพ์ 197 ว่าเริ่มหัวคำใหม่ เตาะแตะ"
+}

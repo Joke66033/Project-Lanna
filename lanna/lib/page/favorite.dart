@@ -426,7 +426,7 @@ class _FavoriteCardState extends State<FavoriteCard> {
                             style: const TextStyle(
                               fontSize: 10,
                               color: Color(0xFF924E19),
-                              fontFamily: 'PayapLanna',
+                              fontFamily: 'LNTilok',
                               height: 1.2,
                             ),
                           ),

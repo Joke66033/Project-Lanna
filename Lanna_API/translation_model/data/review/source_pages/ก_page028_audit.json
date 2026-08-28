@@ -1,0 +1,13 @@
+{
+  "pdf_page": 28,
+  "expected_headwords": 16,
+  "verified_headwords": 16,
+  "expected_entries": 16,
+  "verified_entries": 16,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 16 รายการจากภาพหน้า 28; หัวคำกล่องเข้าหลวงอยู่หน้า 28 และนิยามสองความหมายต่อเนื่องไปหน้า 29"
+}

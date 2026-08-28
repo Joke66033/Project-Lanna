@@ -1,0 +1,13 @@
+{
+  "pdf_page": 82,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 19 รายการจากภาพหน้า 82 และบันทึกข้อความต่อของ คาถามหาสันติ่งหลวง จากหน้า 81"
+}

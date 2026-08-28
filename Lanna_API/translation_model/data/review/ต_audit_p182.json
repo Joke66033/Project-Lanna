@@ -1,0 +1,13 @@
+{
+  "pdf_page": 182,
+  "expected_headwords": 25,
+  "verified_headwords": 25,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 182 (หน้าไฟล์ 204) หมวด ต ช่วง ตั๊ก–ตันผิง"
+}

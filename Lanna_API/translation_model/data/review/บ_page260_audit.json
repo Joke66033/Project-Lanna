@@ -1,0 +1,13 @@
+{
+  "pdf_page": 260,
+  "expected_headwords": 13,
+  "verified_headwords": 13,
+  "expected_entries": 13,
+  "verified_entries": 13,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 260 (หน้าไฟล์ 282) ครบทั้งสองคอลัมน์; ข้อความก่อนหัวคำแรกเป็นส่วนต่อของบอกไฟขึ้นจากหน้าก่อน จึงไม่นับซ้ำ"
+}

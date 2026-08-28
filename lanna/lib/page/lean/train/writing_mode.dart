@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:lanna/services/auth_provider.dart';
 import 'package:lanna/services/lanna_char_service.dart';
 import 'glyph_layout.dart';
 import 'writing_data.dart';
@@ -45,6 +47,78 @@ class _WritingModePageState extends State<WritingModePage> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    if (!auth.isLoggedIn) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFFFFBF7),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFFFFBF7),
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFF2C1A04)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          centerTitle: true,
+          title: Text(
+            widget.title,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2C1A04),
+            ),
+          ),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.lock_outline_rounded, size: 64, color: Color(0xFF924E19)),
+                const SizedBox(height: 16),
+                const Text(
+                  'กรุณาเข้าสู่ระบบก่อนใช้งานโหมดฝึกเขียน',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C1A04),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'เข้าสู่ระบบเพื่อฝึกเขียนและบันทึกความก้าวหน้าของคุณ',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF7A5C3A),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context, rootNavigator: true).pushNamed('/login');
+                  },
+                  icon: const Icon(Icons.login_rounded, color: Colors.white),
+                  label: const Text(
+                    'เข้าสู่ระบบ',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF924E19),
+                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final item = widget.items[_index];
 
     return Scaffold(
@@ -125,7 +199,7 @@ class _WritingModePageState extends State<WritingModePage> {
                               duration: const Duration(milliseconds: 250),
                               child: CenteredWritingGlyph(
                                 character: widget.items[i].char,
-                                fontFamily: 'PayapLanna',
+                                fontFamily: 'LNTilok',
                                 color: active
                                     ? const Color(0xFF924E19)
                                     : const Color(0xFFB99B83),
@@ -161,8 +235,8 @@ class _WritingModePageState extends State<WritingModePage> {
                         text: item.char,
                         style: const TextStyle(
                           fontSize: 18,
-                          fontFamily: 'PayapLanna',
-                          fontFamilyFallback: ['PayapLanna', 'PayapLanna'],
+                          fontFamily: 'LNTilok',
+                          fontFamilyFallback: ['LNTilok', 'LNTilok'],
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF924E19),
                         ),
@@ -245,7 +319,7 @@ class _WritingModePageState extends State<WritingModePage> {
                       key: _canvasKey,
                       guideChar: item.char,
                       character: item.char,
-                      fontFamily: 'PayapLanna',
+                      fontFamily: 'LNTilok',
                       maxGlyphExtent: item.type == WritingType.consonant
                           ? 280
                           : item.type == WritingType.number

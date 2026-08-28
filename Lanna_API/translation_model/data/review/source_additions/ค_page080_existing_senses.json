@@ -1,0 +1,11 @@
+[
+  {
+    "thai": "คัก",
+    "lanna": "ᨣ᩠ᨠᩢ",
+    "note": "ยืนยันหัวคำพ้องรูป คัก จากภาพหน้า 73 และหน้า 80 พร้อมเก็บความหมายแยก sense",
+    "senses": [
+      {"part_of_speech":"ก.","pronunciation":"[กั๊ก]","meaning":"ติดขัด ไม่คล่อง","category":"ลักษณะและอาการ","source_page":80},
+      {"part_of_speech":"ว.","pronunciation":"[กั๊ก]","meaning":"พูดติดอ่าง เรียก ปากคัก","category":"ลักษณะและอาการ","source_page":80}
+    ]
+  }
+]

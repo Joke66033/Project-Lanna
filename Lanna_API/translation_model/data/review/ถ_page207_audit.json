@@ -1,0 +1,13 @@
+{
+  "pdf_page": 207,
+  "expected_headwords": 26,
+  "verified_headwords": 26,
+  "expected_entries": 26,
+  "verified_entries": 26,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดจากภาพหน้าพิมพ์ 207 (หน้าไฟล์ 229); ต้นฉบับมีหัวคำ ถ้า 2 รายการ จึงรวมเป็นระเบียนเดียวในการนำเข้า; ตรวจหน้าพิมพ์ 208 ว่าเริ่มต่อด้วย ถ้านพอ"
+}

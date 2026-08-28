@@ -679,7 +679,7 @@ class _CameraPageState extends State<CameraPage>
             style: TextStyle(
               color: Colors.white,
               fontSize: 19,
-              fontFamily: _resultIsLanna ? 'PayapLanna' : null,
+              fontFamily: _resultIsLanna ? 'LNTilok' : null,
               height: 1.5,
             ),
           ),

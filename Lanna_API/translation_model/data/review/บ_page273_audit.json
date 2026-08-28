@@ -1,0 +1,13 @@
+{
+  "pdf_page": 273,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 273 (หน้าไฟล์ 295) ครบทั้งสองคอลัมน์; รวมหัวคำ เบ้อ สองบรรทัดซึ่งเป็นคำเดียวกันแต่หลายหน้าที่คำเป็นระเบียนเดียว และไม่นับข้อความต่อเนื่องของ แบบ ที่ต้นหน้าเป็นหัวคำใหม่"
+}

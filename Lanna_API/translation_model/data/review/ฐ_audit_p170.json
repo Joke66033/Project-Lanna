@@ -1,0 +1,13 @@
+{
+  "pdf_page": 170,
+  "expected_headwords": 4,
+  "verified_headwords": 4,
+  "expected_entries": 4,
+  "verified_entries": 4,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ อักษรล้านนา คำอ่าน และความหมายจากภาพหน้าพิมพ์ 170 (หน้าไฟล์ 192) หมวด ฐ ครบทั้งหน้า"
+}

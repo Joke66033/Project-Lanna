@@ -1,0 +1,13 @@
+{
+  "pdf_page": 295,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 295 (หน้าไฟล์ 317) ครบทั้งสองคอลัมน์ 20 หัวคำสำนวน เปน"
+}

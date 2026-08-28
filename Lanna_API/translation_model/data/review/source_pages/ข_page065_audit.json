@@ -1,0 +1,13 @@
+{
+  "pdf_page": 65,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดคำค้นหมวด ข จำนวน 24 รูปจากภาพหน้า 65 รวมรูปคำพ้อง ขันสลี/ขันสะหลี และแยกความหมายของ ขั้น"
+}

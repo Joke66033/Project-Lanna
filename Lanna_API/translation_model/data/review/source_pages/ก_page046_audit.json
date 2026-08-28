@@ -1,0 +1,13 @@
+{
+  "pdf_page": 46,
+  "expected_headwords": 22,
+  "verified_headwords": 22,
+  "expected_entries": 22,
+  "verified_entries": 22,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 22 รายการจากภาพทั้งสองคอลัมน์ของหน้า 46 และแยกชนิดคำ/ความหมายย่อยโดยคงจำนวนรายการพิมพ์จริง"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 185,
+  "expected_headwords": 28,
+  "verified_headwords": 28,
+  "expected_entries": 28,
+  "verified_entries": 28,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 185 (หน้าไฟล์ 207) หมวด ต ช่วง ตาปั๊กผ่อ–ตาเหล้อ"
+}

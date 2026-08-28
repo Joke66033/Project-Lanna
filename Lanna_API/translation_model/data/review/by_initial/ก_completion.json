@@ -1,0 +1,28 @@
+{
+  "initial": "ก",
+  "source_id": "lanna_dictionary_drive_672",
+  "source_page_range": [23, 54],
+  "audited_pages": 32,
+  "expected_headwords": 693,
+  "verified_headwords": 693,
+  "expected_entries": 694,
+  "verified_entries": 694,
+  "all_source_pages_complete": true,
+  "next_source_page": 55,
+  "next_initial_confirmed_from_image": "ข",
+  "evidence_rows": 886,
+  "source_image_verified_rows": 715,
+  "verified_alias_rows": 2,
+  "pending_external_rows_not_claimed_as_source_verified": 166,
+  "rejected_rows": 3,
+  "runtime_rows": 717,
+  "database_import_mode": "dry_run_only",
+  "database_dry_run_valid_rows": 886,
+  "database_dry_run_invalid_rows": 0,
+  "test_counts": {
+    "translation_model": 48,
+    "ai_engine": 53,
+    "total": 101
+  },
+  "completion_note": "ตรวจหัวคำหมวด ก จากภาพต้นฉบับทุกหน้าตั้งแต่ PDF หน้า 23 ถึง 54 และยืนยันจากภาพว่า PDF หน้า 55 เริ่มหมวด ข; รายการจากแหล่งภายนอกที่หาไม่พบในภาพยังคงรอตรวจและไม่นับเป็นคำจากพจนานุกรมที่ยืนยันแล้ว"
+}

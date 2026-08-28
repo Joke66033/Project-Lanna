@@ -1,0 +1,26 @@
+[
+  {
+    "thai": "กกดก",
+    "lanna": "ᨠᩫ᩠ᨠᨯᩫ᩠ᨠ",
+    "pdf_page": 23,
+    "decision": "source_image_verified",
+    "checked_fields": ["thai", "lanna_glyph_shape", "pronunciation", "meaning"],
+    "note": "ตรงกับรายการ กกดก ในคอลัมน์ซ้ายของหน้า"
+  },
+  {
+    "thai": "กงธนู",
+    "lanna": "ᨠᩫ᩠ᨦᨵᨶᩪ",
+    "pdf_page": 23,
+    "decision": "source_image_verified",
+    "checked_fields": ["thai", "lanna_glyph_shape", "pronunciation", "meaning"],
+    "note": "ตรงกับรายการ กงธนู ช่วงล่างคอลัมน์ซ้าย"
+  },
+  {
+    "thai": "กงเฮง",
+    "lanna": "ᨠᩫ᩠ᨦᩮᩌ᩠ᨦ",
+    "pdf_page": 23,
+    "decision": "source_image_verified",
+    "checked_fields": ["thai", "lanna_glyph_shape", "pronunciation", "meaning"],
+    "note": "ตรงกับรายการ กงเฮง ในคอลัมน์ขวา"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "thai": "กึ่งดึ่ง",
+    "expected_verified_page": 45,
+    "lanna": "ᨠᩧ᩠᩵ᨦᨯᩧ᩠᩵ᨦ",
+    "pronunciation": "[กึ่ง - ดึ่ง]",
+    "meaning": "ว. ลักษณะของสิ่งใหญ่ที่นอนอยู่หรือถูกทอดทิ้งอยู่ ถ้าจำนวนมากใช้ กึ่งดึ่งกว่างต่าง",
+    "category": "ลักษณะและอาการ",
+    "source_type": "source_dictionary_image",
+    "source_id": "lanna_dictionary_drive_672",
+    "source_page": 45,
+    "reason": "ตรวจภาพหน้า 45 ซ้ำและแก้ source_page ที่เคยไม่สอดคล้องกับ verified_page พร้อมถอดนิยามตามภาพต้นฉบับ"
+  }
+]

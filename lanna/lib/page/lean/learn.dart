@@ -197,24 +197,42 @@ class LearnPageState extends State<LearnPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Navigator(
-      key: learningNavigatorKey,
-      onGenerateRoute: (settings) {
-        return MaterialPageRoute(
-          builder: (context) => Scaffold(
-            backgroundColor: const Color(0xFFFFFBF7),
-            body: SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  if (_currentPage == -1) const AppHeader(title: 'เรียนรู้ภาษาล้านนา'),
-                  Expanded(child: _currentPage == -1 ? _menu() : _lessonContent()),
-                ],
+    return PopScope(
+      canPop: _currentPage == -1 &&
+          (learningNavigatorKey.currentState == null ||
+              !learningNavigatorKey.currentState!.canPop()),
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        final navState = learningNavigatorKey.currentState;
+        if (navState != null && navState.canPop()) {
+          navState.pop();
+          return;
+        }
+        if (_currentPage != -1) {
+          setState(() {
+            _currentPage = -1;
+          });
+        }
+      },
+      child: Navigator(
+        key: learningNavigatorKey,
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (context) => Scaffold(
+              backgroundColor: const Color(0xFFFFFBF7),
+              body: SafeArea(
+                bottom: false,
+                child: Column(
+                  children: [
+                    if (_currentPage == -1) const AppHeader(title: 'เรียนรู้ภาษาล้านนา'),
+                    Expanded(child: _currentPage == -1 ? _menu() : _lessonContent()),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -276,6 +294,32 @@ class LearnPageState extends State<LearnPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            /// ===== Header Before Cards =====
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 16, 20, 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.star_rounded,
+                    color: Color(0xFFD2691E),
+                    size: 22,
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'การเรียนรู้อักขระล้านนาและการฝึกเขียน',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2D1A00),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             /// ===== Grid of Cards (Modern 2-Column Design) =====
             GridView.builder(
               shrinkWrap: true,
@@ -314,13 +358,17 @@ class LearnPageState extends State<LearnPage> {
                     icon = Icons.help_outline;
                   }
 
+                  final count = category.totalItems > 0
+                      ? category.totalItems
+                      : _getDefaultCount(category.categoryCode);
+
                   return _gridItem(
                     index: index,
                     pageIndex: pageIndex,
                     title: category.title,
                     subtitle: category.description,
                     icon: icon,
-                    badgeText: '${category.totalItems} ตัว',
+                    badgeText: count > 0 ? '$count ตัว' : 'บทเรียน',
                     disabled: false,
                     category: category,
                   );
@@ -343,6 +391,22 @@ class LearnPageState extends State<LearnPage> {
     );
   }
 
+  int _getDefaultCount(String code) {
+    switch (code) {
+      case 'LC001':
+        return 45;
+      case 'LC002':
+        return 25;
+      case 'LC003':
+        return 7;
+      case 'LC004':
+        return 20;
+      case 'LC005':
+        return 36;
+      default:
+        return 0;
+    }
+  }
 
   /// ================= CONTENT =================
   Widget _lessonContent() {

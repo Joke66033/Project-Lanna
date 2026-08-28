@@ -1,0 +1,13 @@
+{
+  "pdf_page": 267,
+  "expected_headwords": 17,
+  "verified_headwords": 17,
+  "expected_entries": 17,
+  "verified_entries": 17,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 267 (หน้าไฟล์ 289) ครบทั้งสองคอลัมน์; แยกคำซ้อนอาการ คำโรค ชื่อพืช และหัวคำ บาก ที่เริ่มกลุ่มใหม่"
+}

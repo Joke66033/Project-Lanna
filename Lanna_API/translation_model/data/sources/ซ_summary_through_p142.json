@@ -1,0 +1,34 @@
+{
+  "rows": 25,
+  "verification_statuses": {
+    "source_image_verified": 25
+  },
+  "source_search_statuses": {
+    "source_image_verified": 25
+  },
+  "verified_rows": 25,
+  "verified_alias_rows": 0,
+  "verified_with_reviewed_category": 25,
+  "verified_without_reviewed_category": 0,
+  "reviewed_category_counts": {
+    "การกระทำ": 7,
+    "การกระทำและความสะอาด": 2,
+    "การกระทำและตำแหน่ง": 1,
+    "การกระทำและอารมณ์": 1,
+    "การกระทำและเวลา": 1,
+    "การกระทำและไฟ": 1,
+    "ความคิดและอารมณ์": 2,
+    "ภาษาและอักษร": 1,
+    "รูปร่างและลักษณะ": 1,
+    "ลักษณะและความถี่": 1,
+    "ลักษณะและทิศทาง": 1,
+    "ลักษณะและอารมณ์": 1,
+    "สถาปัตยกรรมและลักษณะ": 1,
+    "สภาพและลักษณะ": 1,
+    "อาหารและการกระทำ": 1,
+    "อาหารและการปรุง": 1,
+    "เสียงและลักษณะ": 1
+  },
+  "false_positive_pdf_pages": 0,
+  "pending_with_page_suggestions": 0
+}

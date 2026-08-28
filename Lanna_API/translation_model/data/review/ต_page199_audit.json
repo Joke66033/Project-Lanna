@@ -1,0 +1,13 @@
+{
+  "pdf_page": 199,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 199 (หน้าไฟล์ 221) หมวด ต ช่วง แต่งแปลง–แทะแหมะ; แยกรูปคำคู่ แตนต่อ, ต่อแตน เป็น 2 ระเบียนค้นหา; ตรวจหน้าพิมพ์ 200 ว่าเริ่มหัวคำใหม่ แทะแหยะ"
+}

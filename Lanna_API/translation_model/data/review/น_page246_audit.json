@@ -1,0 +1,13 @@
+{
+  "pdf_page": 246,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 246 (หน้าไฟล์ 268) ครบทั้งสองคอลัมน์; แยกศัพท์อาหาร แหล่งน้ำ ภาชนะ และอาการตามความหมายต้นฉบับ"
+}

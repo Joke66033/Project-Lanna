@@ -1,0 +1,13 @@
+{
+  "pdf_page": 265,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 265 (หน้าไฟล์ 287) ครบทั้งสองคอลัมน์; แยกชื่อพืชที่เป็นคำใกล้เคียงและคำส่งดูออกเป็นหัวคำตามตัวหนา"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 173,
+  "expected_headwords": 17,
+  "verified_headwords": 17,
+  "expected_entries": 17,
+  "verified_entries": 17,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 173 (หน้าไฟล์ 195) หมวด ต ช่วง ต–ตกธรรม"
+}

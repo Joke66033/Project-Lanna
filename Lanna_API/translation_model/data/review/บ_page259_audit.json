@@ -1,0 +1,13 @@
+{
+  "pdf_page": 259,
+  "expected_headwords": 17,
+  "verified_headwords": 17,
+  "expected_entries": 17,
+  "verified_entries": 17,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 259 (หน้าไฟล์ 281) ครบทั้งสองคอลัมน์; รวมข้อความอธิบายบอกไฟขึ้นที่ต่อเนื่องถึงท้ายหน้าเป็นความหมายเดียว"
+}

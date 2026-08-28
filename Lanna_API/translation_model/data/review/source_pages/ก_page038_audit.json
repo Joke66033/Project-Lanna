@@ -1,0 +1,13 @@
+{
+  "pdf_page": 38,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำใหม่ 19 รายการจากภาพหน้า 38; ต้นหน้ามีคำพ้องของ กัวเกา ต่อจากหน้า 37 และไม่นับเป็นหัวคำใหม่"
+}

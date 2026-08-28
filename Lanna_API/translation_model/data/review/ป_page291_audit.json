@@ -1,0 +1,13 @@
+{
+  "pdf_page": 291,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 291 (หน้าไฟล์ 313) ครบ 25 หน้าที่คำ รวม 24 หัวคำ; เพิ่มความหมายให้หัวคำเดิม ปิด ปึก ปิ้ง และ ปิ้งหลิ้ง"
+}

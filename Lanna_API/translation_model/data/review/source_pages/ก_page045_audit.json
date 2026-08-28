@@ -1,0 +1,13 @@
+{
+  "pdf_page": 45,
+  "expected_headwords": 22,
+  "verified_headwords": 22,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 22 รูปสะกด 23 บทนิยามจากภาพทั้งสองคอลัมน์ของหน้า 45 โดยเก็บหัวคำกีบสอง sense แยกกัน"
+}

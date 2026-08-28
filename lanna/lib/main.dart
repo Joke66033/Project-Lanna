@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:ui' show PointerDeviceKind;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +24,17 @@ import 'package:lanna/page/dictionary.dart';
 
 import 'package:lanna/services/auth_provider.dart';
 
+class AppScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.unknown,
+      };
+}
+
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -31,10 +44,23 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   if (!kIsWeb) {
     HttpOverrides.global = MyHttpOverrides();
   }
+  try {
+    final tilokLoader = FontLoader('LNTilok');
+    tilokLoader.addFont(rootBundle.load('assets/fonts/LN-TILOK-6.10.ttf'));
+    await tilokLoader.load();
+
+    final tilokSpaceLoader = FontLoader('LN TILOK');
+    tilokSpaceLoader.addFont(rootBundle.load('assets/fonts/LN-TILOK-6.10.ttf'));
+    await tilokSpaceLoader.load();
+  } catch (e) {
+    debugPrint('FontLoader LNTilok notice: $e');
+  }
+
   runApp(
     MultiProvider(
       providers: [
@@ -79,6 +105,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'LANNA',
+      scrollBehavior: AppScrollBehavior(),
       builder: (context, child) {
         final mediaQuery = MediaQuery.of(context);
         final currentScale = mediaQuery.textScaler.scale(1);

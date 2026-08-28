@@ -1,0 +1,13 @@
+{
+  "pdf_page": 72,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจหัวคำ 24 รายการ พร้อม glyph คำอ่าน ความหมาย หมวดหมู่ และข้อความของ ครอบ ที่ต่อข้ามคอลัมน์จากภาพหน้า 72 ครบแล้ว"
+}

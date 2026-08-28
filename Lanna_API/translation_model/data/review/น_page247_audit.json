@@ -1,0 +1,13 @@
+{
+  "pdf_page": 247,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 247 (หน้าไฟล์ 269) ครบทั้งสองคอลัมน์; น้ำพะทา ซ้ำจากหน้า 246 จึงรวมเป็นหลักฐานหลายหน้าแทนการสร้างระเบียนซ้ำ"
+}

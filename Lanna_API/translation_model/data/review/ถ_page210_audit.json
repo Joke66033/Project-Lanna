@@ -1,0 +1,13 @@
+{
+  "pdf_page": 210,
+  "expected_headwords": 25,
+  "verified_headwords": 25,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดจากภาพหน้าพิมพ์ 210 (หน้าไฟล์ 232) ครบทั้งสองคอลัมน์; ต้นฉบับมีหัวคำ เถียง 2 ชนิดคำ จึงรวมไว้ในระเบียนเดียว"
+}

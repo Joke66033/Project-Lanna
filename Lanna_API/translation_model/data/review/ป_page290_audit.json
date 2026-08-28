@@ -1,0 +1,13 @@
+{
+  "pdf_page": 290,
+  "expected_headwords": 25,
+  "verified_headwords": 25,
+  "expected_entries": 27,
+  "verified_entries": 27,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 290 (หน้าไฟล์ 312) ครบ 27 หน้าที่คำ รวม 25 หัวคำ; ปินและปิ๋วมีสองหน้าที่คำ และ ปี เพิ่มความหมายจากหัวคำหน้า 289"
+}

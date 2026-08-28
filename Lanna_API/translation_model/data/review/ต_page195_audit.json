@@ -1,0 +1,13 @@
+{
+  "pdf_page": 195,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 195 (หน้าไฟล์ 217) หมวด ต ช่วง เต็กพิมพ์–เตมเต็ง และตรวจหน้าพิมพ์ 196 ว่าเริ่มหัวคำใหม่ เตมแต่"
+}

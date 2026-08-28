@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:lanna/services/auth_provider.dart';
 import '../learning_navigation.dart';
 import 'lanna_glyph_card.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -116,13 +118,28 @@ class _SpellingPageState extends State<SpellingPage>
     });
     try {
       // 1. ดึงหมวดหมู่ย่อยทั้งหมดที่สังกัด LC005 จาก API
-      final subCategories = await _charService.getCategoriesByLearningCode('LC005');
+      var subCategories = await _charService.getCategoriesByLearningCode('LC005');
+      if (subCategories.isEmpty) {
+        final allCats = await _charService.getAllCategories();
+        subCategories = allCats.where((c) => 
+          (c.learningCategoryCode != null && c.learningCategoryCode!.trim().toUpperCase() == 'LC005') ||
+          c.categoryCharId.toUpperCase() == 'CL0008' ||
+          c.categoryCharId.toUpperCase() == 'CL0009' ||
+          c.categoryCharId.toUpperCase() == 'CL0010' ||
+          c.categoryCharId.toUpperCase() == 'CL0011' ||
+          c.categoryCharId.toUpperCase() == 'CL0012' ||
+          c.categoryCharId.toUpperCase() == 'CL0013' ||
+          c.name.contains('สะกด') || c.name.contains('ห นำ') || c.name.contains('ระวง')
+        ).toList();
+      }
       final List<String> catIds = subCategories.map((c) => c.categoryCharId).toList();
+      final String catIdQuery = catIds.join(',');
 
       // 2. ดึงบทความอธิบายตามรหัสหมวดหมู่ย่อย
-      final String catIdQuery = catIds.join(',');
+      const String fallbackSpellingCatIds = 'CL0008,CL0009,CL0010,CL0011,CL0012,CL0013';
+      final String effectiveCatIds = catIdQuery.isNotEmpty ? catIdQuery : fallbackSpellingCatIds;
       final apiArticles = await _articleService.getAllArticles(
-        categoryCharId: catIdQuery.isNotEmpty ? catIdQuery : 'CL0008,CL0009,CL0010,CL0011,CL0012,CL0013',
+        categoryCharId: effectiveCatIds,
       );
       _articlesMap.clear();
       for (var art in apiArticles) {
@@ -131,9 +148,9 @@ class _SpellingPageState extends State<SpellingPage>
         }
       }
 
-      // 3. ดึงอักขระตัวสะกดทั้งหมดจาก API
+      // 3. ดึงอักขระตัวสะกดทั้งหมดจาก API เฉพาะหมวดตัวสะกด
       final apiSpellings = await _charService.getAllCharacters(
-        categoryCharId: catIdQuery.isNotEmpty ? catIdQuery : null,
+        categoryCharId: effectiveCatIds,
       );
 
       final Map<String, List<LannaSpelling>> dynamicMap = {};
@@ -297,15 +314,16 @@ class _SpellingPageState extends State<SpellingPage>
                   indicatorWeight: 3.5,
                   indicatorSize: TabBarIndicatorSize.label,
                   labelColor: const Color(0xFFE16905),
+                  labelStyle: const TextStyle(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w400,
+                  ),
                   unselectedLabelColor: const Color(0xFF7A5C3A),
-                  tabs: List.generate(_groups.length, (index) {
-                    return Tab(
-                      child: AutoScrollingTabLabel(
-                        text: _groups[index].name,
-                        isSelected: _tabController?.index == index,
-                      ),
-                    );
-                  }),
+                  unselectedLabelStyle: const TextStyle(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  tabs: _groups.map((g) => Tab(text: g.name)).toList(),
                 ),
               ),
             ),
@@ -395,7 +413,7 @@ class _SpellingPageState extends State<SpellingPage>
                         spelling.char,
                         style: const TextStyle(
                           fontSize: 100,
-                          fontFamily: 'PayapLanna',
+                          fontFamily: 'LNTilok',
                           color: Color(0xFFD2691E),
                           fontWeight: FontWeight.bold,
                         ),
@@ -471,8 +489,9 @@ class _SpellingPageState extends State<SpellingPage>
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          if (widget.isGuest) {
-                            Navigator.pop(context); // ปิด BottomSheet
+                          final auth = context.read<AuthProvider>();
+                          if (!auth.isLoggedIn) {
+                            Navigator.pop(context);
                             _showLoginRequiredAlert(context);
                             return;
                           }
@@ -751,7 +770,7 @@ class _SpellingCard extends StatelessWidget {
                     spelling.char,
                     style: const TextStyle(
                       fontSize: 28,
-                      fontFamily: 'PayapLanna',
+                      fontFamily: 'LNTilok',
                       color: Color(0xFF924E19),
                       fontWeight: FontWeight.bold,
                     ),
@@ -975,7 +994,7 @@ class __StrokeOrderBottomSheetState extends State<_StrokeOrderBottomSheet>
             widget.spelling.char,
             style: const TextStyle(
               fontSize: 27,
-              fontFamily: 'PayapLanna',
+              fontFamily: 'LNTilok',
               color: Color(0xFF924E19),
               fontWeight: FontWeight.bold,
             ),

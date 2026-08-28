@@ -48,25 +48,29 @@ flutter:
     - assets/images/
 
   fonts:
-    # PayapLanna (Main Lanna Unicode font)
+    # LN TILOK (Main Lanna Unicode font)
+    - family: LNTilok
+      fonts:
+        - asset: assets/fonts/LN-TILOK-6.10.ttf
+
+    - family: LN TILOK
+      fonts:
+        - asset: assets/fonts/LN-TILOK-6.10.ttf
+
     - family: PayapLanna
       fonts:
+        - asset: assets/fonts/LN-TILOK-6.10.ttf
         - asset: assets/fonts/PayapLanna-Regular.ttf
         - asset: assets/fonts/PayapLanna-Bold.ttf
           weight: 700
 
-    - family: LNTilok
-      fonts:
-        - asset: assets/fonts/PayapLanna-Regular.ttf
-        - asset: assets/fonts/LN-TILOK-6.10.ttf
-
     - family: LannaFont
       fonts:
-        - asset: assets/fonts/PayapLanna-Regular.ttf
+        - asset: assets/fonts/LN-TILOK-6.10.ttf
 
     - family: LannaAkkhara
       fonts:
-        - asset: assets/fonts/PayapLanna-Regular.ttf
+        - asset: assets/fonts/LN-TILOK-6.10.ttf
 
     # NotoSansTaiTham
     - family: NotoSansTaiTham

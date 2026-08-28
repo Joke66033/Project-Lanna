@@ -1,0 +1,4 @@
+[
+  {"thai":"ก่อนเนิ้น","expected_verified_page":34,"source_page":34,"pronunciation":"[ก่อน - เนิ้น]","meaning":"ว. ครั้งกระโน้น","category":"เวลาและจำนวน","context_pages":[34],"reason":"ปรับคำอ่านและนิยามให้ตรงภาพหน้า 34"},
+  {"thai":"ก้อมด้อม","expected_verified_page":34,"source_page":34,"pronunciation":"[ก้อม - ด้อม]","meaning":"ว. ลักษณะสิ่งที่สั้น - มักใช้ตามหลังคำว่า สั้น เช่น สั้นก้อมด้อม","category":"ลักษณะและอาการ","context_pages":[34],"reason":"ปรับคำอ่านและนิยามให้ตรงภาพหน้า 34"}
+]

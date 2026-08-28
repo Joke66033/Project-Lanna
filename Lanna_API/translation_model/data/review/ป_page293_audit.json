@@ -1,0 +1,13 @@
+{
+  "pdf_page": 293,
+  "expected_headwords": 26,
+  "verified_headwords": 26,
+  "expected_entries": 26,
+  "verified_entries": 26,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 293 (หน้าไฟล์ 315) ครบทั้งสองคอลัมน์ 26 หัวคำ แยกกลุ่ม ปู ปู่ ปู้ และ ปูน"
+}

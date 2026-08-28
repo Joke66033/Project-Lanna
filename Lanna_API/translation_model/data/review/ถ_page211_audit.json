@@ -1,0 +1,13 @@
+{
+  "pdf_page": 211,
+  "expected_headwords": 14,
+  "verified_headwords": 14,
+  "expected_entries": 14,
+  "verified_entries": 14,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดจากภาพหน้าพิมพ์ 211 (หน้าไฟล์ 233) ครบทั้งหน้า; ตรวจหน้าพิมพ์ 212 ว่าเริ่มหมวด ท จึงเป็นหน้าสุดท้ายของหมวด ถ"
+}

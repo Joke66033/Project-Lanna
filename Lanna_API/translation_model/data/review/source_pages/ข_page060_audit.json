@@ -1,0 +1,13 @@
+{
+  "pdf_page": 60,
+  "expected_headwords": 25,
+  "verified_headwords": 25,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำหมวด ข จำนวน 25 รายการจากภาพต้นฉบับหน้า 60 แยกความหมายของ ข้อน และแยกระเบียน ข่อย กับ ข้อย"
+}

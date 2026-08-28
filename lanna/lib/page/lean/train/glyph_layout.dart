@@ -34,7 +34,7 @@ Future<RasterizedWritingGlyph> rasterizeWritingGlyph({
         text: '\u00A0$normalized\u00A0',
         style: TextStyle(
           fontFamily: fontFamily,
-          fontFamilyFallback: const ['PayapLanna', 'THSarabunNew', 'sans-serif'],
+          fontFamilyFallback: const ['LNTilok', 'THSarabunNew', 'sans-serif'],
           fontSize: _rasterGlyphFontSize,
           height: 1,
           fontWeight: FontWeight.normal,
@@ -287,7 +287,7 @@ class GlyphLayout {
         text: renderedCharacter,
         style: TextStyle(
           fontFamily: fontFamily,
-          fontFamilyFallback: const ['PayapLanna', 'THSarabunNew', 'sans-serif'],
+          fontFamilyFallback: const ['LNTilok', 'THSarabunNew', 'sans-serif'],
           fontSize: writingGlyphFontSize,
           height: 1,
           fontWeight: FontWeight.normal,
@@ -333,7 +333,7 @@ GlyphLayout layoutWritingGlyph({
       text: text,
       style: TextStyle(
         fontFamily: fontFamily,
-        fontFamilyFallback: const ['PayapLanna', 'THSarabunNew', 'sans-serif'],
+        fontFamilyFallback: const ['LNTilok', 'THSarabunNew', 'sans-serif'],
         fontSize: writingGlyphFontSize,
         height: 1,
         fontWeight: FontWeight.normal,

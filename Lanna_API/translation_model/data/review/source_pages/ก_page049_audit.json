@@ -1,0 +1,13 @@
+{
+  "pdf_page": 49,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 19 รายการจากหน้า 49 ใช้นิยามต่อเนื่องหน้า 50 สำหรับแกงฮังเลเชียงแสน และแก้ระเบียนแก่/แก้ให้ตรงภาพ"
+}

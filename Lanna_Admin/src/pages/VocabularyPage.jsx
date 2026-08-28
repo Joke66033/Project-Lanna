@@ -7,7 +7,7 @@ import { normalizeLannaText } from "../lib/lannaNormalizer.js";
 import LannaText from "../components/LannaText.jsx";
 import { loadLannaMap, convertThaiToLanna } from "../lib/thaiToLanna.js";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
-import { SuccessModal, ConfirmDeleteModal } from "../components/AlertModals.jsx";
+import { SuccessModal, ConfirmDeleteModal, WarningModal } from "../components/AlertModals.jsx";
 
 const getApiBase = () => {
   if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
@@ -161,6 +161,9 @@ export default function VocabularyPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successText, setSuccessText] = useState("");
 
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningText, setWarningText] = useState("");
+
   const [showDelete, setShowDelete] = useState(false);
   const [deleteItem, setDeleteItem] = useState(null);
 
@@ -265,7 +268,8 @@ export default function VocabularyPage() {
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
-      alert("Error adding vocabulary: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มคำศัพท์");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -319,7 +323,8 @@ export default function VocabularyPage() {
       setCurrentPage(1);
       fetchData(1);
     } catch (err) {
-      alert("Error updating vocabulary: " + err.message);
+      setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขคำศัพท์");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -352,7 +357,9 @@ export default function VocabularyPage() {
       setShowSuccess(true);
       fetchData();
     } catch (err) {
-      alert("Error deleting vocabulary: " + err.message);
+      setShowDelete(false);
+      setWarningText(err.message || "ไม่สามารถลบข้อมูลได้");
+      setShowWarning(true);
     } finally {
       setLoading(false);
     }
@@ -723,6 +730,14 @@ export default function VocabularyPage() {
         isOpen={showSuccess}
         onClose={() => setShowSuccess(false)}
         message={successText}
+      />
+
+      {/* WARNING MODAL */}
+      <WarningModal
+        isOpen={showWarning}
+        onClose={() => setShowWarning(false)}
+        title="ไม่สามารถดำเนินการได้"
+        message={warningText}
       />
     </div>
   );

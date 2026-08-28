@@ -1,0 +1,13 @@
+{
+  "pdf_page": 95,
+  "expected_headwords": 8,
+  "verified_headwords": 8,
+  "expected_entries": 8,
+  "verified_entries": 8,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดตัวอักษรและหัวคำหมวด ฅ จากภาพหน้า 95 โดยรักษา ฅ/เฅ/แฅ ตามต้นฉบับ"
+}

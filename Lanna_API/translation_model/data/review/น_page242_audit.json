@@ -1,0 +1,13 @@
+{
+  "pdf_page": 242,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 242 (หน้าไฟล์ 264) ครบทั้งสองคอลัมน์; แยก นาง/น่าง และ นาน/น่าน ตามรูปวรรณยุกต์และความหมายต้นฉบับ"
+}

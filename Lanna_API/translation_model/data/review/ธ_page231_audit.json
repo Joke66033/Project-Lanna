@@ -1,0 +1,13 @@
+{
+  "pdf_page": 231,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจภาพหน้าพิมพ์ 231 (หน้าไฟล์ 253) ครบทั้งสองคอลัมน์ พร้อมคำอ่าน ความหมาย หมวดหมู่ และอักษรล้านนา; เป็นหน้าแรกของหมวด ธ และไม่นับบรรทัดอธิบายรูปพยัญชนะ ธ เป็นหัวคำศัพท์"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 30,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 24 รายการจากภาพหน้า 30; แยกสองความหมายของกล้า และไม่นับนิยามกลั้นที่ต่อมาจากหน้า 29 เป็นหัวคำใหม่"
+}

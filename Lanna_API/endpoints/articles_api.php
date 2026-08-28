@@ -73,19 +73,20 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch ($action) {
 
         case 'create':
-            // 1. ดึง ID ล่าสุดเพื่อ increment (AR#### format)
-            $listRes = dbSelect('articles', 'article_id', [], 'article_id.desc', 1);
-            if ($listRes['error']) { jsonError($listRes['error']['message']); break; }
-
-            $nextNumber = 1;
-            $list = $listRes['data'] ?? [];
-            if (!empty($list)) {
-                $lastId = trim($list[0]['article_id'] ?? '');
-                if (preg_match('/\d+/', $lastId, $m)) {
-                    $nextNumber = (int)$m[0] + 1;
+            // 1. ดึง ID ทั้งหมดเพื่อหาค่าตัวเลขสูงสุดและสร้างรหัสถัดไป (AR####)
+            $allRes = dbSelect('articles', 'article_id');
+            $maxNum = 0;
+            if (!empty($allRes['data'])) {
+                foreach ($allRes['data'] as $row) {
+                    if (preg_match('/(\d+)/', $row['article_id'] ?? '', $matches)) {
+                        $num = (int)$matches[1];
+                        if ($num > $maxNum) {
+                            $maxNum = $num;
+                        }
+                    }
                 }
             }
-            $nextId = 'AR' . str_pad((string)$nextNumber, 4, '0', STR_PAD_LEFT);
+            $nextId = 'AR' . str_pad((string)($maxNum + 1), 4, '0', STR_PAD_LEFT);
 
             $insertData = [
                 'article_id'       => $nextId,

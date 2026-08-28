@@ -1,0 +1,13 @@
+{
+  "pdf_page": 70,
+  "expected_headwords": 1,
+  "verified_headwords": 1,
+  "expected_entries": 1,
+  "verified_entries": 1,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำเดียวของพยัญชนะ ฃ จากภาพหน้า 70 โดยรักษา ฃ แยกจาก ข ตามต้นฉบับ; หน้านี้จบหมวด ฃ"
+}

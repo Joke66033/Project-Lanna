@@ -1,0 +1,39 @@
+[
+  {
+    "thai": "เกา",
+    "expected_verified_page": 48,
+    "lanna": "ᩮᨠᩢᩣ",
+    "pronunciation": "[เก๋า]",
+    "meaning": "ก. เกา",
+    "category": "การกระทำ",
+    "source_type": "source_dictionary_image",
+    "source_id": "lanna_dictionary_drive_672",
+    "source_page": 48,
+    "reason": "ตรวจและถอดหัวคำเกาจากภาพหน้า 48 ซ้ำ"
+  },
+  {
+    "thai": "เก้า",
+    "expected_verified_page": 48,
+    "lanna": "ᩮᨠᩢ᩶ᩣ",
+    "pronunciation": "[เก้า]",
+    "meaning": "1. น. ชื่อเดือนทางจันทรคติเรียกว่า เดือน ๙ ตกในราวเดือนมิถุนายน; เกล้า ก็ว่า 2. ว. จำนวนเลขเก้า",
+    "category": "คำศัพท์ทั่วไป",
+    "source_type": "source_dictionary_image",
+    "source_id": "lanna_dictionary_drive_672",
+    "source_page": 48,
+    "reason": "ตรวจภาพหน้า 48 ซ้ำและเติมความหมายชื่อเดือนที่ระเบียนเดิมขาด"
+  },
+  {
+    "thai": "เก้ากอง",
+    "expected_verified_page": 48,
+    "lanna": "ᩮᨠᩢ᩶ᩣᨠ᩠ᩋᨦ",
+    "pronunciation": "[เก้า - ก๋อง]",
+    "meaning": "น. ระบบการนับวันตามความเชื่อเรื่องวันมงคลและอวมงคล ชื่อวันอันดับ ๑ ใน ๑๒ วันของระบบเก้ากอง เป็นวันที่ห้ามการเผาศพในวันนี้ (ความเชื่อล้านนา)",
+    "category": "เวลาและจำนวน",
+    "source_type": "source_dictionary_image",
+    "source_id": "lanna_dictionary_drive_672",
+    "source_page": 48,
+    "reason": "คืนสถานะหลังตรวจพบหัวคำเก้ากองชัดเจนในภาพหน้า 48 และแก้รูปอักษรเดิมที่ถูกตัดเหลือเพียงคำว่าเก้า",
+    "restore_rejected": true
+  }
+]

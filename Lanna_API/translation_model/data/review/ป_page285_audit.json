@@ -1,0 +1,13 @@
+{
+  "pdf_page": 285,
+  "expected_headwords": 20,
+  "verified_headwords": 20,
+  "expected_entries": 20,
+  "verified_entries": 20,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 285 (หน้าไฟล์ 307) ครบทั้งสองคอลัมน์; รวม ปัน สองหน้าที่คำและ ปัว สองหน้าที่คำ พร้อมแยก ปัน/ปั้น ตามวรรณยุกต์"
+}

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 99,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำหมวด ง จากภาพหน้า 99 แยกคำกลุ่ม งัว/งา/ง่า ตามวรรณยุกต์ต้นฉบับ"
+}

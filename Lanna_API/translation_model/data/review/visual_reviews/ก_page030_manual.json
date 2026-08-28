@@ -1,0 +1,12 @@
+[
+  {
+    "thai": "กลั้นเข้าหยากน้ำ",
+    "lanna": "ᨠᩢ᩠᩶ᩃᩁᩮᨡᩢ᩶ᩣᩉ᩠ᨿᩣ᩠ᨠ᩠ᨶᩣᩴ᩶",
+    "pdf_page": 30,
+    "decision": "source_image_verified",
+    "manual_source_page": true,
+    "checked_fields": ["thai", "lanna_glyph_shape", "unicode_component_render", "pronunciation", "meaning"],
+    "category": "ลักษณะและอาการ",
+    "note": "ตรวจภาพความละเอียดสูงหน้า 30 และเทียบการเรนเดอร์ Unicode จากองค์ประกอบคำ"
+  }
+]

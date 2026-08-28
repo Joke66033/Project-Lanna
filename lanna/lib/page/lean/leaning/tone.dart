@@ -6,7 +6,6 @@ import 'package:lanna/models/article_model.dart';
 import '../learning_navigation.dart';
 import 'lanna_glyph_card.dart';
 import 'char_detail_page.dart';
-import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
 import 'package:lanna/services/character_stroke_service.dart';
 
@@ -97,7 +96,12 @@ class _TonePageState extends State<TonePage> {
       if (tArticles.isNotEmpty && tArticles.first.content.trim().isNotEmpty) {
         _article = tArticles.first;
       } else {
-        _article = null;
+        _article = const ArticleModel(
+          articleId: 'AR0006',
+          title: 'วรรณยุกต์และเครื่องหมายพิเศษล้านนา',
+          content: 'วรรณยุกต์ในภาษาล้านนามีเครื่องหมายกำกับเสียง เช่น ไม้เหยาะ (เทียบเท่าไม้เอก), ไม้ขอช้าง (เทียบเท่าไม้โท) และเครื่องหมายพิเศษอย่างไม้ซัดและไม้ฆ่า',
+          categoryCharId: 'CL0006',
+        );
       }
 
       // 2. ดึงวรรณยุกต์ทั้งหมดจาก API เฉพาะกลุ่ม CL0006
@@ -126,9 +130,20 @@ class _TonePageState extends State<TonePage> {
         ));
       }
 
+      if (listMain.isEmpty) {
+        listMain.addAll(const [
+          LannaTone(char: '᩵', reading: 'ไม้เหยาะ (ไม้เอก)', thai: '่ (ไม้เอก)', description: 'วรรณยุกต์เอกล้านนา'),
+          LannaTone(char: '᩶', reading: 'ไม้ขอช้าง (ไม้โท)', thai: '้ (ไม้โท)', description: 'วรรณยุกต์โทล้านนา'),
+          LannaTone(char: '᩷', reading: 'ไม้ตรี', thai: '๊ (ไม้ตรี)', description: 'วรรณยุกต์ตรีล้านนา'),
+          LannaTone(char: '᩸', reading: 'ไม้จัตวา', thai: '๋ (ไม้จัตวา)', description: 'วรรณยุกต์จัตวาล้านนา'),
+          LannaTone(char: '᩹', reading: 'ไม้ซัด', thai: '์ (การันต์/ไม้ซัด)', description: 'เครื่องหมายไม้ซัดล้านนา'),
+          LannaTone(char: '᩺', reading: 'ไม้ทัณฑฆาต (ไม้ฆ่า)', thai: '์ (การันต์)', description: 'เครื่องหมายฆ่าเสียงพยัญชนะ'),
+        ]);
+      }
+
       setState(() {
         _groups = [
-          ToneGroup(name: catNames['CL0006'] ?? 'วรรณยุกต์', tones: listMain),
+          ToneGroup(name: catNames['CL0006'] ?? 'วรรณยุกต์ล้านนา', tones: listMain),
         ].where((g) => g.tones.isNotEmpty).toList();
         _isLoading = false;
       });
@@ -470,7 +485,7 @@ class _ToneCard extends StatelessWidget {
                     tone.char,
                     style: const TextStyle(
                       fontSize: 28,
-                      fontFamily: 'PayapLanna',
+                      fontFamily: 'LNTilok',
                       color: Color(0xFF924E19),
                       fontWeight: FontWeight.bold,
                     ),
@@ -692,7 +707,7 @@ class _ToneStrokeOrderBottomSheetState extends State<ToneStrokeOrderBottomSheet>
             widget.tone.char,
             style: const TextStyle(
               fontSize: 27,
-              fontFamily: 'PayapLanna',
+              fontFamily: 'LNTilok',
               color: Color(0xFF924E19),
               fontWeight: FontWeight.bold,
             ),

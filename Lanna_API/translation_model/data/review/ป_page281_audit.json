@@ -1,0 +1,13 @@
+{
+  "pdf_page": 281,
+  "expected_headwords": 22,
+  "verified_headwords": 22,
+  "expected_entries": 22,
+  "verified_entries": 22,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 281 (หน้าไฟล์ 303) ครบทั้งสองคอลัมน์; แยกชื่อปลา คำทั่วไป และหัวคำสำนวนเต็มตามต้นฉบับ"
+}

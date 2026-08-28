@@ -1,0 +1,13 @@
+{
+  "pdf_page": 197,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 197 (หน้าไฟล์ 219) หมวด ต ช่วง เตาะแตะ–เตี่ยวห่อหนึ่ง; แยกรูปคำคู่ เตี่ยวหลัง, เตี่ยวหรัง เป็น 2 ระเบียนค้นหา; ตรวจหน้าพิมพ์ 198 ว่าเริ่มหัวคำใหม่ เตือน"
+}

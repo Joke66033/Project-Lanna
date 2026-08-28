@@ -1,0 +1,13 @@
+{
+  "pdf_page": 223,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดจากภาพหน้าพิมพ์ 223 (หน้าไฟล์ 245) ครบทั้งสองคอลัมน์; ความหมาย ทุเจ้าหัวหมวด ต่อเนื่องจากท้ายคอลัมน์ซ้ายไปต้นคอลัมน์ขวา"
+}

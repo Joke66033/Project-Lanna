@@ -1,0 +1,13 @@
+{
+  "pdf_page": 272,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 272 (หน้าไฟล์ 294) ครบทั้งสองคอลัมน์; แยกรูปคำร่วม บุตต์/บุตร์ ให้ค้นได้ทั้งสองรูป และแยกคำกลุ่ม เบง/เบญจะ ตามหัวคำตัวหนา"
+}

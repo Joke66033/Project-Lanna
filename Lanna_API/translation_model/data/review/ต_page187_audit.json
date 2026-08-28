@@ -1,0 +1,13 @@
+{
+  "pdf_page": 187,
+  "expected_headwords": 25,
+  "verified_headwords": 25,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 187 (หน้าไฟล์ 209) หมวด ต ช่วง ตามคำมัก–ตายผาก และตรวจต้นหน้าพิมพ์ 188 ว่าเริ่มหัวคำใหม่ ตายพราย"
+}

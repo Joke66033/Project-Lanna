@@ -1,0 +1,12 @@
+[
+  {
+    "thai": "กี้",
+    "lanna": "ᨠᩦ᩶",
+    "pdf_page": 44,
+    "decision": "source_image_verified",
+    "manual_source_page": true,
+    "checked_fields": ["thai", "lanna_glyph_shape", "pronunciation", "meaning"],
+    "category": "เวลาและจำนวน",
+    "note": "ตรวจภาพความละเอียดสูงหน้า 44 และแก้นิยามตามต้นฉบับ"
+  }
+]

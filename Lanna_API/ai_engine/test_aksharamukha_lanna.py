@@ -29,6 +29,12 @@ class ThaiToTaiThamTests(unittest.TestCase):
         self.assertTrue(result.is_valid)
         self.assertTrue(result.text.endswith(","))
 
+    def test_thai_repetition_mark_is_preserved_and_valid(self):
+        result = thai_to_tai_tham("หยิบๆ")
+        self.assertTrue(result.is_valid)
+        self.assertFalse(result.unsupported)
+        self.assertTrue(result.text.endswith("ๆ"))
+
     def test_empty_input(self):
         result = thai_to_tai_tham("  ")
         self.assertTrue(result.is_valid)

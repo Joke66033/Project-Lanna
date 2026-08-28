@@ -23,7 +23,7 @@ class WritingCanvas extends StatefulWidget {
     required this.onChanged,
     required this.guideChar,
     required this.character,
-    this.fontFamily = 'PayapLanna',
+    this.fontFamily = 'LNTilok',
     this.showStrokeOrder = true,
     this.maxGlyphExtent = 150,
     this.targetGlyphInkArea = 3500,
@@ -261,64 +261,73 @@ class _WritingPainter extends CustomPainter {
       return Offset(o.dx * size.width / 100, o.dy * size.height / 100);
     }
 
-    // Draw the real glyph and its stroke metadata through the exact same
-    // layout. This guarantees that 1, 2, 3 and the arrows sit on the pale ink.
-    final guidePadding = math.max(
-      0.0,
-      (size.shortestSide - maxGlyphExtent) / 2,
-    );
-    final glyphLayout = layoutWritingGlyph(
-      character: guideChar,
-      fontFamily: fontFamily,
-      size: size,
-      padding: guidePadding,
-    );
-
-    // 0.8 วาดตัวอักษรล้านนาสีน้ำตาลอ่อนเป็นโครงร่างแม่แบบ (Guiding Glyph Template)
-    // เพื่อให้เส้นลำดับขีดตรงกับรูปทรงของอักขระล้านนา 100%
-    glyphLayout.paint(
-      canvas,
-      const Color(0xFF8D6E63).withValues(alpha: 0.16),
-    );
-
     final orderData = getCharacterStrokeOrder(guideChar);
 
-    if (showStrokeOrder && orderData != null) {
-      // Build the worksheet outline from the authored teaching paths. This
-      // keeps the outline, dotted centreline and arrows on the exact same
-      // geometry and does not depend on platform font rendering.
+    if (showStrokeOrder && orderData != null && orderData.strokes.isNotEmpty) {
+      // 1. คำนวณ Bounding Box ของเส้นลำดับขีดทั้งหมด เพื่อจัดกึ่งกลางและปรับขนาดให้พอดีสวยงามเสมอ
+      double minX = 100.0, minY = 100.0, maxX = 0.0, maxY = 0.0;
+      bool hasPoints = false;
+      for (final stroke in orderData.strokes) {
+        for (final pt in stroke.points) {
+          hasPoints = true;
+          if (pt.dx < minX) minX = pt.dx;
+          if (pt.dy < minY) minY = pt.dy;
+          if (pt.dx > maxX) maxX = pt.dx;
+          if (pt.dy > maxY) maxY = pt.dy;
+        }
+      }
+
+      final double charWidth = hasPoints ? math.max(20.0, maxX - minX) : 60.0;
+      final double charHeight = hasPoints ? math.max(20.0, maxY - minY) : 60.0;
+      final double charCenterX = hasPoints ? (minX + maxX) / 2.0 : 50.0;
+      final double charCenterY = hasPoints ? (minY + maxY) / 2.0 : 50.0;
+
+      final double targetSize = size.shortestSide * 0.54;
+      final double scaleFactor = targetSize / math.max(charWidth, charHeight);
+
+      Offset strokeTransform(Offset point) {
+        final double scaledX = (point.dx - charCenterX) * scaleFactor;
+        final double scaledY = (point.dy - charCenterY) * scaleFactor;
+        return Offset(
+          size.width / 2.0 + scaledX,
+          size.height / 2.0 + scaledY,
+        );
+      }
+
+      // 2. วาดกรอบรูปเส้นเขียนด้านหลัง (Worksheet Track / Outline Template)
+      // โครงร่างเส้นเขียนด้านหลังและเส้นประสีน้ำเงินจะอิงจากพิกัดเดียวกัน 100%
       for (final stroke in orderData.strokes) {
         final strokePath = buildStrokePath(
           stroke.points,
-          glyphLayout.positionFromNormalized,
+          strokeTransform,
         );
+        // กรอบนอกสีน้ำตาลอ่อน
         canvas.drawPath(
           strokePath,
           Paint()
-            ..color = const Color(0xFF7A5C3A).withValues(alpha: 0.38)
-            ..strokeWidth = 15
+            ..color = const Color(0xFF7A5C3A).withValues(alpha: 0.22)
+            ..strokeWidth = 22
             ..strokeCap = StrokeCap.round
             ..strokeJoin = StrokeJoin.round
             ..style = PaintingStyle.stroke,
         );
+        // ร่องในสีขาวครีม
         canvas.drawPath(
           strokePath,
           Paint()
-            ..color = const Color(0xFFFFFBF6).withValues(alpha: 0.96)
-            ..strokeWidth = 10
+            ..color = const Color(0xFFFFFBF6).withValues(alpha: 0.98)
+            ..strokeWidth = 14
             ..strokeCap = StrokeCap.round
             ..strokeJoin = StrokeJoin.round
             ..style = PaintingStyle.stroke,
         );
       }
 
-      // Paint every teaching stroke as a coloured dotted centreline on top of
-      // the pale glyph. All categories use this painter, so consonants,
-      // vowels, tones, numbers and compound forms share the same guide style.
+      // 3. วาดเส้นประสีน้ำเงินตรงกลางร่องเส้นเขียน (Dashed Guideline)
       for (final stroke in orderData.strokes) {
         final strokePath = buildStrokePath(
           stroke.points,
-          glyphLayout.positionFromNormalized,
+          strokeTransform,
         );
         final isCurrent = stroke.order == completedStrokeCount + 1;
         drawDashedStroke(
@@ -326,7 +335,7 @@ class _WritingPainter extends CustomPainter {
           strokePath,
           Paint()
             ..color = stroke.color.withValues(alpha: isCurrent ? 0.95 : 0.62)
-            ..strokeWidth = isCurrent ? 3.2 : 2.5
+            ..strokeWidth = isCurrent ? 3.5 : 2.8
             ..strokeCap = StrokeCap.round
             ..strokeJoin = StrokeJoin.round
             ..style = PaintingStyle.stroke,
@@ -335,23 +344,24 @@ class _WritingPainter extends CustomPainter {
         );
       }
 
+      // 4. วาดจุดเริ่มต้นวงกลมหมายเลข 1, 2, ... และลูกศรทิศทางการเขียน
       for (final stroke in orderData.strokes) {
-        final startPt = glyphLayout.positionFromNormalized(stroke.start);
+        final startPt = strokeTransform(stroke.start);
         final isCurrent = stroke.order == completedStrokeCount + 1;
         final markerFill = Paint()
-          ..color = stroke.color.withValues(alpha: isCurrent ? 1 : 0.16);
+          ..color = stroke.color.withValues(alpha: isCurrent ? 1 : 0.2);
         final markerBorder = Paint()
-          ..color = stroke.color.withValues(alpha: isCurrent ? 1 : 0.72)
-          ..strokeWidth = 1.2
+          ..color = Colors.white
+          ..strokeWidth = 1.8
           ..style = PaintingStyle.stroke;
-        canvas.drawCircle(startPt, 9, markerFill);
-        canvas.drawCircle(startPt, 9, markerBorder);
+        canvas.drawCircle(startPt, 10, markerFill);
+        canvas.drawCircle(startPt, 10, markerBorder);
 
         final numPainter = TextPainter(
           text: TextSpan(
             text: '${stroke.order}',
             style: TextStyle(
-              fontSize: 8,
+              fontSize: 9,
               fontWeight: FontWeight.bold,
               color: isCurrent ? Colors.white : stroke.color,
               fontFamily: 'sans-serif',
@@ -368,16 +378,13 @@ class _WritingPainter extends CustomPainter {
           ),
         );
 
-        // Show the initial writing direction without covering the full glyph.
-        // Pick a point far enough from the numbered start to make the arrow
-        // readable even when the source path contains dense control points.
         if (stroke.points.length > 1) {
           var directionPoint = stroke.points[1];
           for (final candidate in stroke.points.skip(1)) {
             directionPoint = candidate;
-            if ((candidate - stroke.start).distance >= 12) break;
+            if ((candidate - stroke.start).distance >= 10) break;
           }
-          final arrowEnd = glyphLayout.positionFromNormalized(directionPoint);
+          final arrowEnd = strokeTransform(directionPoint);
           _drawDirectionArrow(
             canvas,
             startPt,
@@ -387,6 +394,22 @@ class _WritingPainter extends CustomPainter {
           );
         }
       }
+    } else {
+      // Fallback ถ้าไม่มีข้อมูลเส้น ให้แสดงตัวอักษรจางๆ กึ่งกลาง
+      final guidePadding = math.max(
+        0.0,
+        (size.shortestSide - maxGlyphExtent) / 2,
+      );
+      final glyphLayout = layoutWritingGlyph(
+        character: guideChar,
+        fontFamily: fontFamily,
+        size: size,
+        padding: guidePadding,
+      );
+      glyphLayout.paint(
+        canvas,
+        const Color(0xFF8D6E63).withValues(alpha: 0.16),
+      );
     }
 
     // 3. วาดเส้นที่ผู้ใช้ลากเขียน

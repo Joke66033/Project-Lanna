@@ -59,12 +59,20 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $allowed = ['log_id', 'category_vocab_id', 'translate_type', 'input_text', 'output_text', 'created_at'];
             $cleanData = [];
             foreach ($allowed as $f) {
-                if (isset($body[$f]) && $body[$f] !== null) {
+                if (isset($body[$f]) && $body[$f] !== null && $body[$f] !== '') {
                     $cleanData[$f] = $body[$f];
                 }
             }
             if (!isset($cleanData['log_id'])) {
                 $cleanData['log_id'] = 'TL' . str_pad((string)mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            }
+            // Check foreign key constraint for category_vocab_id
+            if (!empty($cleanData['category_vocab_id'])) {
+                $chk = dbSelectSingle('category_vocab', 'category_vocab_id', ['category_vocab_id' => 'eq.' . rawurlencode($cleanData['category_vocab_id'])]);
+                if (!empty($chk['error']) || empty($chk['data'])) {
+                    // Category ID doesn't exist in category_vocab table, set to null to avoid FK constraint error
+                    unset($cleanData['category_vocab_id']);
+                }
             }
             $res = dbInsert('translate_logs', $cleanData);
             if ($res['error']) { jsonError($res['error']['message']); break; }

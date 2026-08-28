@@ -1,0 +1,13 @@
+{
+  "pdf_page": 277,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 21,
+  "verified_entries": 21,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 277 (หน้าไฟล์ 299) ครบทั้งสองคอลัมน์; ไม่นับบรรทัดอธิบายพยัญชนะ ป เป็นหัวคำ และรวม ปง สองบรรทัดเป็นหนึ่งระเบียนหลายความหมาย"
+}

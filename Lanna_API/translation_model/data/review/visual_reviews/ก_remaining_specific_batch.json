@@ -1,0 +1,7 @@
+[
+  {"thai":"กลองปุ่มผิ้ง","lanna":"ᨠ᩠ᩃ᩠ᩋᨦᨸᩩ᩵ᨾᨹᩥ᩠᩶ᨦ","pdf_page":28,"decision":"source_image_verified","category":"สิ่งของและเครื่องมือ","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบหัวคำกลองปุ่มผิ้ง รูปอักษร คำอ่าน และคำอ้างอิงตรงภาพหน้า 28"},
+  {"thai":"กล่องเข้า","lanna":"ᨠ᩠᩵ᩋᨦᩮᨡᩢ᩶ᩣ","pdf_page":28,"decision":"source_image_verified","category":"สิ่งของและเครื่องมือ","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบหัวคำกล่องเข้าและคำอธิบายว่าเป็นภาชนะตรงภาพหน้า 28"},
+  {"thai":"กิ","lanna":"ᨠᩥ","pdf_page":42,"decision":"source_image_verified","category":"ลักษณะและอาการ","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบหัวคำกิ ความหมายว่าสั้นมาก และรูปอักษรตรงภาพหน้า 42"},
+  {"thai":"กิ้มดิ้ม","lanna":"ᨠᩥ᩠᩶ᨾᨯᩥ᩠᩶ᨾ","pdf_page":44,"decision":"source_image_verified","category":"ลักษณะและอาการ","checked_fields":["thai","lanna_glyph_shape","pronunciation","meaning"],"note":"พบหัวคำกิ้มดิ้ม ความหมายว่าสั้นมาก และรูปอักษรตรงภาพหน้า 44"},
+  {"thai":"เกิด็","lanna":"ᩮᨠᩥ᩠᩶ᨯ","pdf_page":48,"decision":"evidence_false_positive","note":"หน้า 48 มีหัวคำรูปใกล้เคียงแต่ความหมายไม่ตรงกับระเบียนที่ระบุว่าดักหรือสกัดกั้น จึงใช้หน้านี้ยืนยันไม่ได้"}
+]

@@ -1,0 +1,13 @@
+{
+  "pdf_page": 102,
+  "expected_headwords": 21,
+  "verified_headwords": 21,
+  "expected_entries": 21,
+  "verified_entries": 21,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้า 102 ต่อเนื่องชื่อสัตว์และเริ่มกลุ่มคำ เงิน"
+}

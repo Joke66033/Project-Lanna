@@ -1,0 +1,13 @@
+{
+  "pdf_page": 35,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำ 23 รายการจากภาพหน้า 35; ยืนยันระเบียนรอตรวจ กะบี้ และปรับหลักฐาน กะวุกกะวุ้ย ให้สอดคล้องกับภาพ"
+}

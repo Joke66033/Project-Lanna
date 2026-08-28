@@ -1,0 +1,10 @@
+[
+  {
+    "thai": "กบทือเดือน",
+    "lanna": "ᨠᩫ᩠ᨸᨴᩨᩮᨯ᩠ᩋᩥᩁ",
+    "pdf_page": 24,
+    "decision": "source_image_verified",
+    "checked_fields": ["thai", "lanna_glyph_shape", "pronunciation", "meaning"],
+    "note": "ตรงกับรายการแรกในคอลัมน์ซ้ายของหน้า 24"
+  }
+]

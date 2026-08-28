@@ -1,0 +1,23 @@
+[
+  {"thai":"กวยสลาก","lanna":"ᨠ᩠ᩅ᩠ᨿᩈ᩠᩻ᩃᩣ᩠ᨠ","pronunciation":"[โก้ย - สะ - หลาก]","meaning":"น. ตะกร้าหรือภาชนะที่บรรจุเครื่องไทยทานในงานทำบุญสลากภัตต์","initial":"ก","category":"ศาสนาและความเชื่อ","pdf_page":32},
+  {"thai":"กวยหาบหญ้า","lanna":"ᨠ᩠ᩅ᩠ᨿᩉᩣ᩠ᨷᩉ᩠ᨿ᩶ᩣ","pronunciation":"[โก้ย - หาบ - หญ้า]","meaning":"น. ตะกร้าที่สานด้วยไม้ไผ่มีหู ๒ หู สูงประมาณ ๑ เมตรเศษๆ ปากกว้างประมาณ ๑ ศอกกว่าๆ ใช้เกี่ยวหญ้าไปให้วัวควายกิน กวยตาควาย ก็ว่า","initial":"ก","category":"สิ่งของและเครื่องมือ","pdf_page":32},
+  {"thai":"กวัก","lanna":"ᨠ᩠ᩅᩢᨠ","pronunciation":"[กวั๊ก]","meaning":"1. น. ระวิง - เครื่องใช้ในการปั่นด้าย 2. น. นกกวัก","initial":"ก","category":"คำศัพท์ทั่วไป","pdf_page":32,"senses":[{"sense_no":1,"part_of_speech":"น.","pronunciation":"[กวั๊ก]","meaning":"ระวิง - เครื่องใช้ในการปั่นด้าย","category":"สิ่งของและเครื่องมือ","source_page":32},{"sense_no":2,"part_of_speech":"น.","pronunciation":"[กวั๊ก]","meaning":"นกกวัก","category":"สัตว์","source_page":32}]},
+  {"thai":"กวัง","lanna":"ᨠ᩠ᩅᩢᨦ","pronunciation":"[กวั้ง]","meaning":"ก. มึน งง หลงใหล ฉวัง ก็ว่า","initial":"ก","category":"ความคิดและอารมณ์","pdf_page":32},
+  {"thai":"กว่า","lanna":"ᨠ᩠᩵ᩅᩣ","pronunciation":"[กว่า]","meaning":"ก. ไป เลยไป ล่วง ล่วงเกิน ล่วงอำนาจ","initial":"ก","category":"การกระทำ","pdf_page":32},
+  {"thai":"กว่าเซ่น","lanna":"ᨠ᩠᩵ᩅᩣᩮᨪ᩠᩵ᨶ","pronunciation":"[กว่า - เซ่น]","meaning":"ว. เกินขนาด","initial":"ก","category":"ลักษณะและอาการ","pdf_page":32},
+  {"thai":"กว่าไม้","lanna":"ᨠ᩠᩵ᩅᩣᩱᨾ᩶","pronunciation":"[กว่า - ไม้]","meaning":"ว. ยิ่งนัก มากมาย","initial":"ก","category":"ลักษณะและอาการ","pdf_page":32},
+  {"thai":"กวาง","lanna":"ᨠ᩠ᩅᩣ᩠ᨦ","pronunciation":"[กว๋าง]","meaning":"น. กวาง","initial":"ก","category":"สัตว์","pdf_page":32},
+  {"thai":"กวางเผือง","lanna":"ᨠ᩠ᩅᩣ᩠ᨦᩮᨹᩨᩋᨦ","pronunciation":"[กว๋าง - เผือง]","meaning":"น. เลียงผา เผือง ก็ว่า","initial":"ก","category":"สัตว์","pdf_page":32},
+  {"thai":"กว่าง","lanna":"ᨠ᩠᩵ᩅᩣ᩠ᨦ","pronunciation":"[กว่าง]","meaning":"น. ด้วงปีกแข็ง ตัวผู้มีเขา นิยมนำมาชนกันเป็นกีฬา หรือ การพนัน","initial":"ก","category":"สัตว์","pdf_page":32},
+  {"thai":"กว่างกิ","lanna":"ᨠ᩠᩵ᩅᩣ᩠ᨦᨠᩥ","pronunciation":"[กว่าง - กิ]","meaning":"น. กว่างตัวผู้สีน้ำตาล มีเขาบนสั้นกว่าเขาล่าง","initial":"ก","category":"สัตว์","pdf_page":32},
+  {"thai":"กว่างอีหลุ้ม","lanna":"ᨠ᩠᩵ᩅᩣ᩠ᨦᩋᩦ᩵ᩉᩖᩩ᩶ᨾ","pronunciation":"[กว่าง - อี่ - หลุ้ม]","meaning":"น. กว่างตัวเมีย กว่างแม่ กว่างแม่อู้ด ก็เรียก","initial":"ก","category":"สัตว์","pdf_page":32},
+  {"thai":"กว้างสึ้ง","lanna":"ᨠ᩠ᩅ᩶ᩣ᩠ᨦᩈᩨ᩶ᨦ","pronunciation":"[กว๊าง - สึ้ง]","meaning":"ว. กว้างและโล่งมาก","initial":"ก","category":"ลักษณะและอาการ","pdf_page":32},
+  {"thai":"กวาน","lanna":"ᨠ᩠ᩅᩣ᩠ᨶ","pronunciation":"[กว๋าน]","meaning":"น. ขวานชนิดหนึ่งมีบ้องที่หัวบิดได้ สำหรับตัดและถาก","initial":"ก","category":"สิ่งของและเครื่องมือ","pdf_page":32},
+  {"thai":"กวานฟ้าผ่า","lanna":"ᨠ᩠ᩅᩣ᩠ᨶᨼ᩶ᩣᨹ᩵ᩣ","pronunciation":"[กว๋าน - ฟ้า - ผ่า]","meaning":"น. ขวานฟ้า","initial":"ก","category":"สิ่งของและเครื่องมือ","pdf_page":32},
+  {"thai":"กว้านค้า","lanna":"ᨠ᩠ᩅ᩶ᩣ᩠ᨶᨣ᩶ᩣ","pronunciation":"[กว้าน - ก๊า]","meaning":"น. ร้านค้า ที่ขายของ","initial":"ก","category":"สถานที่และชุมชน","pdf_page":32},
+  {"thai":"กว้านจอด","lanna":"ᨠ᩠ᩅ᩶ᩣ᩠ᨶᨧᩬᨯ","pronunciation":"[กว้าน - จอด]","meaning":"น. ที่พัก ที่พักแรม","initial":"ก","category":"สถานที่และชุมชน","pdf_page":32},
+  {"thai":"กว้านตีน","lanna":"ᨠ᩠ᩅ᩶ᩣ᩠ᨶᨲᩦ᩠ᨶ","pronunciation":"[กว้าน - ตีน]","meaning":"น. รองเท้า แซ็บตีน ก็ว่า","initial":"ก","category":"เครื่องแต่งกาย","pdf_page":32},
+  {"thai":"กว้านทาน","lanna":"ᨠ᩠ᩅ᩶ᩣ᩠ᨶᨴᩣ᩠ᨶ","pronunciation":"[กว้าน - ตาน]","meaning":"น. ศาลาโรงทาน","initial":"ก","category":"ศาสนาและความเชื่อ","pdf_page":32},
+  {"thai":"กว้านบ้าน","lanna":"ᨠ᩠ᩅ᩶ᩣ᩠ᨶᨷ᩶ᩣ᩠ᨶ","pronunciation":"[กว้าน - บ้าน]","meaning":"น. หัวหน้าหมู่บ้าน","initial":"ก","category":"บุคคลและเครือญาติ","pdf_page":32},
+  {"thai":"กวาว","lanna":"ᨠ᩠ᩅᩣ᩠ᩅ","pronunciation":"[กว๋าว]","meaning":"น. ต้นทองกวาว","initial":"ก","category":"พืชและเกษตร","pdf_page":32}
+]

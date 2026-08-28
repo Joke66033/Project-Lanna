@@ -1,0 +1,21 @@
+[
+  {"thai":"กาบจั๋ว","lanna":"ᨠᩣ᩠ᨷᨧᩢ᩠ᩅ","pronunciation":"[กาบ - จั๋ว]","meaning":"น. กาบลายดอกบนยอดเจดีย์ก่อนที่จะถึงฉัตร ใช้ประดับส่วนฐานเพื่อรับสิ่งอื่นก็ได้","initial":"ก","category":"ศาสนาและความเชื่อ","pdf_page":41},
+  {"thai":"กาบปลี","lanna":"ᨠᩣ᩠ᨷᨸ᩠ᩃᩦ","pronunciation":"[กาบ - ปี]","meaning":"น. กาบของปลีกล้วย ชื่อเรือขนาดเล็กลักษณะคล้ายกาบของปลีกล้วย","initial":"ก","category":"สิ่งของและเครื่องมือ","pdf_page":41},
+  {"thai":"กาบแป้น","lanna":"ᨠᩣ᩠ᨷᩯᨸ᩠᩶ᨶ","pronunciation":"[กาบ - แป้น]","meaning":"น. ดู กะแป้น","initial":"ก","category":"พืชและเกษตร","pdf_page":41},
+  {"thai":"กาบโปก","lanna":"ᨠᩣ᩠ᨷᩰᨸ᩠ᨠ","pronunciation":"[กาบ - โปก]","meaning":"น. กาบไม้ไผ่ หรือกาบหมากขนาดใหญ่ที่สามารถนำมาใช้ประโยชน์ได้ เช่น ใช้มุงอบบุแผง ทำหมวก (ไทยใหญ่) เป็นต้น กะโปก ก้าโปก ก็ว่า ดู ถิ่ม","initial":"ก","category":"สิ่งของและเครื่องมือ","pdf_page":41},
+  {"thai":"กาบหมาก","lanna":"ᨠᩣ᩠ᨷᩉ᩠ᨾᩣ᩠ᨠ","pronunciation":"[กาบ - หมาก]","meaning":"น. กาบใบหมาก ถ้าลอกเยื่อบางๆ ออกมา ใช้มวนบุหรี่ได้ เรียกว่า ตองกาบหมาก","initial":"ก","category":"พืชและเกษตร","pdf_page":41},
+  {"thai":"กาบออก","lanna":"ᨠᩣ᩠ᨷᩋᩬᨠ","pronunciation":"[กาบ - ออก]","meaning":"น. กาบที่หุ้มจั่นมะพร้าวหรือตาล","initial":"ก","category":"พืชและเกษตร","pdf_page":41},
+  {"thai":"กาย","lanna":"ᨠᩣ᩠ᨿ","pronunciation":"[ก๋าย]","meaning":"1. น. ร่างกาย 2. ก. กราย - เดินเฉียดไปใกล้ๆ เปลี่ยนแปลงเป็นอย่างอื่น","initial":"ก","category":"คำศัพท์ทั่วไป","pdf_page":41,"senses":[{"sense_no":1,"part_of_speech":"น.","pronunciation":"[ก๋าย]","meaning":"ร่างกาย","category":"ร่างกายและสุขภาพ","source_page":41},{"sense_no":2,"part_of_speech":"ก.","pronunciation":"[ก๋าย]","meaning":"กราย - เดินเฉียดไปใกล้ๆ เปลี่ยนแปลงเป็นอย่างอื่น","category":"การกระทำ","source_page":41}]},
+  {"thai":"ก่าย","lanna":"ᨠ᩵ᩣ᩠ᨿ","pronunciation":"[ก่าย]","meaning":"ก. พาด วาง ทับ","initial":"ก","category":"การกระทำ","pdf_page":41},
+  {"thai":"ก่ายง้อน","lanna":"ᨠ᩵ᩣ᩠ᨿᨦ᩶ᩬᩁ","pronunciation":"[ก่าย - ง้อน]","meaning":"ก. ไขว่ห้าง","initial":"ก","category":"การกระทำ","pdf_page":41},
+  {"thai":"การ","lanna":"ᨠᩣ᩠ᩁ","pronunciation":"[ก๋าน]","meaning":"น. การงาน ถ้าเป็นงานที่ต้องใช้กำลัง เรียก เวียก","initial":"ก","category":"คำศัพท์ทั่วไป","pdf_page":41},
+  {"thai":"การขุน","lanna":"ᨠᩣ᩠ᩁᨡᩩ᩠ᨶ","pronunciation":"[ก๋าน - ขุน]","meaning":"น. งานของผู้ปกครอง งานของผู้บริหารบ้านเมือง","initial":"ก","category":"สถานที่และชุมชน","pdf_page":41},
+  {"thai":"การเล็กการเด็ก","lanna":"ᨠᩣ᩠ᩁᩮᩃᩢ᩠ᨠᨠᩣ᩠ᩁᩮᨯᩢ᩠ᨠ","pronunciation":"[ก๋าน - เล็ก - ก๋าน - เด็ก]","meaning":"น. เรื่องที่ลึกซึ้ง และละเอียดมากๆ","initial":"ก","category":"ลักษณะและอาการ","pdf_page":41},
+  {"thai":"การวีก","lanna":"ᨠᩣ᩠ᩁᩅᩦ᩠ᨠ","pronunciation":"[ก๋า - ละ - วีก]","meaning":"น. นกการเวก","initial":"ก","category":"สัตว์","pdf_page":41},
+  {"thai":"การหลวง","lanna":"ᨠᩣ᩠ᩁᩉ᩠ᩃ᩠ᩅᨦ","pronunciation":"[ก๋าน - หลวง]","meaning":"น. งานที่ราชการมอบหมายให้ทำ","initial":"ก","category":"สถานที่และชุมชน","pdf_page":41},
+  {"thai":"กาลกิณี","lanna":"ᨠᩣᩃᨠᩥᨱᩦ","pronunciation":"[ก๋า - ละ - กั๋น - นี]","meaning":"น. สิ่งชั่วช้า จัญไร","initial":"ก","category":"ศาสนาและความเชื่อ","pdf_page":41},
+  {"thai":"กาลปัตต์","lanna":"ᨠᩣᩃᨸᩢᨲ᩠ᨲ᩼","pronunciation":"[ก๋า - ละ - ปั๊ด]","meaning":"น. ตาลปัตร กา ก็ว่า","initial":"ก","category":"ศาสนาและความเชื่อ","pdf_page":41},
+  {"thai":"กาลพฤกษ์","lanna":"ᨠᩣᩃᨻᩂᨠ᩠ᨡ᩼","pronunciation":"[ก๋า - ละ - พึก]","meaning":"น. ต้นกัลปพฤกษ์","initial":"ก","category":"พืชและเกษตร","pdf_page":41},
+  {"thai":"กาว","lanna":"ᨠᩣ᩠ᩅ","pronunciation":"[ก๋าว]","meaning":"น. ต้นทองกวาว ชื่อชนกลุ่มหนึ่ง - ลาวกาว ชาวน่านในสมัยโบราณเรียกว่า กาว หรือ กาวน่าน","initial":"ก","category":"คำศัพท์ทั่วไป","pdf_page":41,"senses":[{"sense_no":1,"part_of_speech":"น.","pronunciation":"[ก๋าว]","meaning":"ต้นทองกวาว","category":"พืชและเกษตร","source_page":41},{"sense_no":2,"part_of_speech":"น.","pronunciation":"[ก๋าว]","meaning":"ชื่อชนกลุ่มหนึ่ง - ลาวกาว ชาวน่านในสมัยโบราณเรียกว่า กาว หรือ กาวน่าน","category":"บุคคลและเครือญาติ","source_page":41}]},
+  {"thai":"ก้าวล่วง","lanna":"ᨠ᩶ᩣ᩠ᩅᩃ᩠᩵ᩅᨦ","pronunciation":"[ก้าว - ล่วง]","meaning":"ก. ละเมิด","initial":"ก","category":"การกระทำ","pdf_page":41}
+]

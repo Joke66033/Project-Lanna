@@ -1,0 +1,13 @@
+{
+  "pdf_page": 256,
+  "expected_headwords": 23,
+  "verified_headwords": 23,
+  "expected_entries": 23,
+  "verified_entries": 23,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจภาพหน้าพิมพ์ 256 (หน้าไฟล์ 278) ครบทั้งสองคอลัมน์; แยกสำนวนกลุ่ม บ่ฮู้… และ บ่ลอน/บ่หลอน ตามรูปสะกดกับความหมายต้นฉบับ"
+}

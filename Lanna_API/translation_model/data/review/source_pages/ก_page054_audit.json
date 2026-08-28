@@ -1,0 +1,13 @@
+{
+  "pdf_page": 54,
+  "expected_headwords": 13,
+  "verified_headwords": 13,
+  "expected_entries": 13,
+  "verified_entries": 13,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำใหม่ 13 รายการจากหน้า 54; ไม่นับข้อความต้นหน้าที่ต่อจากไก่เจ้าเล้าหน้า 53"
+}

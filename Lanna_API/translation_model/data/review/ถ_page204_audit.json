@@ -1,0 +1,13 @@
+{
+  "pdf_page": 204,
+  "expected_headwords": 25,
+  "verified_headwords": 25,
+  "expected_entries": 25,
+  "verified_entries": 25,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดหัวคำจากภาพหน้าพิมพ์ 204 (หน้าไฟล์ 226) หมวด ถ ช่วง ถ้วยแบน–ถ็อบ และตรวจหน้าพิมพ์ 205 ว่าเริ่มหัวคำใหม่ ถ่อม"
+}

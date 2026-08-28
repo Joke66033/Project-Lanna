@@ -1,0 +1,13 @@
+{
+  "pdf_page": 94,
+  "expected_headwords": 19,
+  "verified_headwords": 19,
+  "expected_entries": 19,
+  "verified_entries": 19,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจหัวคำ 19 รายการจากภาพหน้า 94 ซึ่งเป็นหน้าสุดท้ายของหมวด ค"
+}

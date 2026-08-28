@@ -1,0 +1,13 @@
+{
+  "pdf_page": 71,
+  "expected_headwords": 22,
+  "verified_headwords": 22,
+  "expected_entries": 22,
+  "verified_entries": 22,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ตรวจหัวคำ 22 รูปคำใน 21 ระเบียน พร้อม glyph ล้านนา คำอ่าน ความหมาย และหมวดหมู่จากภาพหน้า 71 ครบแล้ว"
+}

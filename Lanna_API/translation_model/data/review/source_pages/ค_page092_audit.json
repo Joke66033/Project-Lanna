@@ -1,0 +1,13 @@
+{
+  "pdf_page": 92,
+  "expected_headwords": 24,
+  "verified_headwords": 24,
+  "expected_entries": 24,
+  "verified_entries": 24,
+  "missing": [],
+  "unverified": [],
+  "wrong_verified_page": [],
+  "missing_senses": [],
+  "complete": true,
+  "review_note": "ถอดและตรวจหัวคำ 24 รายการจากภาพหน้า 92; ความหมายต้นหน้าที่ต่อจากหน้า 91 ไม่นับเป็นหัวคำใหม่"
+}

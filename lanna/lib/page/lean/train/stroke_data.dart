@@ -89,9 +89,17 @@ List<List<Offset>>? getConsonantStrokePaths(String char) {
         [const Offset(25.4, 58.7), const Offset(26.8, 54.6), const Offset(30.0, 52.7), const Offset(34.1, 54.6), const Offset(36.0, 58.7), const Offset(34.1, 62.9), const Offset(30.0, 64.7), const Offset(25.9, 62.9), const Offset(20.8, 56.9), const Offset(20.8, 44.0), const Offset(20.8, 30.0), const Offset(24.0, 18.0), const Offset(38.0, 14.0), const Offset(55.0, 14.0), const Offset(75.0, 18.0)],
         [const Offset(20.8, 44.0), const Offset(32.0, 36.0), const Offset(48.0, 34.0), const Offset(62.0, 38.0), const Offset(70.0, 46.0), const Offset(72.0, 58.0), const Offset(68.0, 65.0), const Offset(72.0, 68.0), const Offset(80.0, 64.0)],
       ];
-    case 'ᨥ': // ฆะ (ตรงตามรูปภาพต้นแบบฟอนต์ LN-TILOK 100%: หัวกลมซ้าย ลอนคู่บนซ้าย ท้องอ่างล่างซ้าย คาดเอวกลาง ท้องคลื่นขวาลอนคู่ตวัดหาง)
+    case 'ᨥ': // ฆะ (ตรงตามรูปภาพต้นแบบฟอนต์ LN-TILOK 100%: หัวกลมบนซ้าย ท้องอ่างล่างซ้าย คาดเอวกลาง คลื่นล่างสองลอน ซุ้มแหลมสองยอดตวัดหาง)
       return [
-        [const Offset(22.0, 48.0), const Offset(18.0, 54.0), const Offset(24.0, 58.0), const Offset(28.0, 52.0), const Offset(26.0, 42.0), const Offset(24.0, 32.0), const Offset(28.0, 24.0), const Offset(34.0, 28.0), const Offset(38.0, 36.0), const Offset(42.0, 28.0), const Offset(46.0, 24.0), const Offset(50.0, 32.0), const Offset(50.0, 46.0), const Offset(44.0, 58.0), const Offset(32.0, 60.0), const Offset(24.0, 54.0), const Offset(36.0, 50.0), const Offset(48.0, 48.0), const Offset(58.0, 46.0), const Offset(64.0, 36.0), const Offset(70.0, 28.0), const Offset(76.0, 36.0), const Offset(76.0, 48.0), const Offset(80.0, 36.0), const Offset(86.0, 28.0), const Offset(90.0, 38.0), const Offset(88.0, 54.0)],
+        [
+          const Offset(24.0, 36.0), const Offset(28.0, 30.0), const Offset(33.0, 30.0), const Offset(36.0, 36.0),
+          const Offset(30.0, 48.0), const Offset(18.0, 56.0), const Offset(22.0, 64.0), const Offset(34.0, 64.0),
+          const Offset(42.0, 52.0), const Offset(44.0, 42.0),
+          const Offset(46.0, 54.0), const Offset(52.0, 64.0), const Offset(58.0, 56.0),
+          const Offset(62.0, 42.0), const Offset(65.0, 30.0), const Offset(69.0, 32.0), const Offset(69.0, 48.0),
+          const Offset(71.0, 56.0), const Offset(77.0, 64.0), const Offset(83.0, 56.0),
+          const Offset(86.0, 42.0), const Offset(89.0, 28.0), const Offset(93.0, 32.0), const Offset(92.0, 48.0), const Offset(88.0, 56.0),
+        ],
       ];
     case 'ᨦ': // งะ (ตรงตามรูปภาพต้นแบบ 100%: ม้วนหัวก้นหอยล่างซ้าย พุ่งขึ้นทำหงอนบน โค้งข้ามโดมบน ลงเสาขวา ตวัดหางล่าง)
       return [

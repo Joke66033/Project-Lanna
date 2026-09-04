@@ -788,38 +788,9 @@ class _LocalStrokePainter extends CustomPainter {
       size: size,
       padding: writingExamplePadding,
     );
-    // Stroke coordinates are already normalized as a complete 100×100 glyph.
-    // Mapping them through the font's selection box compresses some wide
-    // Lanna characters into a tall, narrow shape. Map them directly into the
-    // fixed writing square so every character keeps its authored proportions.
-    // คำนวณ Bounding Box ของตัวอักษรเพื่อจัดกึ่งกลางและปรับขนาดให้ออกมาสวยงาม เต็มกรอบ พอดีเสมอ
-    double minX = 100.0, minY = 100.0, maxX = 0.0, maxY = 0.0;
-    bool hasPoints = false;
-    for (final stroke in strokes) {
-      for (final pt in stroke) {
-        hasPoints = true;
-        if (pt.dx < minX) minX = pt.dx;
-        if (pt.dy < minY) minY = pt.dy;
-        if (pt.dx > maxX) maxX = pt.dx;
-        if (pt.dy > maxY) maxY = pt.dy;
-      }
-    }
-
-    final double charWidth = hasPoints ? math.max(20.0, maxX - minX) : 60.0;
-    final double charHeight = hasPoints ? math.max(20.0, maxY - minY) : 60.0;
-    final double charCenterX = hasPoints ? (minX + maxX) / 2.0 : 50.0;
-    final double charCenterY = hasPoints ? (minY + maxY) / 2.0 : 50.0;
-
-    final double targetSize = size.shortestSide * (isFloatingVowelOrMark ? 0.36 : 0.52);
-    final double scale = targetSize / math.max(charWidth, charHeight);
 
     Offset strokeScale(Offset point) {
-      final double scaledX = (point.dx - charCenterX) * scale;
-      final double scaledY = (point.dy - charCenterY) * scale;
-      return Offset(
-        size.width / 2.0 + scaledX,
-        size.height / 2.0 + scaledY,
-      );
+      return glyphLayout.positionFromNormalized(point);
     }
 
     // Paint the true authentic font glyph in the background so it matches the card 100%
@@ -828,8 +799,8 @@ class _LocalStrokePainter extends CustomPainter {
     final usesGeneratedGuide = strokes.isNotEmpty;
     if (usesGeneratedGuide) {
       final guidePaint = Paint()
-        ..color = const Color(0xFFD9D2CB).withValues(alpha: 0.5)
-        ..strokeWidth = 3.5
+        ..color = const Color(0xFFD9D2CB).withValues(alpha: 0.6)
+        ..strokeWidth = 4.0
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
         ..style = PaintingStyle.stroke;

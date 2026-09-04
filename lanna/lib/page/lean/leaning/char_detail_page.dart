@@ -735,6 +735,16 @@ class _LocalStrokePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    var activeStrokeIndex = currentIndex;
+    var activeStrokeProgress = progress.clamp(0.0, 1.0);
+    if (animateAllStrokes && strokes.isNotEmpty) {
+      final sequenceProgress = progress.clamp(0.0, 1.0) * strokes.length;
+      activeStrokeIndex = sequenceProgress.floor().clamp(0, strokes.length - 1);
+      activeStrokeProgress = sequenceProgress >= strokes.length
+          ? 1.0
+          : sequenceProgress - activeStrokeIndex;
+    }
+
     // 0. ตารางจุดพื้นหลัง (Dotted grid)
     final paintDot = Paint()
       ..color = const Color(0xFFDCC8B8).withValues(alpha: 0.4);
@@ -745,111 +755,155 @@ class _LocalStrokePainter extends CustomPainter {
       }
     }
 
-    // 1. เรนเดอร์ตัวอักษรจริงจากฟอนต์ LNTilok ให้ตรงกับด้านบน 100%
-    final double fontSize = size.shortestSide * 0.65;
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: char,
-        style: TextStyle(
-          fontSize: fontSize,
-          fontFamily: 'LNTilok',
-          fontFamilyFallback: const ['LNTilok', 'THSarabunNew', 'sans-serif'],
-          color: const Color(0xFFEADBC8),
-          fontWeight: FontWeight.normal,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-      textAlign: TextAlign.center,
-    )..layout();
+    if (strokes.isEmpty) return;
 
-    final textOffset = Offset(
-      (size.width - textPainter.width) / 2.0,
-      (size.height - textPainter.height) / 2.0,
-    );
+    // คำนวณ Bounding Box ของเส้นทั้งหมดเพื่อจัดกึ่งกลางและปรับขนาดให้พอดีสวยงาม
+    double minX = 100.0, minY = 100.0, maxX = 0.0, maxY = 0.0;
+    for (final stroke in strokes) {
+      for (final pt in stroke) {
+        if (pt.dx < minX) minX = pt.dx;
+        if (pt.dy < minY) minY = pt.dy;
+        if (pt.dx > maxX) maxX = pt.dx;
+        if (pt.dy > maxY) maxY = pt.dy;
+      }
+    }
 
-    // 1.1 วาดรูปทรงอักษรจริงสีจางเป็นลายน้ำแม่แบบ (Pale Guide)
-    textPainter.paint(canvas, textOffset);
+    final double charWidth = (maxX > minX) ? (maxX - minX) : 60.0;
+    final double charHeight = (maxY > minY) ? (maxY - minY) : 60.0;
+    final double charCenterX = (minX + maxX) / 2.0;
+    final double charCenterY = (minY + maxY) / 2.0;
 
-    // 2. วาดการเขียนหมึกสีน้ำตาลตามแอนิเมชัน (Ink Stroke Reveal)
-    var currentProgress = progress.clamp(0.0, 1.0);
-    if (currentProgress > 0) {
-      canvas.save();
-      // สร้าง Mask คลิปการเขียนตามทิศทางแอนิเมชัน
-      final revealRect = Rect.fromLTWH(
-        0,
-        0,
-        size.width * (currentProgress * 1.05).clamp(0.0, 1.0),
-        size.height,
+    // สเกลให้ขนาดตัวอักษรพอดีกับกรอบวาด (ประมาณ 65% ของ Canvas)
+    final double targetSize = size.shortestSide * 0.62;
+    final double scale = targetSize / (charWidth > charHeight ? charWidth : charHeight);
+
+    Offset mapPoint(Offset p) {
+      final double scaledX = (p.dx - charCenterX) * scale;
+      final double scaledY = (p.dy - charCenterY) * scale;
+      return Offset(
+        size.width / 2.0 + scaledX,
+        size.height / 2.0 + scaledY,
       );
-      canvas.clipRect(revealRect);
+    }
 
-      final inkPainter = TextPainter(
+    // Helper: สร้างเส้นโค้ง Catmull-Rom spline ที่เรียบเนียนเป็นธรรมชาติ
+    Path buildSmoothPath(List<Offset> pts) {
+      final path = Path();
+      if (pts.isEmpty) return path;
+      final scaled = pts.map(mapPoint).toList();
+      path.moveTo(scaled[0].dx, scaled[0].dy);
+      if (scaled.length == 1) return path;
+      if (scaled.length == 2) {
+        path.lineTo(scaled[1].dx, scaled[1].dy);
+        return path;
+      }
+      for (int i = 0; i < scaled.length - 1; i++) {
+        final p0 = scaled[(i - 1).clamp(0, scaled.length - 1)];
+        final p1 = scaled[i];
+        final p2 = scaled[i + 1];
+        final p3 = scaled[(i + 2).clamp(0, scaled.length - 1)];
+        final cp1x = p1.dx + (p2.dx - p0.dx) / 6.0;
+        final cp1y = p1.dy + (p2.dy - p0.dy) / 6.0;
+        final cp2x = p2.dx - (p3.dx - p1.dx) / 6.0;
+        final cp2y = p2.dy - (p3.dy - p1.dy) / 6.0;
+        path.cubicTo(cp1x, cp1y, cp2x, cp2y, p2.dx, p2.dy);
+      }
+      return path;
+    }
+
+    // 1. วาดเส้นไกด์โครงสร้างทั้งหมดสีจาง (Background Guide Path)
+    final guidePaint = Paint()
+      ..color = const Color(0xFFF5D5C0).withValues(alpha: 0.8)
+      ..strokeWidth = 14.0
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+
+    for (final stroke in strokes) {
+      if (stroke.isEmpty) continue;
+      canvas.drawPath(buildSmoothPath(stroke), guidePaint);
+    }
+
+    // 2. วาดเส้นที่เขียนเสร็จแล้วก่อนหน้า (Completed Strokes)
+    final completedPaint = Paint()
+      ..color = const Color(0xFF924E19)
+      ..strokeWidth = 9.0
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+
+    for (int i = 0; i < activeStrokeIndex; i++) {
+      if (i >= strokes.length || strokes[i].isEmpty) continue;
+      canvas.drawPath(buildSmoothPath(strokes[i]), completedPaint);
+    }
+
+    // 3. วาดเส้นที่กำลังเขียนสด (Active Animated Stroke)
+    if (activeStrokeIndex >= 0 && activeStrokeIndex < strokes.length) {
+      final currentPts = strokes[activeStrokeIndex];
+      if (currentPts.isNotEmpty) {
+        final currentPath = buildSmoothPath(currentPts);
+        for (final metric in currentPath.computeMetrics()) {
+          final targetLen = metric.length * activeStrokeProgress;
+          canvas.drawPath(
+            metric.extractPath(0, targetLen),
+            completedPaint,
+          );
+
+          // วาดหัวปากกาขณะลากเส้น
+          final tangent = metric.getTangentForOffset(targetLen);
+          if (tangent != null && activeStrokeProgress > 0 && activeStrokeProgress < 1.0) {
+            final penPaint = Paint()
+              ..color = const Color(0xFFE16905)
+              ..style = PaintingStyle.fill;
+            canvas.drawCircle(tangent.position, 6.0, penPaint);
+          }
+        }
+      }
+    }
+
+    // 4. วาดจุดเริ่มต้นลำดับขีด (1, 2, 3...)
+    for (int i = 0; i < strokes.length; i++) {
+      if (strokes[i].isEmpty) continue;
+      final startPt = mapPoint(strokes[i][0]);
+      final isCurrentOrDone = i <= activeStrokeIndex;
+      final isFirst = i == 0;
+
+      // วงกลมมาร์กเกอร์
+      final badgePaint = Paint()
+        ..color = isFirst
+            ? const Color(0xFFFF9800)
+            : (isCurrentOrDone ? const Color(0xFF924E19) : const Color(0xFFB0A090));
+
+      canvas.drawCircle(startPt, 8.5, badgePaint);
+
+      // ขอบสีขาวรอบวงกลม
+      canvas.drawCircle(
+        startPt,
+        8.5,
+        Paint()
+          ..color = Colors.white
+          ..strokeWidth = 1.5
+          ..style = PaintingStyle.stroke,
+      );
+
+      // ตัวเลข 1, 2, 3...
+      final tp = TextPainter(
         text: TextSpan(
-          text: char,
-          style: TextStyle(
-            fontSize: fontSize,
-            fontFamily: 'LNTilok',
-            fontFamilyFallback: const ['LNTilok', 'THSarabunNew', 'sans-serif'],
-            color: const Color(0xFF924E19),
-            fontWeight: FontWeight.normal,
+          text: '${i + 1}',
+          style: const TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontFamily: 'sans-serif',
           ),
         ),
         textDirection: TextDirection.ltr,
-        textAlign: TextAlign.center,
       )..layout();
 
-      inkPainter.paint(canvas, textOffset);
-      canvas.restore();
-    }
-
-    // 3. วาดจุดเริ่มต้นลำดับขีด (1, 2, 3...)
-    if (strokes.isNotEmpty) {
-      // แม็ปพิกัดให้อยู่ในกรอบตัวอักษรจริง
-      final charBox = Rect.fromLTWH(
-        textOffset.dx + textPainter.width * 0.1,
-        textOffset.dy + textPainter.height * 0.1,
-        textPainter.width * 0.8,
-        textPainter.height * 0.8,
+      tp.paint(
+        canvas,
+        Offset(startPt.dx - tp.width / 2, startPt.dy - tp.height / 2),
       );
-
-      Offset mapToChar(Offset pt) {
-        return Offset(
-          charBox.left + (pt.dx / 100.0) * charBox.width,
-          charBox.top + (pt.dy / 100.0) * charBox.height,
-        );
-      }
-
-      for (int i = 0; i < strokes.length; i++) {
-        if (strokes[i].isEmpty) continue;
-        final startPt = mapToChar(strokes[i][0]);
-        final isFirst = i == 0;
-
-        canvas.drawCircle(
-          startPt,
-          8,
-          isFirst
-              ? (Paint()..color = const Color(0xFFFF9800).withValues(alpha: 0.85))
-              : (Paint()..color = const Color(0xFF924E19).withValues(alpha: 0.7)),
-        );
-
-        final tp = TextPainter(
-          text: TextSpan(
-            text: '${i + 1}',
-            style: const TextStyle(
-              fontSize: 8,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontFamily: 'sans-serif',
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout();
-
-        tp.paint(
-          canvas,
-          Offset(startPt.dx - tp.width / 2, startPt.dy - tp.height / 2),
-        );
-      }
     }
   }
 

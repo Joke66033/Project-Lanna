@@ -1,11 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import '../learning_navigation.dart';
 import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
 import '../train/stroke_order_model.dart';
-import '../train/glyph_layout.dart';
 import 'package:lanna/services/character_stroke_service.dart';
 
 // ============================================================================
@@ -738,17 +735,7 @@ class _LocalStrokePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    var activeStrokeIndex = currentIndex;
-    var activeStrokeProgress = progress.clamp(0.0, 1.0);
-    if (animateAllStrokes && strokes.isNotEmpty) {
-      final sequenceProgress = progress.clamp(0.0, 1.0) * strokes.length;
-      activeStrokeIndex = sequenceProgress.floor().clamp(0, strokes.length - 1);
-      activeStrokeProgress = sequenceProgress >= strokes.length
-          ? 1
-          : sequenceProgress - activeStrokeIndex;
-    }
-
-    // 0. Dotted grid background
+    // 0. ตารางจุดพื้นหลัง (Dotted grid)
     final paintDot = Paint()
       ..color = const Color(0xFFDCC8B8).withValues(alpha: 0.4);
     const double spacing = 16.0;
@@ -758,134 +745,111 @@ class _LocalStrokePainter extends CustomPainter {
       }
     }
 
-    // Draw the character that belongs to this page directly from the Lanna
-    // font. The coordinate data below describes stroke order/start positions;
-    // it must not replace the real glyph silhouette because hand-entered
-    // coordinates can otherwise make a different character appear here.
-    // Use one shared glyph layout for the pale guide, animated strokes and
-    // numbered start points. Coordinates in stroke_data.dart are normalized
-    // to the visible glyph box (0..100), not to the whole writing board.
-    // Keep the writing example visually the same size as the 56 px glyph in
-    // the character card above. The board itself may be 200 or 220 px, but
-    // the glyph should not expand to fill the whole board.
-    // Use one optical size for every writing example. Per-character sizes
-    // caused neighbouring glyphs to jump between very large and very small.
-    final characterRunes = char.runes.toList();
-    final isFloatingVowelOrMark =
-        characterRunes.length == 1 &&
-        characterRunes.first >= 0x1A65 &&
-        characterRunes.first <= 0x1A7C;
-    // Floating vowels and marks are optically much smaller than consonants.
-    // Preserve that scale so their teaching path matches the glyph above.
-    final writingExampleSize = isFloatingVowelOrMark ? 38.0 : 68.0;
-    final writingExamplePadding = math.max(
-      0.0,
-      (size.shortestSide - writingExampleSize) / 2,
-    );
-    final glyphLayout = layoutWritingGlyph(
-      character: char,
-      fontFamily: 'LNTilok',
-      size: size,
-      padding: writingExamplePadding,
+    // 1. เรนเดอร์ตัวอักษรจริงจากฟอนต์ LNTilok ให้ตรงกับด้านบน 100%
+    final double fontSize = size.shortestSide * 0.65;
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: char,
+        style: TextStyle(
+          fontSize: fontSize,
+          fontFamily: 'LNTilok',
+          fontFamilyFallback: const ['LNTilok', 'THSarabunNew', 'sans-serif'],
+          color: const Color(0xFFEADBC8),
+          fontWeight: FontWeight.normal,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+    )..layout();
+
+    final textOffset = Offset(
+      (size.width - textPainter.width) / 2.0,
+      (size.height - textPainter.height) / 2.0,
     );
 
-    Offset strokeScale(Offset point) {
-      return glyphLayout.positionFromNormalized(point);
-    }
+    // 1.1 วาดรูปทรงอักษรจริงสีจางเป็นลายน้ำแม่แบบ (Pale Guide)
+    textPainter.paint(canvas, textOffset);
 
-    // Paint the true authentic font glyph in the background so it matches the card 100%
-    glyphLayout.paint(canvas, const Color(0xFFE8DFD5));
-
-    final usesGeneratedGuide = strokes.isNotEmpty;
-    if (usesGeneratedGuide) {
-      final guidePaint = Paint()
-        ..color = const Color(0xFFD9D2CB).withValues(alpha: 0.6)
-        ..strokeWidth = 4.0
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round
-        ..style = PaintingStyle.stroke;
-      for (final stroke in strokes) {
-        if (stroke.isEmpty) continue;
-        canvas.drawPath(buildStrokePath(stroke, strokeScale), guidePaint);
-      }
-    }
-
-    // Never fake handwriting with a horizontal colour reveal. If a character
-    // genuinely has no path data, keep only the pale glyph guide. Supported
-    // multi-character forms are composed into real paths in stroke_data.dart.
-    if (strokes.isEmpty) {
-      return;
-    }
-
-    // Animate the real centre-line data. This is a pen movement along each
-    // stroke, not a horizontal colour reveal over the font glyph.
-    final completedPaint = Paint()
-      ..color = const Color(0xFF924E19)
-      ..strokeWidth = 4.5
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke;
-
-    for (var index = 0; index < activeStrokeIndex; index++) {
-      if (index >= strokes.length || strokes[index].isEmpty) continue;
-      canvas.drawPath(
-        buildStrokePath(strokes[index], strokeScale),
-        completedPaint,
+    // 2. วาดการเขียนหมึกสีน้ำตาลตามแอนิเมชัน (Ink Stroke Reveal)
+    var currentProgress = progress.clamp(0.0, 1.0);
+    if (currentProgress > 0) {
+      canvas.save();
+      // สร้าง Mask คลิปการเขียนตามทิศทางแอนิเมชัน
+      final revealRect = Rect.fromLTWH(
+        0,
+        0,
+        size.width * (currentProgress * 1.05).clamp(0.0, 1.0),
+        size.height,
       );
-    }
+      canvas.clipRect(revealRect);
 
-    if (activeStrokeIndex >= 0 && activeStrokeIndex < strokes.length) {
-      final currentStroke = strokes[activeStrokeIndex];
-      if (currentStroke.isNotEmpty) {
-        final currentPath = buildStrokePath(currentStroke, strokeScale);
-        for (final metric in currentPath.computeMetrics()) {
-          canvas.drawPath(
-            metric.extractPath(0, metric.length * activeStrokeProgress),
-            completedPaint,
-          );
-        }
-      }
-    }
-
-    // Stroke-start circles and numbers still come from this character's own
-    // stroke-order data. Keep markers small and translucent so they do not
-    // cover the character underneath.
-    final paintStartActive = Paint()
-      ..color = const Color(0xFF924E19).withValues(alpha: 0.48);
-    final paintStartInactive = Paint()
-      ..color = const Color(0xFFC7B8AA).withValues(alpha: 0.32);
-
-    for (int i = 0; i < strokes.length; i++) {
-      if (strokes[i].isEmpty) continue;
-      final startPt = strokeScale(strokes[i][0]);
-      final isCurrentOrCompleted = i <= activeStrokeIndex;
-      final isFirst = i == 0;
-      canvas.drawCircle(
-        startPt,
-        7,
-        isFirst
-            ? (Paint()..color = const Color(0xFFFF9800).withValues(alpha: 0.58))
-            : isCurrentOrCompleted
-            ? paintStartActive
-            : paintStartInactive,
-      );
-      final tp = TextPainter(
+      final inkPainter = TextPainter(
         text: TextSpan(
-          text: '${i + 1}',
+          text: char,
           style: TextStyle(
-            fontSize: 7,
-            fontWeight: FontWeight.bold,
-            color: Colors.white.withValues(alpha: 0.88),
-            fontFamily: 'sans-serif',
+            fontSize: fontSize,
+            fontFamily: 'LNTilok',
+            fontFamilyFallback: const ['LNTilok', 'THSarabunNew', 'sans-serif'],
+            color: const Color(0xFF924E19),
+            fontWeight: FontWeight.normal,
           ),
         ),
         textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+      )..layout();
+
+      inkPainter.paint(canvas, textOffset);
+      canvas.restore();
+    }
+
+    // 3. วาดจุดเริ่มต้นลำดับขีด (1, 2, 3...)
+    if (strokes.isNotEmpty) {
+      // แม็ปพิกัดให้อยู่ในกรอบตัวอักษรจริง
+      final charBox = Rect.fromLTWH(
+        textOffset.dx + textPainter.width * 0.1,
+        textOffset.dy + textPainter.height * 0.1,
+        textPainter.width * 0.8,
+        textPainter.height * 0.8,
       );
-      tp.layout();
-      tp.paint(
-        canvas,
-        Offset(startPt.dx - tp.width / 2, startPt.dy - tp.height / 2),
-      );
+
+      Offset mapToChar(Offset pt) {
+        return Offset(
+          charBox.left + (pt.dx / 100.0) * charBox.width,
+          charBox.top + (pt.dy / 100.0) * charBox.height,
+        );
+      }
+
+      for (int i = 0; i < strokes.length; i++) {
+        if (strokes[i].isEmpty) continue;
+        final startPt = mapToChar(strokes[i][0]);
+        final isFirst = i == 0;
+
+        canvas.drawCircle(
+          startPt,
+          8,
+          isFirst
+              ? (Paint()..color = const Color(0xFFFF9800).withValues(alpha: 0.85))
+              : (Paint()..color = const Color(0xFF924E19).withValues(alpha: 0.7)),
+        );
+
+        final tp = TextPainter(
+          text: TextSpan(
+            text: '${i + 1}',
+            style: const TextStyle(
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontFamily: 'sans-serif',
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout();
+
+        tp.paint(
+          canvas,
+          Offset(startPt.dx - tp.width / 2, startPt.dy - tp.height / 2),
+        );
+      }
     }
   }
 

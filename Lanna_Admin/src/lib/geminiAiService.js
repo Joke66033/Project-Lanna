@@ -90,8 +90,8 @@ export async function translateWithAi(thaiText, lannaMap = null) {
       }
 
       const parsed = JSON.parse(rawText);
-      const kamMueang = (parsed.kam_mueang || cleanInput).replace(/[\[\]]/g, '').trim();
-      const reading = (parsed.phonetic || kamMueang).replace(/[\[\]]/g, '').trim();
+      const kamMueang = (parsed.kam_mueang || cleanInput).replace(/[[\]]/g, '').trim();
+      const reading = (parsed.phonetic || kamMueang).replace(/[[\]]/g, '').trim();
       const meaning = parsed.meaning || '';
 
       // นำคำเมืองหรือคำอ่านมาแปลงเป็นตัวอักขระล้านนา Tai Tham

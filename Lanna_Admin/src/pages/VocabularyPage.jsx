@@ -57,7 +57,9 @@ export default function VocabularyPage() {
         const resCat = await fetch(`${BASE}/endpoints/category_vocab_api.php?action=getAll`);
         const jsonCat = await resCat.json();
         catData = jsonCat.data || [];
-      } catch (e) {}
+      } catch (e) {
+        console.warn("Category fetch fallback:", e);
+      }
 
       if (!Array.isArray(catData) || catData.length === 0) {
         const { data: resC } = await supabase
@@ -73,7 +75,9 @@ export default function VocabularyPage() {
         const resV = await fetch(`${BASE}/endpoints/vocabulary_api.php?action=getAll`);
         const jsonV = await resV.json();
         list = jsonV.data || [];
-      } catch (e) {}
+      } catch (e) {
+        console.warn("Vocab fetch fallback:", e);
+      }
 
       if (!Array.isArray(list) || list.length === 0) {
         const { data: resData } = await supabase
@@ -175,6 +179,7 @@ export default function VocabularyPage() {
     category_vocab_id: "",
   });
 
+  const [errors, setErrors] = useState({});
   const [aiLoading, setAiLoading] = useState(false);
   const [isAiConverted, setIsAiConverted] = useState(false);
 
@@ -230,7 +235,7 @@ export default function VocabularyPage() {
 
     // 1. ถ้ามีคำอ่านภาษาล้านนา ให้แปลงจากคำอ่านก่อนเสมอ
     if (rawReading) {
-      const cleanReading = rawReading.replace(/[\[\]\-]/g, '').trim();
+      const cleanReading = rawReading.replace(/[[\]-]/g, '').trim();
       const lannaConverted = convertThaiToLanna(cleanReading, lannaMap);
       setForm((prev) => ({
         ...prev,

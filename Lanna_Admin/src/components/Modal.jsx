@@ -9,8 +9,8 @@ import React from "react";
 */
 export default function Modal({ title, onClose, children, maxWidthClass = "max-w-lg" }) {
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className={`bg-white rounded-2xl w-full ${maxWidthClass} shadow-xl flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-150`}>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center z-[9999] p-4">
+      <div className={`bg-white rounded-2xl w-full ${maxWidthClass} shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-150 relative z-[10000]`}>
         {title && (
           <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 flex-shrink-0">
             <h2 className="font-bold text-xl text-gray-800">{title}</h2>

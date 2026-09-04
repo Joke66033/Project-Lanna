@@ -9,6 +9,8 @@ import { loadLannaMap, convertThaiToLanna, toTilokFontString, tilokDirectMap } f
 import { translateWithAi } from "../lib/geminiAiService.js";
 import { trackRecentActivity, sortRecentData } from "../lib/recentActivity.js";
 import { SuccessModal, ConfirmDeleteModal, WarningModal } from "../components/AlertModals.jsx";
+import Modal from "../components/Modal.jsx";
+import { categoryColors, getCategoryBadgeStyle } from "../lib/categoryColors";
 
 const getApiBase = () => {
   if (typeof window !== 'undefined' && window.location.hostname === 'siripaporn.lnw.mn') {
@@ -17,9 +19,6 @@ const getApiBase = () => {
   return import.meta.env.VITE_API_BASE_URL || 'https://siripaporn.lnw.mn';
 };
 const BASE = getApiBase();
-
-import Modal from "../components/Modal.jsx";
-import { categoryColors, getCategoryBadgeStyle } from "../lib/categoryColors";
 
 /* ================= HELPERS ================= */
 const mapVocabCategory = (items) => {

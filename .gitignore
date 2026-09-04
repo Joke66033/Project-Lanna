@@ -17,7 +17,6 @@ lanna/ios/Flutter/flutter_export_environment.sh
 
 # Node.js (Lanna_Admin)
 Lanna_Admin/node_modules/
-Lanna_Admin/dist/
 Lanna_Admin/.env
 
 # Local logs

@@ -269,11 +269,50 @@ export default function VocabularyPage() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!form.lanna_word.trim()) newErrors.lanna_word = "กรุณากรอกคำศัพท์ล้านนา";
-    if (!form.thai_word.trim()) newErrors.thai_word = "กรุณากรอกคำศัพท์ไทย";
-    if (!form.reading.trim()) newErrors.reading = "กรุณากรอกคำอ่าน";
-    if (!form.meaning.trim()) newErrors.meaning = "กรุณากรอกความหมาย";
-    if (!form.category_vocab_id) newErrors.category_vocab_id = "กรุณาเลือกหมวดหมู่";
+    const cleanThai = (form.thai_word || "").trim();
+    if (!cleanThai) {
+      newErrors.thai_word = "กรุณากรอกคำศัพท์ไทย";
+    }
+
+    // Auto-fill reading if empty
+    let cleanReading = (form.reading || "").trim();
+    if (!cleanReading && cleanThai) {
+      cleanReading = cleanThai;
+    }
+
+    // Auto-fill lanna_word if empty
+    let cleanLanna = (form.lanna_word || "").trim();
+    if (!cleanLanna && (cleanReading || cleanThai)) {
+      cleanLanna = convertThaiToLanna(cleanReading || cleanThai, lannaMap);
+    }
+
+    if (!cleanLanna) {
+      newErrors.lanna_word = "กรุณากดปุ่มแปลงหรือกรอกคำศัพท์ล้านนา";
+    }
+
+    let cleanMeaning = (form.meaning || "").trim();
+    if (!cleanMeaning && cleanThai) {
+      cleanMeaning = cleanThai;
+    }
+
+    let catId = form.category_vocab_id;
+    if (!catId && categories.length > 0) {
+      catId = categories[0].category_vocab_id;
+    }
+
+    if (!catId) {
+      newErrors.category_vocab_id = "กรุณาเลือกหมวดหมู่";
+    }
+
+    // Update form with auto-filled values
+    setForm((prev) => ({
+      ...prev,
+      thai_word: cleanThai,
+      reading: cleanReading,
+      lanna_word: cleanLanna,
+      meaning: cleanMeaning,
+      category_vocab_id: catId,
+    }));
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -286,12 +325,20 @@ export default function VocabularyPage() {
 
     try {
       setLoading(true);
+      const payload = {
+        ...form,
+        reading: form.reading || form.thai_word,
+        lanna_word: form.lanna_word || convertThaiToLanna(form.reading || form.thai_word, lannaMap),
+        meaning: form.meaning || form.thai_word,
+        category_vocab_id: form.category_vocab_id || (categories[0]?.category_vocab_id || null),
+      };
+
       const res = await fetch(
         `${BASE}/endpoints/vocabulary_api.php?action=create`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify(payload),
         }
       );
       const resJson = await res.json();
@@ -301,11 +348,12 @@ export default function VocabularyPage() {
       setShowAdd(false);
       setForm({ lanna_word: "", thai_word: "", reading: "", meaning: "", category_vocab_id: "" });
       setErrors({});
+      setIsAiConverted(false);
       setSuccessText("เพิ่มคำศัพท์สำเร็จ");
       setShowSuccess(true);
       
       // Update state locally (prepend)
-      const newVocab = insertedItem || resJson?.data || { ...form };
+      const newVocab = insertedItem || resJson?.data || { ...payload };
       const vocabId = newVocab?.vocab_id || newVocab?.id;
       if (vocabId) {
         trackRecentActivity("vocabulary", vocabId);
@@ -323,15 +371,26 @@ export default function VocabularyPage() {
 
   /* ===== EDIT ===== */
   const openEdit = (item) => {
+    let catId = item.category_vocab_id || item.category_vocab?.category_vocab_id || item.category_id || "";
+    if (!catId && item.category && categories.length > 0) {
+      const matchCat = categories.find((c) => c.name === item.category);
+      if (matchCat) catId = matchCat.category_vocab_id;
+    }
+    if (!catId && categories.length > 0) {
+      catId = categories[0].category_vocab_id;
+    }
+
     setForm({
       lanna_word: item.lanna_word || "",
       thai_word: item.thai_word || "",
       reading: item.reading || "",
       meaning: item.meaning || "",
-      category_vocab_id: item.category_vocab_id || "",
+      category_vocab_id: catId || "",
     });
     setOriginalForm(item);
     setErrors({});
+    setIsAiConverted(false);
+    setShowAdd(false);
     setShowEdit(true);
   };
 
@@ -342,12 +401,20 @@ export default function VocabularyPage() {
     try {
       setLoading(true);
       const targetId = originalForm.vocab_id || originalForm.id;
+      const payload = {
+        ...form,
+        reading: form.reading || form.thai_word,
+        lanna_word: form.lanna_word || convertThaiToLanna(form.reading || form.thai_word, lannaMap),
+        meaning: form.meaning || form.thai_word,
+        category_vocab_id: form.category_vocab_id || (categories[0]?.category_vocab_id || null),
+      };
+
       const res = await fetch(
         `${BASE}/endpoints/vocabulary_api.php?action=update&id=${encodeURIComponent(targetId)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify(payload),
         }
       );
       const resJson = await res.json();
@@ -358,11 +425,12 @@ export default function VocabularyPage() {
       setOriginalForm(null);
       setForm({ lanna_word: "", thai_word: "", reading: "", meaning: "", category_vocab_id: "" });
       setErrors({});
+      setIsAiConverted(false);
       setSuccessText("แก้ไขคำศัพท์สำเร็จ");
       setShowSuccess(true);
 
       // Update state locally (prepend updated item)
-      const updatedObj = updatedItem || { ...originalForm, ...form, vocab_id: targetId, id: targetId };
+      const updatedObj = updatedItem || { ...originalForm, ...payload, vocab_id: targetId, id: targetId };
       const editId = updatedObj?.vocab_id || targetId;
       trackRecentActivity("vocabulary", editId);
       setData((prev) => [updatedObj, ...prev.filter((i) => (i.vocab_id || i.id) !== editId)]);
@@ -444,12 +512,14 @@ export default function VocabularyPage() {
         </div>
         <button
           onClick={() => {
-            setForm({ lanna_word: "", thai_word: "", reading: "", meaning: "", category_vocab_id: "" });
+            const defaultCat = categories.length > 0 ? categories[0].category_vocab_id : "";
+            setForm({ lanna_word: "", thai_word: "", reading: "", meaning: "", category_vocab_id: defaultCat });
             setErrors({});
+            setIsAiConverted(false);
             setShowEdit(false);
             setShowAdd(true);
           }}
-          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition shrink-0"
+          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition shrink-0 cursor-pointer"
         >
           <Plus size={18} /> เพิ่มคำศัพท์
         </button>
@@ -820,14 +890,15 @@ export default function VocabularyPage() {
             {/* STICKY FOOTER */}
             <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/80 flex-shrink-0">
               <button
-                disabled={loading || !form.thai_word || !form.category_vocab_id}
-                className={`w-full py-3 rounded-xl font-bold text-sm transition-all shadow-sm ${
-                  loading || !form.thai_word || !form.category_vocab_id
+                type="submit"
+                disabled={loading || !form.thai_word.trim()}
+                className={`w-full py-3 rounded-xl font-bold text-sm transition-all shadow-sm cursor-pointer ${
+                  loading || !form.thai_word.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#16A34A] hover:bg-[#15803D] text-white shadow-md active:scale-[0.99]"
                 }`}
               >
-                {loading ? "กำลังดำเนินการ..." : "บันทึกข้อมูลคำศัพท์"}
+                {loading ? "กำลังดำเนินการ..." : (showAdd ? "บันทึกข้อมูลคำศัพท์ใหม่" : "บันทึกการแก้ไขข้อมูล")}
               </button>
             </div>
           </form>

@@ -130,7 +130,13 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             $res = dbInsert('vocabulary', $insertData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
-            jsonOk($res['data']);
+
+            $resRow = dbSelectSingle('vocabulary', '*,category_vocab(name)', ['vocab_id' => 'eq.' . rawurlencode($nextId)]);
+            if (!empty($resRow['data'])) {
+                jsonOk(mapVocabCategory([$resRow['data']])[0]);
+            } else {
+                jsonOk($res['data'] ?? $insertData);
+            }
             break;
 
         case 'update':
@@ -148,9 +154,12 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (array_key_exists('meaning', $body))           $updateData['meaning'] = $body['meaning'];
             if (array_key_exists('category_vocab_id', $body)) $updateData['category_vocab_id'] = !empty($body['category_vocab_id']) ? $body['category_vocab_id'] : null;
 
-            $resRow = dbSelectSingle('vocabulary', '*', ['vocab_id' => 'eq.' . rawurlencode($id)]);
-            if ($resRow['data']) {
-                jsonOk($resRow['data']);
+            $res = dbUpdate('vocabulary', $updateData, ['vocab_id' => 'eq.' . rawurlencode($id)]);
+            if ($res['error']) { jsonError($res['error']['message']); break; }
+
+            $resRow = dbSelectSingle('vocabulary', '*,category_vocab(name)', ['vocab_id' => 'eq.' . rawurlencode($id)]);
+            if (!empty($resRow['data'])) {
+                jsonOk(mapVocabCategory([$resRow['data']])[0]);
             } else {
                 jsonOk(array_merge(['vocab_id' => $id], $updateData));
             }

@@ -691,56 +691,51 @@ export default function VocabularyPage() {
                 {errors.reading && <p className="text-red-500 text-xs mt-1">{errors.reading}</p>}
               </div>
 
-              {/* 3. ปุ่มกดแปลง (แปลงจากคำอ่าน/คำไทย เป็นตัวอักขระล้านนาตามแบบในแอป) */}
+              {/* 3. ปุ่มกดแปลง (แปลงจากคำอ่านเพื่อสร้างตัวอักขระล้านนา) */}
               <div className="pt-1 pb-1">
                 <button
                   type="button"
                   onClick={handleConvert}
                   className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition transform active:scale-[0.99] text-sm cursor-pointer"
-                  title="กดเพื่อแปลงคำอ่านภาษาล้านนาหรือคำภาษาไทยเป็นตัวอักขระล้านนาแบบเดียวกับในแอป"
+                  title="กดเพื่อแปลงคำอ่านเป็นตัวอักขระล้านนาตามแบบในแอป"
                 >
-                  <span className="text-base">⚡</span> กดแปลงเป็นตัวอักขระล้านนา (ระบบแปลงตามแอป)
+                  <span className="text-base">⚡</span> กดแปลงเป็นตัวอักขระล้านนา
                 </button>
                 <p className="text-[11px] text-gray-500 text-center mt-1.5">
-                  * ระบบจะนำ <b>คำอ่านภาษาล้านนา</b> หรือ <b>คำภาษาไทย</b> มาแปลงเป็นอักขระล้านนาแท้โดยอัตโนมัติ
+                  * ระบบจะนำ <b>คำอ่านภาษาล้านนา</b> มาแปลงเป็นตัวอักขระล้านนาโดยอัตโนมัติ
                 </p>
               </div>
 
-              {/* 4. ตัวอักขระล้านนา (Lanna Characters & Preview) */}
-              <div className="bg-[#FFFDF9] border border-[#EADBC8] rounded-2xl p-4 space-y-3">
-                <div>
-                  <label className="text-xs font-bold text-[#7A5C3A] block mb-1">
-                    4. ตัวอักขระล้านนา <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    value={form.lanna_word}
-                    placeholder="พิมพ์เอง หรือกดปุ่มแปลงด้านบน"
-                    className={`w-full border rounded-xl px-4 py-2.5 text-2xl font-lanna lanna-text bg-white text-[#924E19] focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 ${
-                      errors.lanna_word ? "border-red-500" : "border-gray-200"
-                    }`}
-                    onChange={(e) => {
-                      const normalized = normalizeLannaText(e.target.value);
-                      setForm((prev) => ({ ...prev, lanna_word: normalized }));
-                      setErrors((prev) => ({ ...prev, lanna_word: null }));
-                    }}
-                  />
-                  {errors.lanna_word && <p className="text-red-500 text-xs mt-1">{errors.lanna_word}</p>}
-                </div>
-
-                {/* กล่องตัวอย่างพรีวิวตัวอักษรล้านนา (เหมือนในแอป) */}
-                <div className="bg-[#F5EAE1]/70 border border-[#EADBC8] rounded-xl p-3.5 flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <span className="text-[11px] text-[#7A5C3A] font-medium block">ตัวอย่างการแสดงผลอักขระล้านนา (LN-TILOK):</span>
-                    <span className="text-3xl text-[#924E19] font-lanna leading-relaxed block tracking-wide">
-                      {form.lanna_word || "—"}
+              {/* 4. ตัวอักขระล้านนา (แสดงผลอัตโนมัติจากการกดแปลงคำอ่าน) */}
+              <div>
+                <label className="text-xs font-bold text-gray-700 block mb-1">
+                  4. ตัวอักขระล้านนา <span className="text-red-500">*</span>
+                </label>
+                <div
+                  className={`w-full min-h-[64px] border rounded-xl px-4 py-3 bg-[#FFFDF9] flex items-center justify-between transition-all ${
+                    errors.lanna_word
+                      ? "border-red-500 bg-red-50/20"
+                      : form.lanna_word
+                      ? "border-[#EADBC8] shadow-sm"
+                      : "border-dashed border-gray-300"
+                  }`}
+                >
+                  {form.lanna_word ? (
+                    <span className="text-3xl text-[#924E19] font-lanna leading-none tracking-wide select-all">
+                      {form.lanna_word}
                     </span>
-                  </div>
+                  ) : (
+                    <span className="text-sm text-gray-400 italic">
+                      (กดปุ่ม &quot;กดแปลงเป็นตัวอักขระล้านนา&quot; ด้านบนเพื่อแสดงตัวอักขระ)
+                    </span>
+                  )}
                   {form.lanna_word && (
                     <span className="px-2.5 py-1 bg-green-100 text-green-700 border border-green-200 text-xs font-medium rounded-lg shrink-0">
-                      ✓ อักขระพร้อมใช้งาน
+                      ✓ แปลงสำเร็จ
                     </span>
                   )}
                 </div>
+                {errors.lanna_word && <p className="text-red-500 text-xs mt-1">{errors.lanna_word}</p>}
               </div>
 
               {/* 5. ความหมาย */}

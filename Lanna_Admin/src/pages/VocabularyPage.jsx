@@ -178,7 +178,7 @@ export default function VocabularyPage() {
   const [errors, setErrors] = useState({});
 
   // แปลงจากคำอ่านภาษาล้านนา (หรือคำภาษาไทย) ให้เป็นตัวอักขระล้านนา โดยใช้กฎเดียวกับในแอป 100%
-  const handleConvert = async () => {
+  const handleConvert = () => {
     const rawReading = form.reading ? form.reading.trim() : "";
     const rawThai = form.thai_word ? form.thai_word.trim() : "";
 
@@ -191,63 +191,9 @@ export default function VocabularyPage() {
       return;
     }
 
-    // แผนที่คำศัพท์ภาษาเหนือ / คำอ่านพื้นเมือง
-    const northernDialectMap = {
-      'มะม่วง': { reading: 'บะม่วง', lanna: 'ᨷᩡᨾ᩠ᩅ᩵ᨦ', meaning: 'ผลไม้ชนิดหนึ่ง รสเปรี้ยวหรือหวาน' },
-      'บะม่วง': { reading: 'บะม่วง', lanna: 'ᨷᩡᨾ᩠ᩅ᩵ᨦ', meaning: 'ผลไม้ชนิดหนึ่ง รสเปรี้ยวหรือหวาน' },
-      'มะนาว': { reading: 'บะนาว', lanna: 'ᨷᩡᨶᩣᩅ', meaning: 'ผลไม้รสเปรี้ยว ใช้ปรุงอาหาร' },
-      'บะนาว': { reading: 'บะนาว', lanna: 'ᨷᩡᨶᩣᩅ', meaning: 'ผลไม้รสเปรี้ยว ใช้ปรุงอาหาร' },
-      'มะพร้าว': { reading: 'บะป๊าว', lanna: 'ᨷᩡᨸ᩶ᩣᩅ', meaning: 'ผลไม้ยืนต้น มีกะลาและน้ำมะพร้าว' },
-      'บะป๊าว': { reading: 'บะป๊าว', lanna: 'ᨷᩡᨸ᩶ᩣᩅ', meaning: 'ผลไม้ยืนต้น มีกะลาและน้ำมะพร้าว' },
-      'มะเขือ': { reading: 'บะเขือ', lanna: 'ᨷᩡᨡᩮᩬᩥ', meaning: 'พืชผักสวนครัว' },
-      'มะขาม': { reading: 'บะขาม', lanna: 'ᨷᩡᨡᩣ᩠ᨾ', meaning: 'ผลไม้รสเปรี้ยวอมหวาน' },
-      'ส้ม': { reading: 'ส้ม', lanna: 'ᩈᩫ᩠ᨾ', meaning: 'ผลไม้รสเปรี้ยวอมหวาน หรือ รสเปรี้ยว' },
-      'ส้มตำ': { reading: 'ตำส้ม', lanna: 'ᨲᩣᩴᩈᩫ᩠ᨾ', meaning: 'อาหารคาวรสจัดจ้านทำจากมะละกอ' },
-      'ตำส้ม': { reading: 'ตำส้ม', lanna: 'ᨲᩣᩴᩈᩫ᩠ᨾ', meaning: 'อาหารคาวรสจัดจ้านทำจากมะละกอ' },
-      'พะเยา': { reading: 'พะเยา', lanna: '[พยา\uF027', meaning: 'จังหวัดพะเยา ในภาคเหนือของไทย' },
-      'พยาว': { reading: 'พยาว', lanna: '[พยา\uF027', meaning: 'จังหวัดพะเยา' },
-      'สวัสดี': { reading: 'สะ-หวัด-ดี', lanna: 'ส\uF027ั\u00AAดี', meaning: 'คำทักทาย สวัสดิภาพ' },
-      'สวัดดี': { reading: 'สะ-หวัด-ดี', lanna: 'ส\uF027ั\u00AAดี', meaning: 'คำทักทาย สวัสดิภาพ' },
-      'เชียงใหม่': { reading: 'เจียงใหม่', lanna: 'ช\uF022ง\u0E43ห\uF021\u0E48', meaning: 'จังหวัดเชียงใหม่' },
-      'เจียงใหม่': { reading: 'เจียงใหม่', lanna: 'ช\uF022ง\u0E43ห\uF021\u0E48', meaning: 'จังหวัดเชียงใหม่' },
-      'เชียงราย': { reading: 'เจียงฮาย', lanna: 'ช\uF022งรา\uF022', meaning: 'จังหวัดเชียงราย' },
-      'เจียงฮาย': { reading: 'เจียงฮาย', lanna: 'ช\uF022งรา\uF022', meaning: 'จังหวัดเชียงราย' },
-      'ลำพูน': { reading: 'ละปูน', lanna: 'ลตูร', meaning: 'จังหวัดลำพูน' },
-      'ละปูน': { reading: 'ละปูน', lanna: 'ลตูร', meaning: 'จังหวัดลำพูน' },
-      'ลำปาง': { reading: 'ละปาง', lanna: 'ล\u0E4Dาพา\uF007', meaning: 'จังหวัดลำปาง' },
-      'ละปาง': { reading: 'ละปาง', lanna: 'ล\u0E4Dาพา\uF007', meaning: 'จังหวัดลำปาง' },
-      'น่าน': { reading: 'น่าน', lanna: '\u00A2\uF0A3\uF019', meaning: 'จังหวัดน่าน' },
-      'แพร่': { reading: 'แพร่', lanna: 'แ\u0E1E\uF025\u0E48', meaning: 'จังหวัดแพร่' },
-      'แม่ฮ่องสอน': { reading: 'แม่ฮ่องสอน', lanna: 'แม่ร\uF007่คส\uF007ร', meaning: 'จังหวัดแม่ฮ่องสอน' },
-      'ขอโทษ': { reading: 'สุมา', lanna: 'ᩈᩩᨾᩣ', meaning: 'การกล่าวขออภัย ขอโทษ' },
-      'สุมา': { reading: 'สุมา', lanna: 'ᩈᩩᨾᩣ', meaning: 'การกล่าวขออภัย ขอโทษ' },
-      'ขอบคุณ': { reading: 'ยินดี', lanna: 'ᨿᩥ᩠ᨶᨯᩦ', meaning: 'การแสดงความขอบคุณ ยินดีต้อนรับ' },
-      'ยินดี': { reading: 'ยินดี', lanna: 'ᨿᩥ᩠ᨶᨯᩦ', meaning: 'การแสดงความขอบคุณ ยินดีต้อนรับ' },
-      'ยินดีต้อนรับ': { reading: 'ยินดีต้อนฮับ', lanna: 'ยิ\uF019ดีต้อ\uF019ฮั\uF01A', meaning: 'คำกล่าวต้อนรับ' },
-      'กิน': { reading: 'กิ๋น', lanna: 'ᨠᩥ᩠᩵ᨶ', meaning: 'การรับประทานอาหาร' },
-      'กินข้าว': { reading: 'กิ๋นข้าว', lanna: 'ᨠᩥ᩠᩵ᨶᨡ᩶ᩣᩅ', meaning: 'รับประทานอาหาร' },
-      'กิ๋น': { reading: 'กิ๋น', lanna: 'ᨠᩥ᩠᩵ᨶ', meaning: 'การรับประทานอาหาร' },
-      'อร่อย': { reading: 'ลำ', lanna: 'ᩃᩣᩴ', meaning: 'รสชาติอร่อย ถูกปาก' },
-      'ลำ': { reading: 'ลำ', lanna: 'ᩃᩣᩴ', meaning: 'รสชาติอร่อย ถูกปาก' },
-      'สวย': { reading: 'งาม', lanna: 'ᨦᩣ᩠ᨾ', meaning: 'มีความงดงาม น่ามอง' },
-      'งาม': { reading: 'งาม', lanna: 'ᨦᩣ᩠ᨾ', meaning: 'มีความงดงาม น่ามอง' },
-      'พูด': { reading: 'อู้', lanna: 'ᩋᩪ᩶', meaning: 'การพูดคุย สนทนา' },
-      'อู้': { reading: 'อู้', lanna: 'ᩋᩪ᩶', meaning: 'การพูดคุย สนทนา' },
-    };
-
     // 1. ถ้ามีคำอ่านภาษาล้านนา ให้แปลงจากคำอ่านก่อนเสมอ
     if (rawReading) {
       const cleanReading = rawReading.replace(/[\[\]\-]/g, '').trim();
-      if (northernDialectMap[cleanReading]) {
-        const entry = northernDialectMap[cleanReading];
-        setForm((prev) => ({
-          ...prev,
-          lanna_word: entry.lanna,
-          meaning: prev.meaning || entry.meaning,
-        }));
-        setErrors((prev) => ({ ...prev, reading: null, lanna_word: null }));
-        return;
-      }
       const lannaConverted = convertThaiToLanna(cleanReading, lannaMap);
       setForm((prev) => ({
         ...prev,
@@ -257,20 +203,8 @@ export default function VocabularyPage() {
       return;
     }
 
-    // 2. ถ้ายังไม่มีคำอ่าน แต่มีคำภาษาไทย ให้ค้นหาคำอ่านและแปลงอักษรล้านนา
+    // 2. ถ้ายังไม่มีคำอ่าน แต่มีคำภาษาไทย ให้แปลงอักษรล้านนา
     if (rawThai) {
-      if (northernDialectMap[rawThai]) {
-        const entry = northernDialectMap[rawThai];
-        setForm((prev) => ({
-          ...prev,
-          reading: entry.reading,
-          lanna_word: entry.lanna,
-          meaning: prev.meaning || entry.meaning,
-        }));
-        setErrors((prev) => ({ ...prev, thai_word: null, reading: null, lanna_word: null }));
-        return;
-      }
-
       const lannaConverted = convertThaiToLanna(rawThai, lannaMap);
       setForm((prev) => ({
         ...prev,

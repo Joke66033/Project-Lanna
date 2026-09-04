@@ -679,17 +679,17 @@ export default function VocabularyPage() {
       )}
 
       {/* ADD / EDIT MODAL */}
-      {(showAdd || showEdit) && (
-        <Modal
-          title={showAdd ? "เพิ่มคำศัพท์ใหม่" : "แก้ไขข้อมูลคำศัพท์"}
-          onClose={() => {
-            setShowAdd(false);
-            setShowEdit(false);
-            setOriginalForm(null);
-            setErrors({});
-            setForm({ lanna_word: "", thai_word: "", reading: "", meaning: "", category_vocab_id: "" });
-          }}
-        >
+      <Modal
+        isOpen={Boolean(showAdd || showEdit)}
+        title={showAdd ? "เพิ่มคำศัพท์ใหม่" : "แก้ไขข้อมูลคำศัพท์"}
+        onClose={() => {
+          setShowAdd(false);
+          setShowEdit(false);
+          setOriginalForm(null);
+          setErrors({});
+          setForm({ lanna_word: "", thai_word: "", reading: "", meaning: "", category_vocab_id: "" });
+        }}
+      >
           <form
             onSubmit={showAdd ? handleAdd : handleEdit}
             className="flex flex-col flex-1 overflow-hidden"
@@ -902,7 +902,6 @@ export default function VocabularyPage() {
             </div>
           </form>
         </Modal>
-      )}
 
       {/* DELETE CONFIRM MODAL */}
       <ConfirmDeleteModal

@@ -1,40 +1,32 @@
 @font-face {
-  font-family: "PayapLanna";
-  src: url("/fonts/PayapLanna-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "PayapLanna";
-  src: url("/fonts/PayapLanna-Bold.ttf") format("truetype");
-  font-weight: bold;
-  font-style: normal;
-}
-
-@font-face {
   font-family: "LN-TILOK";
-  src: url("/fonts/LN-TILOK-6.10.ttf") format("truetype");
+  src: url("./assets/fonts/LN-TILOK-6.10.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-  font-family: "Noto Sans Tai Tham";
-  src: url("/fonts/NotoSansTaiTham.ttf") format("truetype");
+  font-family: "LNTilok";
+  src: url("./assets/fonts/LN-TILOK-6.10.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
-.lanna-text {
-  font-family: "LN-TILOK", "LNTilok", "Noto Sans Tai Tham", "PayapLanna", sans-serif;
-  font-size: 1.4em;
-  line-height: 1.8;
+@font-face {
+  font-family: "LannaAkkhara";
+  src: url("./assets/fonts/LN-TILOK-6.10.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
-.lanna-char {
-  font-family: "LN-TILOK", "LNTilok", "Noto Sans Tai Tham", "PayapLanna", sans-serif;
-  font-size: 1.4em;
+.lanna-text,
+.lanna-char,
+.font-lanna {
+  font-family: "LN-TILOK", "LNTilok", "LannaAkkhara", sans-serif !important;
+  font-size: 1.45em;
   line-height: 1.8;
 }
 

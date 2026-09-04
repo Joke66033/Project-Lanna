@@ -14,7 +14,7 @@ export default {
 
       fontFamily: {
         sans: ["Sarabun", "sans-serif"],
-        lanna: ["LannaAkkhara", "serif"],
+        lanna: ["LN-TILOK", "LNTilok", "LannaAkkhara", "sans-serif"],
       },
 
       keyframes: {

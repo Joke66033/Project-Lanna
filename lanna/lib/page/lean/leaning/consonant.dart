@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lanna/services/lanna_char_service.dart';
 import 'package:lanna/services/article_service.dart';
 import 'package:lanna/models/article_model.dart';
@@ -51,7 +50,6 @@ class ConsonantPage extends StatefulWidget {
 }
 
 class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProviderStateMixin {
-  late final FlutterTts _tts;
   TabController? _tabController;
   
   final LannaCharService _charService = LannaCharService();
@@ -67,26 +65,11 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _tts = FlutterTts();
-    _initTts();
     _loadData();
-  }
-
-  Future<void> _initTts() async {
-    await _tts.setLanguage('th-TH');
-    await _tts.setSpeechRate(0.5);
-    await _tts.setPitch(1.0);
-    await _tts.setVolume(1.0);
-  }
-
-  Future<void> _speak(String text) async {
-    await _tts.stop();
-    await _tts.speak(text);
   }
 
   @override
   void dispose() {
-    _tts.stop();
     _tabController?.removeListener(_handleTabChange);
     _tabController?.dispose();
     super.dispose();

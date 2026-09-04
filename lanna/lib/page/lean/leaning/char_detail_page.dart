@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import '../learning_navigation.dart';
 import '../train/writing_mode.dart';
 import '../train/writing_data.dart';
@@ -63,10 +62,6 @@ class _CharDetailPageState extends State<CharDetailPage>
     with SingleTickerProviderStateMixin {
   final CharacterStrokeService _strokeService = CharacterStrokeService();
 
-  // ── TTS ──────────────────────────────────────────────────────────────────
-  late final FlutterTts _tts;
-  bool _isPlaying = false;
-
   // ── Stroke animation ──────────────────────────────────────────────────────
   CharacterStrokeOrder? _strokeOrder;
   late List<List<Offset>> _strokes;
@@ -76,10 +71,6 @@ class _CharDetailPageState extends State<CharDetailPage>
   @override
   void initState() {
     super.initState();
-
-    // TTS setup
-    _tts = FlutterTts();
-    _initTts();
 
     _loadStrokesFromCache();
 
@@ -132,34 +123,8 @@ class _CharDetailPageState extends State<CharDetailPage>
     return source.map((stroke) => List<Offset>.of(stroke)).toList();
   }
 
-  Future<void> _initTts() async {
-    await _tts.setLanguage('th-TH');
-    await _tts.setSpeechRate(0.5);
-    await _tts.setPitch(1.0);
-    await _tts.setVolume(1.0);
-    _tts.setStartHandler(() {
-      if (mounted) setState(() => _isPlaying = true);
-    });
-    _tts.setCompletionHandler(() {
-      if (mounted) setState(() => _isPlaying = false);
-    });
-    _tts.setErrorHandler((_) {
-      if (mounted) setState(() => _isPlaying = false);
-    });
-  }
-
-  Future<void> _speak([String? text]) async {
-    if (_isPlaying) {
-      await _tts.stop();
-      setState(() => _isPlaying = false);
-    } else {
-      await _tts.speak(text ?? widget.reading);
-    }
-  }
-
   @override
   void dispose() {
-    _tts.stop();
     _strokeController.dispose();
     super.dispose();
   }
@@ -377,35 +342,6 @@ class _CharDetailPageState extends State<CharDetailPage>
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 12),
-
-            // ปุ่มเล่นเสียง
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _speak,
-                icon: Icon(
-                  _isPlaying ? Icons.stop_rounded : Icons.volume_up_rounded,
-                  size: 18,
-                ),
-                label: Text(
-                  _isPlaying ? 'หยุดเสียง' : 'ฟังเสียงหลัก',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF924E19),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
             ),
             const SizedBox(height: 12),
             const Divider(color: Color(0xFFEADBC8), height: 1, thickness: 1),
@@ -886,13 +822,14 @@ class _LocalStrokePainter extends CustomPainter {
       );
     }
 
+    // Paint the true authentic font glyph in the background so it matches the card 100%
+    glyphLayout.paint(canvas, const Color(0xFFE8DFD5));
+
     final usesGeneratedGuide = strokes.isNotEmpty;
     if (usesGeneratedGuide) {
-      // Paint the pale guide from the exact same centre-lines as the animation.
-      // This removes font-metric offsets: the dark line now overlays it exactly.
       final guidePaint = Paint()
-        ..color = const Color(0xFFD9D2CB)
-        ..strokeWidth = 4.5
+        ..color = const Color(0xFFD9D2CB).withValues(alpha: 0.5)
+        ..strokeWidth = 3.5
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
         ..style = PaintingStyle.stroke;
@@ -900,9 +837,6 @@ class _LocalStrokePainter extends CustomPainter {
         if (stroke.isEmpty) continue;
         canvas.drawPath(buildStrokePath(stroke, strokeScale), guidePaint);
       }
-    } else {
-      // ᨠ and unsupported legacy marks keep their existing font guide.
-      glyphLayout.paint(canvas, const Color(0xFFD9D2CB));
     }
 
     // Never fake handwriting with a horizontal colour reveal. If a character

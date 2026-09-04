@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lanna/models/category_model.dart';
 import 'package:lanna/models/lanna_char_model.dart';
 import 'package:lanna/services/lanna_char_service.dart';
@@ -18,7 +17,6 @@ class GenericLessonPage extends StatefulWidget {
 
 class _GenericLessonPageState extends State<GenericLessonPage> with TickerProviderStateMixin {
   final LannaCharService _charService = LannaCharService();
-  late final FlutterTts _tts;
   TabController? _tabController;
 
   bool _isLoading = true;
@@ -29,26 +27,11 @@ class _GenericLessonPageState extends State<GenericLessonPage> with TickerProvid
   @override
   void initState() {
     super.initState();
-    _tts = FlutterTts();
-    _initTts();
     _loadData();
-  }
-
-  Future<void> _initTts() async {
-    await _tts.setLanguage('th-TH');
-    await _tts.setSpeechRate(0.5);
-    await _tts.setPitch(1.0);
-    await _tts.setVolume(1.0);
-  }
-
-  Future<void> _speak(String text) async {
-    await _tts.stop();
-    await _tts.speak(text);
   }
 
   @override
   void dispose() {
-    _tts.stop();
     _tabController?.dispose();
     super.dispose();
   }
@@ -266,103 +249,6 @@ class _GenericLessonPageState extends State<GenericLessonPage> with TickerProvid
           ),
         );
       },
-    );
-  }
-}
-
-class _GenericCharCard extends StatelessWidget {
-  final LannaCharModel charModel;
-  final VoidCallback onPlaySound;
-
-  const _GenericCharCard({
-    required this.charModel,
-    required this.onPlaySound,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shadowColor: Colors.black.withAlpha((0.05 * 255).toInt()),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: Color(0xFFF0E5D8), width: 1.5),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // Big Lanna Character with Rounded Circle background
-            Container(
-              width: 64,
-              height: 64,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFF3E0),
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                charModel.lannaChar,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontFamily: 'LNTilok',
-                  color: Color(0xFFD2691E),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            
-            // Reading and Thai equivalent
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'อักษรเทียบเคียง: ${charModel.thaiEquivalent}',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2D1A00),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'หมวดหมู่บทเรียนร่วมสมัย',
-                    style: TextStyle(
-                      fontSize: 8,
-                      color: Color(0xFF7A5C3A),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Pronunciation Button
-            Material(
-              color: const Color(0xFFFFF3E0),
-              shape: const CircleBorder(),
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: onPlaySound,
-                child: const Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Icon(
-                    Icons.volume_up_rounded,
-                    color: Color(0xFFD2691E),
-                    size: 22,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

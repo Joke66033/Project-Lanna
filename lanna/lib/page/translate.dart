@@ -1,6 +1,7 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -48,7 +49,6 @@ class _TranslatePageState extends State<TranslatePage> {
   final _inputCtrl = TextEditingController();
 
   late final stt.SpeechToText _speech;
-  final FlutterTts _tts = FlutterTts();
 
   bool _isListening = false;
   bool _speechReady = false;
@@ -64,21 +64,27 @@ class _TranslatePageState extends State<TranslatePage> {
 
   final _vocabService = VocabularyService();
   final _translateLogService = TranslateLogService();
+
   @override
   void initState() {
     super.initState();
     _speech = stt.SpeechToText();
 
     _initSpeech();
-    _initTts();
     _inputCtrl.addListener(_onInputEdited);
     _loadDictionaryData();
   }
 
-  /// โหลดข้อมูลพจนานุกรมเพื่อใช้ match ผลการแปล
+  /// โหลดข้อมูลพจนานุกรมและตารางอักขระล้านนาเพื่อใช้ match ผลการแปล
   Future<void> _loadDictionaryData() async {
     if (!mounted) return;
     try {
+      // โหลดพยัญชนะ สระ และไวยากรณ์จากฐานข้อมูล MySQL (`lanna_char`)
+      await Future.wait([
+        LannaTransliterator.loadFromDatabase(),
+        LannaRulesData.loadFromDatabase(),
+      ]);
+
       final dbVocabs = await _vocabService.getAllVocabulary();
 
       if (!mounted) return;
@@ -119,21 +125,10 @@ class _TranslatePageState extends State<TranslatePage> {
     debugPrint('Speech ready = $_speechReady');
   }
 
-  Future<void> _initTts() async {
-    await _tts.setLanguage('th-TH');
-    await _tts.setSpeechRate(0.45);
-    await _tts.setPitch(1.0);
-    await _tts.setVolume(1.0);
-
-    // ⭐ สำคัญมากสำหรับ Android
-    await _tts.awaitSpeakCompletion(false);
-  }
-
   @override
   void dispose() {
     _inputCtrl.dispose();
     _speech.stop();
-    _tts.stop();
     super.dispose();
   }
 
@@ -166,50 +161,49 @@ class _TranslatePageState extends State<TranslatePage> {
     final hasLannaChar = RegExp(r'[\u1A20-\u1AAF]').hasMatch(normalizedInput);
     final hasThaiChar = RegExp(r'[\u0E00-\u0E7F]').hasMatch(normalizedInput);
 
-    // 0. ตรวจสอบจากฐานข้อมูลกฎอักขรวิธีและชื่อบ้านนามเมืองล้านนา (LannaRulesData) เป็นอันดับแรก
-    if (_thaiToLanna &&
-        (LannaRulesData.irregularSpellingMap.containsKey(input) ||
-            LannaRulesData.commonWordDefinitions.containsKey(input))) {
-      final lannaWord = LannaRulesData.irregularSpellingMap[input] ??
-          _conv.thaiToLanna(input);
-      matchedItem = LannaDictItem(
-        category: 'ชื่อบ้าน-นามเมือง / คำเฉพาะ',
-        lanna: lannaWord,
-        reading: LannaRulesData.commonWordReadings[input] ?? '[$input]',
-        thaiSound: input,
-        meaning: LannaRulesData.commonWordDefinitions[input] ?? '',
-      );
+    // 1. ค้นหาคำตรงจากฐานข้อมูลจริง (MySQL Database: Vocabulary Table)
+    for (var item in _dictItems) {
+      final primaryCandidate = _thaiToLanna ? item.thaiSound : item.lanna;
+      final secondaryCandidate = _thaiToLanna ? item.lanna : item.thaiSound;
+      if (primaryCandidate.trim().toLowerCase() == normalizedInput) {
+        matchedItem = item;
+        break;
+      } else if (secondaryCandidate.trim().toLowerCase() == normalizedInput) {
+        matchedItem = item;
+        break;
+      }
     }
 
-    // 1. ค้นหาคำตรงในพจนานุกรม
+    // 2. ค้นหาจากคำอ่านที่ตรงกับคำทั้งหมดพอดี
     if (matchedItem == null) {
       for (var item in _dictItems) {
-        final primaryCandidate = _thaiToLanna ? item.thaiSound : item.lanna;
-        final secondaryCandidate = _thaiToLanna ? item.lanna : item.thaiSound;
-        if (primaryCandidate.trim().toLowerCase() == normalizedInput) {
-          matchedItem = item;
-          break;
-        } else if (secondaryCandidate.trim().toLowerCase() == normalizedInput) {
+        if (item.reading.replaceAll(RegExp(r'[\[\]]'), '').trim().toLowerCase() == normalizedInput) {
           matchedItem = item;
           break;
         }
       }
     }
 
-    // 2. ค้นหาจากความหมาย
+    // 3. ยิงค้นหาตรงแบบ Live จากฐานข้อมูล MySQL ทันที (ต้องตรงกับคำศัพท์แบบ Exact Match เท่านั้น)
     if (matchedItem == null) {
-      final directDefPattern = RegExp(
-        r'^([a-zA-Zก-ฮ]+\.\s*)?' + RegExp.escape(normalizedInput) + r'(\s*|;|,|$)',
-        caseSensitive: false,
-      );
-
-      for (var item in _dictItems) {
-        if (directDefPattern.hasMatch(item.meaning.trim()) ||
-            item.meaning.trim().toLowerCase() == normalizedInput) {
-          matchedItem = item;
-          break;
+      try {
+        final liveSearch = await _vocabService.searchVocabulary(input.trim());
+        for (var v in liveSearch) {
+          if (v.thaiWord.trim().toLowerCase() == normalizedInput ||
+              v.lannaWord.trim() == normalizedInput ||
+              v.reading.replaceAll(RegExp(r'[\[\]]'), '').trim().toLowerCase() == normalizedInput) {
+            matchedItem = LannaDictItem(
+              vocabId: v.vocabId,
+              category: v.category ?? 'คำศัพท์ทั่วไป',
+              lanna: v.lannaWord,
+              reading: v.reading,
+              thaiSound: v.thaiWord,
+              meaning: v.meaning,
+            );
+            break;
+          }
         }
-      }
+      } catch (_) {}
     }
 
     String result;
@@ -233,31 +227,52 @@ class _TranslatePageState extends State<TranslatePage> {
     }
     var needsReview = matchedItem == null;
 
-    // Only call remote translation API if we don't have a verified dictionary match
+    // 3. ใช้ AI (Gemini Flash Live) วิเคราะห์คำเมืองและจัดรูปอักขระล้านนาอัตโนมัติ
     if (_thaiToLanna && needsReview) {
       setState(() => _isTranslating = true);
       try {
-        final apiResult = await _vocabService.translate(input);
-        if (!mounted) return;
-        result = apiResult['lanna_word']?.toString() ?? result;
-        needsReview = apiResult['needs_review'] as bool? ?? needsReview;
-        matchedItem = LannaDictItem(
-          category: needsReview ? 'ผลลัพธ์อัตโนมัติ' : 'พจนานุกรม',
-          lanna: result,
-          reading: apiResult['reading']?.toString() ?? '[$input]',
-          thaiSound: input,
-          meaning:
-              apiResult['meaning']?.toString() ??
-              (needsReview ? 'ผลถอดอักษรอัตโนมัติ โปรดตรวจสอบ' : ''),
-        );
+        final aiResult = await _callGeminiAi(input);
+        if (aiResult != null && mounted) {
+          final notation = aiResult['lanna_notation']?.toString() ??
+              aiResult['kam_mueang']?.toString() ??
+              input;
+          result = _parseLannaNotation(notation);
+          matchedItem = LannaDictItem(
+            category: '✨ แปลด้วย AI (Gemini Flash)',
+            lanna: result,
+            reading: aiResult['phonetic']?.toString() ?? '[$input]',
+            thaiSound: input,
+            meaning: aiResult['meaning']?.toString() ??
+                'แปลและจัดอักขรวิธีล้านนาด้วย AI',
+          );
+        } else {
+          // Fallback: ใช้กฎการแปลคำเมืองออฟไลน์ (Offline Kam Mueang Engine)
+          final offlineKamMueang = _translateKamMueangOffline(input);
+          result = _parseLannaNotation(offlineKamMueang['notation']!);
+          matchedItem = LannaDictItem(
+            category: 'กฎไวยากรณ์คำเมืองล้านนา',
+            lanna: result,
+            reading: offlineKamMueang['reading']!,
+            thaiSound: input,
+            meaning: 'แปลตามหลักไวยากรณ์และอักขรวิธีคำเมือง',
+          );
+        }
       } catch (error) {
-        debugPrint(
-          'Hybrid translation API unavailable; using local fallback: $error',
+        debugPrint('Gemini translation error: $error');
+        final offlineKamMueang = _translateKamMueangOffline(input);
+        result = _parseLannaNotation(offlineKamMueang['notation']!);
+        matchedItem = LannaDictItem(
+          category: 'กฎไวยากรณ์คำเมืองล้านนา',
+          lanna: result,
+          reading: offlineKamMueang['reading']!,
+          thaiSound: input,
+          meaning: 'แปลตามหลักไวยากรณ์และอักขรวิธีคำเมือง',
         );
       } finally {
         if (mounted) setState(() => _isTranslating = false);
       }
     }
+    if (!mounted) return;
     final store = context.read<FavoriteStore>();
     final key = _thaiToLanna ? input : result;
 
@@ -298,6 +313,430 @@ class _TranslatePageState extends State<TranslatePage> {
 
   String _translateCharByChar(String text) {
     return _thaiToLanna ? _conv.thaiToLanna(text) : _conv.lannaToThai(text);
+  }
+
+  /// แปลงภาษาไทยเป็นภาษาคำเมืองแท้แบบออฟไลน์
+  Map<String, String> _translateKamMueangOffline(String thaiText) {
+    var km = thaiText;
+    const phraseDict = {
+      'สวัสดีปีใหม่': 'สวัสสดีปีใหม่',
+      'สวัสดี': 'สวัสสดี',
+      'ยินดีต้อนรับ': 'ยินดีต้อนฮับ',
+      'ต้อนรับ': 'ต้อนฮับ',
+      'รับ': 'ฮับ',
+      'วันนี้เธอกินข้าวกับอะไร': 'วันนี้ตั๋วกิ๋นข้าวกับหยัง',
+      'เธอกินข้าวกับอะไร': 'ตั๋วกิ๋นข้าวกับหยัง',
+      'กินข้าวกับอะไร': 'กิ๋นข้าวกับหยัง',
+      'กินข้าวไหม': 'กิ๋นข้าวก่อ',
+      'กินข้าวหรือยัง': 'กิ๋นข้าวแล้วกา',
+      'กินข้าว': 'กิ๋นข้าว',
+      'กิน': 'กิ๋น',
+      'ข้าว': 'ข้าว',
+      'ไม่ต้องไป': 'บ่ต้องไป',
+      'ไม่ต้อง': 'บ่ต้อง',
+      'อย่าไป': 'บ่ดีไป',
+      'ห้ามไป': 'บ่ดีไป',
+      'อย่าทำ': 'จะไปยะ',
+      'อย่ากิน': 'จะไปกิ๋น',
+      'อย่าพูด': 'จะไปอู้',
+      'อย่า': 'บ่ดี',
+      'ไม่ได้': 'บ่ได้',
+      'ไม่เอา': 'บ่เอา',
+      'ไม่ใช่': 'บ่ใจ้',
+      'ไม่รู้': 'บ่ฮู้',
+      'ไม่': 'บ่',
+      'เธอ': 'ตั๋ว',
+      'คุณ': 'ตั๋ว',
+      'ตัวเอง': 'ตั๋ว',
+      'ฉัน': 'เฮา',
+      'ผม': 'เฮา',
+      'เรา': 'เฮา',
+      'ยินดีด้วย': 'ยินดีโตย',
+      'ด้วย': 'โตย',
+      'เที่ยวไหน': 'แอ่วไหน',
+      'เที่ยว': 'แอ่ว',
+      'ทำอะไร': 'ยะหยัง',
+      'อะไร': 'หยัง',
+      'ไปไหน': 'ไปตางใด',
+      'ไม่เป็นไร': 'บ่เป๋นหยัง',
+      'ขอโทษ': 'สูมา',
+      'สุนัข': 'หมา',
+      'ช้าง': 'จ๊าง',
+      'วัว': 'งัว',
+      'ตลาด': 'กาด',
+      'โกหก': 'ขี้จุ๊',
+      'สวย': 'งาม',
+      'อร่อย': 'ลำ',
+      'หมดแล้ว': 'เสี้ยงแล้ว',
+      'หมด': 'เสี้ยง',
+      'กินหมด': 'กิ๋นเสี้ยง',
+      'หรือยัง': 'แล้วกา',
+      'สบายดีไหม': 'สบายดีก่อ',
+      'มะม่วง': 'บะม่วง',
+      'มะนาว': 'บะนาว',
+      'มะขาม': 'บะขาม',
+      'มะพร้าว': 'บะป๊าว',
+      'มะละกอ': 'บะก้วยเต้ด',
+      'มะเขือ': 'บะเขือ',
+      'มะยม': 'บะยม',
+      'กระท้อน': 'บะตื๋น',
+      'ส้มตำ': 'ตำส้ม',
+      'ส้ม': 'ส้ม',
+      'เชียงราย': 'เชียงราย',
+      'เชียงใหม่': 'เชียงใหม่',
+      'น่าน': 'น่าน',
+      'พะเยา': 'พระยาว',
+      'แพร่': 'แพล่',
+      'แม่ฮ่องสอน': 'แม่ร่องสอน',
+      'ลำปาง': 'ลำพาง',
+      'อุตรดิตถ์': 'อุตตรดิตถ์',
+      'กัลยาณิวัฒนา': 'กัลยาณิวัฑฒนา',
+      'เกาะคา': 'เกาะตา',
+      'ขุนตาล': 'ขุนตาล',
+      'จอมทอง': 'จอมทอง',
+      'จุน': 'ชุน',
+      'เด่นชัย': 'เด่นไชย',
+      'ท่าปลา': 'ท่าปลา',
+      'ท่าวังผา': 'ท่าวังผา',
+      'ทุ่งเสลี่ยม': 'ทุ่งเสลี่ยม',
+      'ทุ่งหัวช้าง': 'ทุ่งหัวช้าง',
+      'เทิง': 'เริง',
+      'นาน้อย': 'นาหน้อย',
+      'นาหมื่น': 'นาหมื่น',
+      'บ่อเกลือ': 'บ่อเกือ',
+      'บ้านธิ': 'บ้านธิ',
+      'บ้านหลวง': 'บ้านหลวง',
+      'บ้านโฮ่ง': 'บ้านโห้ง',
+      'ปง': 'ปง',
+      'ป่าซาง': 'ป่าชาง',
+      'ปาย': 'พาย',
+      'เมืองลำพูน': 'เมืองละพูน',
+      'แม่จริม': 'แม่จริม',
+      'แม่จัน': 'แม่ชัน',
+      'แม่แจ่ม': 'แม่แจ่ม',
+      'แม่ใจ': 'แม่ไชย',
+      'แม่แตง': 'แม่แตง',
+      'แม่ทะ': 'แม่ธะ',
+      'แม่ทา': 'แม่ทรา',
+      'แม่พริก': 'แม่พริก',
+      'แม่ฟ้าหลวง': 'แม่ฟ้าหลวง',
+      'แม่เมาะ': 'แม่เมาะ',
+      'แม่ริม': 'แม่ริม',
+      'แม่ลาน้อย': 'แม่ลาหน้อย',
+      'แม่ลาว': 'แม่ลาว',
+      'แม่วาง': 'แม่วาง',
+      'เวียงสา': 'เวียงสา',
+      'เวียงหนองล่อง': 'เวียงหนองหล้อง',
+      'เวียงแหง': 'เวียงแหง',
+      'สบปราบ': 'สบปาบ',
+      'สบเมย': 'สบเมย',
+      'สอง': 'สรอง',
+      'สองแคว': 'สองแคว',
+      'สะเมิง': 'สะเมิง',
+      'สันกำแพง': 'สันก่ำแพง',
+      'สันติสุข': 'สันติสุข',
+      'สันทราย': 'สันชาย',
+      'สันป่าตอง': 'สันป่าทอง',
+      'สารภี': 'สารพี',
+      'สูงเม่น': 'สุงเหมั้น',
+      'เสริมงาม': 'เสริมงาม',
+    };
+
+    for (final entry in phraseDict.entries) {
+      km = km.replaceAll(entry.key, entry.value);
+    }
+
+    var notation = km;
+    const subWords = {
+      'สวัสสดีปีใหม่': 'ส_วั\u00AAดี ปีใ_ห่_ม',
+      'สวัสสดี': 'ส_วั\u00AAดี',
+      'ยินดีต้อนฮับ': 'ยิ_นดีต้อ_นฮั_บ',
+      'ยินดีต้อนรับ': 'ยิ_นดีต้อ_นฮั_บ',
+      'บ่ต้องไป': 'บ่ต้อ_งไป',
+      'บ่ต้อง': 'บ่ต้อ_ง',
+      'บ่ดีไป': 'บ่ดีไป',
+      'จะไปไป': 'จะไปไป',
+      'จะไปมา': 'จะไปมา',
+      'จะไปยะ': 'จะไปยัง',
+      'ตั๋ว': 'ตั๋_ว',
+      'กิ๋น': 'กิ๋_น',
+      'ข้าว': 'ข้า_ว',
+      'กับ': 'กั_บ',
+      'หยัง': 'ห_ยั_ง',
+      'แมว': 'แม_ว',
+      'หมา': 'ห_มา',
+      'จ๊าง': 'จ๊า_ง',
+      'งัว': 'ง_ว',
+      'ไก่': 'ไก่',
+      'โตย': 'โต_ย',
+      'แอ่ว': 'แอ่_ว',
+      'กาด': 'กา_ด',
+      'งาม': 'งา_ม',
+      'ลำ': 'ลำ',
+      'สูมา': 'สูมา',
+      'ยะหยัง': 'ยะห_ยั_ง',
+      'บ่เป๋นหยัง': 'บ่เป๋_นห_ยั_ง',
+      'ฉลาด': 'จ_รา_ด',
+      'จะหลาด': 'จ_รา_ด',
+      'ตลาด': 'ต_ลา_ด',
+      'เสี้ยงแล้ว': 'สี้_ย_งแล้_ว',
+      'เสี้ยง': 'สี้_ย_ง',
+      'วัดมหาวัน': 'วั_ดมหาว_น',
+      'มหาวัน': 'มหาว_น',
+      'มะม่วง': 'บ_ะม_่ว_ง',
+      'บะม่วง': 'บ_ะม_่ว_ง',
+      'มะนาว': 'บ_ะนา_ว',
+      'บะนาว': 'บ_ะนา_ว',
+      'มะขาม': 'บ_ะขา_ม',
+      'บะขาม': 'บ_ะขา_ม',
+      'มะพร้าว': 'บ_ะป_้า_ว',
+      'บะป๊าว': 'บ_ะป_้า_ว',
+      'ส้มตำ': 'ต_ำส_้ม',
+      'ตำส้ม': 'ต_ำส_้ม',
+      'ส้ม': 'ส_้ม',
+      'เชียงราย': 'ช_ย_งรา_ย',
+      'เชียงใหม่': 'ช_ย_งให_ม_่',
+      'น่าน': 'น่า_น',
+      'พะเยา': 'พยาว',
+      'พระยาว': 'พยาว',
+      'พยาว': 'พยาว',
+      'แพร่': 'แ_พ_ล่',
+      'แม่ฮ่องสอน': 'แ_ม_่ร_่อ_งส_่อร',
+      'ลำปาง': 'ลำพา_ง',
+      'อุตรดิตถ์': 'อุ_ต_ตระดิ_ต_ถ์',
+      'กัลยาณิวัฒนา': 'กั_ลยาณิวั_ฒนา',
+      'เกาะคา': 'เกาะตา',
+      'ขุนตาล': 'ขุ_นตา_ล',
+      'จอมทอง': 'จ_อมท_อง',
+      'จุน': 'ชุ_น',
+      'เด่นชัย': 'เด_่_นไช_ย',
+      'ท่าปลา': 'ท่าป_ลา',
+      'ท่าวังผา': 'ท่าวั_งผา',
+      'ทุ่งเสลี่ยม': 'ทุ_่_งส_เลี_่ย_ม',
+      'ทุ่งหัวช้าง': 'ทุ_่_งห_ัวจ_้า_ง',
+      'เทิง': 'เริ_ง',
+      'นาน้อย': 'นาห_น_้อ_ย',
+      'นาหมื่น': 'นาห_ม_ื_่_น',
+      'บ่อเกลือ': 'บ_่อเกื_อ',
+      'บ้านธิ': 'บ_้า_นธิ',
+      'บ้านหลวง': 'บ_้า_นห_ลว_ง',
+      'บ้านโฮ่ง': 'บ_้า_นโห_้_ง',
+      'ปง': 'ป_ง',
+      'ป่าซาง': 'ป_่าจา_ง',
+      'ปาย': 'พา_ย',
+      'เมืองลำพูน': 'เมื_องละพู_น',
+      'แม่จริม': 'แ_ม_่จริ_ม',
+      'แม่จัน': 'แ_ม_่ชั_น',
+      'แม่แจ่ม': 'แ_ม_่แ_จ_่_ม',
+      'แม่ใจ': 'แ_ม_่ไช_ย',
+      'แม่แตง': 'แ_ม_่แ_ต_ง',
+      'แม่ทะ': 'แ_ม_่ธะ',
+      'แม่ทา': 'แ_ม_่ท_รา',
+      'แม่พริก': 'แ_ม_่พ_ริ_ก',
+      'แม่ฟ้าหลวง': 'แ_ม_่ฟ_้าห_ลว_ง',
+      'แม่เมาะ': 'แ_ม_่เมาะ',
+      'แม่ริม': 'แ_ม_่ริ_ม',
+      'แม่ลาน้อย': 'แ_ม_่ลาห_น_้อ_ย',
+      'แม่ลาว': 'แ_ม_่ลา_ว',
+      'แม่วาง': 'แ_ม_่วา_ง',
+      'เวียงสา': 'ว_ย_งสา',
+      'เวียงหนองล่อง': 'ว_ย_งห_น_องห_ล_้อ_ง',
+      'เวียงแหง': 'ว_ย_งแ_ห_ง',
+      'สบปราบ': 'ส_บปา_บ',
+      'สบเมย': 'ส_บเม_ย',
+      'สอง': 'ส_รอ_ง',
+      'สองแคว': 'ส_องแ_ค_ว',
+      'สะเมิง': 'สะเมิ_ง',
+      'สันกำแพง': 'สั_นก_ำแ_พ_ง',
+      'สันติสุข': 'สั_น_ติสุ_ข',
+      'สันทราย': 'สั_นชา_ย',
+      'สันป่าตอง': 'สั_นป_่าท_อง',
+      'สารภี': 'สารพ_ี',
+      'สูงเม่น': 'สุ_งห_ม_ั_้น',
+      'เสริมงาม': 'เสริ_มงา_ม',
+    };
+
+    for (final entry in subWords.entries) {
+      notation = notation.replaceAll(entry.key, entry.value);
+    }
+
+    return {
+      'kam_mueang': km,
+      'notation': notation,
+      'reading': '[$km]',
+    };
+  }
+
+  /// แปลง Notation จาก AI ที่มีขีดล่าง _ ให้เป็นอักขระ LN-TILOK และสลับวรรณยุกต์ยกสูง
+  String _parseLannaNotation(String notation) {
+    const subMap = {
+      'ก': '\uF001', 'ข': '\uF002', 'ฃ': '\uF003', 'ค': '\uF004', 'ฅ': '\uF005', 'ฆ': '\uF006',
+      'ง': '\uF007', 'จ': '\uF008', 'ฉ': '\uF009', 'ช': '\uF00A', 'ซ': '\uF00B', 'ฌ': '\uF00C',
+      'ญ': '\uF00D', 'ฎ': '\uF00E', 'ฏ': '\uF00F', 'ฐ': '\uF010', 'ฑ': '\uF011', 'ฒ': '\uF012',
+      'ณ': '\uF013', 'ด': '\uF014', 'ต': '\uF015', 'ถ': '\uF016', 'ท': '\uF017', 'ธ': '\uF018',
+      'น': '\uF019', 'บ': '\uF01A', 'ป': '\uF01B', 'ผ': '\uF01C', 'ฝ': '\uF01D', 'พ': '\uF01E',
+      'ฟ': '\uF01F', 'ภ': '\uF020', 'ม': '\uF021', 'ย': '\uF022', 'ร': '\uF023', 'ฤ': '\uF024',
+      'ล': '\uF025', 'ฦ': '\uF026', 'ว': '\uF027', 'ศ': '\uF028', 'ษ': '\uF029', 'ส': '\uF02A',
+      'ห': '\uF02B', 'ฬ': '\uF02C', 'อ': '\uF02D', 'ฮ': '\uF02E',
+      'สฺส': '\u00AA',
+    };
+
+    // 1. จัดการสระเอียล้านนา: สระเอียในตั๋วเมืองแท้ใช้ สระอี + ย ห้อย (ไม่ใช้สระ เ ด้านหน้า เพื่อไม่ให้ทับซ้อนกัน)
+    var cleanNotation = notation.replaceAllMapped(
+      RegExp(r'เ([ก-ฮ])([ีิ])([่้๊๋]?)(ย|_ย)([ก-ฮ]|_[ก-ฮ])?'),
+      (m) => '${m[1]}${m[3] ?? ''}${m[2]}_ย${m[5] ?? ''}',
+    );
+
+    final sb = StringBuffer();
+    for (int i = 0; i < cleanNotation.length; i++) {
+      if (cleanNotation[i] == '_' && i + 1 < cleanNotation.length) {
+        final next = cleanNotation[i + 1];
+        if (subMap.containsKey(next)) {
+          sb.write(subMap[next]);
+          i++;
+          continue;
+        }
+      }
+      sb.write(cleanNotation[i]);
+    }
+    var result = sb.toString();
+
+    // 2. สลับลำดับสระบนและวรรณยุกต์ เพื่อให้วรรณยุกต์ลอยขึ้นไปบนชั้น 4 ไม่ทับซ้อนกับสระบนชั้น 3
+    const upperVowels = ['\u0E34', '\u0E35', '\u0E36', '\u0E37', '\u0E31']; // ิ, ี, ึ, ื, ั
+    const tones = ['\u0E48', '\u0E49', '\u0E4A', '\u0E4B', '\u0E4C']; // ่, ้, ๊, ๋, ์
+    for (final v in upperVowels) {
+      for (final t in tones) {
+        while (result.contains('$v$t')) {
+          result = result.replaceAll('$v$t', '$t$v');
+        }
+      }
+    }
+
+    // 3. ลบเครื่องหมาย _ ที่อาจหลงเหลืออยู่ออกให้หมด
+    result = result.replaceAll('_', '');
+
+    return result;
+  }
+
+  /// เรียก Gemini Flash AI Live
+  Future<Map<String, dynamic>?> _callGeminiAi(String promptText) async {
+    const apiKey = 'AIzaSyCj8rr8MGBBYGOVJgP0oaIplIZLDe7ub-c';
+    const models = ['gemini-flash-lite-latest', 'gemini-3.5-flash', 'gemini-flash-latest'];
+    const promptInstructions = '''
+คุณคือผู้เชี่ยวชาญระดับศาสตราจารย์ด้านภาษาศาสตร์ล้านนา อักขรวิธีตั๋วเมืองตามตำราพจนานุกรมล้านนา มรภ.เชียงใหม่ (หน้า 17-22) และคู่มือฟอนต์ LN-TILOK มหาวิทยาลัยเชียงใหม่
+
+จงแปลข้อความภาษาไทยเป็นภาษาคำเมืองแท้ ถอดคำอ่านสำเนียงคำเมือง และระบุโครงสร้างอักขระล้านนา (LN-TILOK Notation)
+
+กฎการแปลคำเมืองแท้และสรรพนาม:
+* สรรพนาม: "เธอ / คุณ / ตัวเอง" แปลว่า "ตั๋ว" (ห้ามแปลว่า "เปิ้น" เด็ดขาด เพราะ "เปิ้น" หมายถึง ฉัน/เขา/คนอื่น)
+* สรรพนาม: "ฉัน / เรา" แปลว่า "เฮา", "ข้าเจ้า" หรือ "เปิ้น"
+* คำสั่งห้าม/ปฏิเสธ "อย่า..." ในภาษาคำเมืองแท้ให้ใช้ "จะไป..." หรือ "จะไปดี...":
+  - "อย่าไป" แปลว่า "จะไปไป" (คำอ่าน: [จะ-ไป-ไป], ตั๋วเมือง: "จะไ_ปไ_ป") หรือ "จะไปดีไป" / "บ่าต้องไป"
+  - "อย่ามา" แปลว่า "จะไปมา" (คำอ่าน: [จะ-ไป-มา], ตั๋วเมือง: "จะไ_ปมา") หรือ "จะไปดีมา" / "บ่าต้องมา"
+  - "อย่าทำ" แปลว่า "จะไปยะ" (คำอ่าน: [จะ-ไป-ยะ]) หรือ "จะไปดียะ"
+  - "อย่ากิน" แปลว่า "จะไปกิ๋น" (คำอ่าน: [จะ-ไป-กิ๋น])
+  - "อย่าพูด" แปลว่า "จะไปอู้" (คำอ่าน: [จะ-ไป-อู้])
+  - "ห้ามไป" แปลว่า "บ่ดีไป" หรือ "บ่หื้อไป" (คำอ่าน: [บ่-ดี-ไป])
+  - "ไม่ต้องไป" แปลว่า "บ่ต้องไป" (คำอ่าน: [บ่-ต้อง-ไป])
+  - "ไม่..." แปลว่า "บ่..." หรือ "บ่า..."
+* กฎชื่อผลไม้และพืชผักพื้นเมืองล้านนา (คนเหนือใช้ "บ่า..." หรือ "บะ..." นำหน้า ห้ามใช้ภาษาอีสาน เช่น ห้ามใช้คำว่า บัก... เด็ดขาด):
+  - "สับปะรด" แปลว่า "บ่าขะนัด" (คำอ่าน: [บ่า-ขะ-นัด], ตั๋วเมือง: "บ่าขะนั_ด") ห้ามแปลว่า บักนัด เด็ดขาด
+  - "กระท้อน" แปลว่า "บ่าต้อง" หรือ "บ่าตื๋น" (คำอ่าน: [บ่า-ต้อง] หรือ [บ่า-ตื๋น], ตั๋วเมือง: "บ่าต้อ_ง")
+  - "มะม่วง" แปลว่า "บ่าม่วง" (คำอ่าน: [บ่า-ม่วง], ตั๋วเมือง: "บ่ามั_ว่_ง")
+  - "มะละกอ" แปลว่า "บ่าก้วยเต้ด" (คำอ่าน: [บ่า-ก้วย-เต้ด], ตั๋วเมือง: "บ่าก_ว้_ยเต้_ด")
+  - "ฝรั่ง" แปลว่า "บ่าก้วยก๋า" (คำอ่าน: [บ่า-ก้วย-ก๋า], ตั๋วเมือง: "บ่าก_ว้_ยก๋า")
+  - "ฟักทอง" แปลว่า "บ่าน้ำแก้ว" (คำอ่าน: [บ่า-น้ำ-แก้ว], ตั๋วเมือง: "บ่าน้ำแก้_ว")
+  - "ขนุน" แปลว่า "บ่าหนุน" (คำอ่าน: [บ่า-หนุน], ตั๋วเมือง: "บ่าห_นุ_น")
+  - "น้อยหน่า" แปลว่า "บ่าน่อแน่" (คำอ่าน: [บ่า-น่อ-แน่])
+  - "มะเขือเทศ" แปลว่า "บ่าเขือส้ม" (คำอ่าน: [บ่า-เขือ-ส้ม])
+  - "มะยม" แปลว่า "บ่ายม", "มะนาว" แปลว่า "บ่านาว", "มะขาม" แปลว่า "บ่าขาม", "มะเขือ" แปลว่า "บ่าเขือ"
+* "อะไร" แปลว่า "อะหยัง" หรือ "หยัง"
+* "หมด / หมดแล้ว" แปลว่า "เสี้ยง / เสี้ยงแล้ว" (คำอ่าน: [เสี้ยง] / [เสี้ยง-แล้ว], ตั๋วเมือง: "สี้_ย_ง" / "สี้_ย_งแล้_ว") ห้ามแปลเป็น ตายลืม หรือ ต๋ายลืม เด็ดขาด
+* "กินหมด" แปลว่า "กิ๋นเสี้ยง" (คำอ่าน: [กิ๋น-เสี้ยง])
+* "วันนี้เธอกินข้าวกับอะไร" แปลเป็น "วันนี้ตั๋วกิ๋นข้าวกับหยัง" (คำอ่าน: [วัน-นี้-ตั๋ว-กิ๋น-ข้าว-กับ-หยัง])
+* "ขอบคุณมาก / ขอบคุณมากๆ" แปลเป็น "ขอบคุณจ๊าดนัก" หรือ "ยินดีจ๊าดนัก" (ห้ามแปลเป็น นักๆ)
+* "กินข้าวไหม / กินข้าวหรือยัง" แปลเป็น "กิ๋นข้าวก่อ / กิ๋นข้าวแล้วกา"
+* "ไปเที่ยวไหน" แปลเป็น "ไปแอ่วไหน"
+* "ทำอะไร" แปลเป็น "ยะหยัง"
+* "สบายดีไหม" แปลเป็น "สบายดีก่อ"
+
+กฎเหล็ก 4 ชั้น (4 Vertical Layers) ตามตำราหน้า 17-22:
+1. เขียนอักษรชิดติดกันต่อเนื่อง ห้ามเคาะเว้นวรรคระหว่างพยางค์ (เช่น "ขอบ_คุณจ้า_ดนั_ก")
+2. เครื่องหมายขีดล่าง "_" ให้ใส่เฉพาะหน้าพยัญชนะที่เป็น "ตัวสะกดท้ายพยางค์" หรือ "พยัญชนะซ้อนสังโยค/อักษรนำ" เท่านั้น เช่น:
+   * มหาวิทยาลัยเชียงใหม่ -> "มหาวิท_ยาลั_ยช_ย_งให_ม_่"
+   * วัดพระสิงห์ วรมหาวิหาร -> "วั_ดพ_ระสิ_งห์ วรมหาวิหา_ร"
+   * วัดมหาวัน -> "วั_ดมหาว_น"
+   * ขอสืบสานอักษรล้านนา -> "ขอสื_บสา_นอัก_ษ_รล้า_นนา"
+   * คนเมืองอู้เมือง เขียนตั๋วเมือง -> "ค_นเมื_องอู้เมื_อง ขี้_ย_นตั๋_วเมื_อง"
+   * สวัสดี -> "ส_วั" + "\\u00AA" + "ดี"
+   * วัดป่าอ้อเมืองอินทร์ -> "วั_ดป่าอ้อเมื_องอิ_นท_ร์"
+   * วัดมังคลถาวรราม -> "วั_ดมั_งคลถาวรา_ม"
+   * ชีวิตธรรมดา -> "ชีวิตธ_มดา"
+   * วันนี้ -> "วั_นนี้"
+   * ตั๋ว -> "ตั๋_ว"
+   * อย่าไป -> "จะไปไป" (ห้ามใส่ _ หน้า ป ในคำว่า "ไป" เพราะ ป เป็นพยัญชนะต้น)
+   * อย่ามา -> "จะไปมา" (ห้ามใส่ _ หน้า ป ในคำว่า "ไป" เพราะ ป เป็นพยัญชนะต้น)
+   * บ่ดีไป -> "บ่ดีไป"
+   * บ่ต้องไป -> "บ่ต้อ_งไป"
+   * กินข้าว -> "กิ๋_นข้า_ว"
+   * กับหยัง -> "กั_บห_ยั_ง"
+   * แม่ กก: ผัก -> "ผั_ก", นก -> "น_ก", ลูก -> "ลู_ก"
+   * แม่ กง: กงหาง -> "ก_งหา_ง", สอง -> "ส_ง", เมือง -> "เมื_อง"
+   * แม่ กด: วัด -> "วั_ด", ปิด -> "ปิ_ด", มด -> "ม_ด"
+   * แม่ กน: กิ๋น -> "กิ๋_น", บ้าน -> "บ้า_น", น่าน -> "น่า_น"
+   * แม่ กบ: สบ -> "ส_บ", แอบ -> "แ_อบ", กับ -> "กั_บ"
+   * แม่ กม: งาม -> "งา_ม", สาม -> "สา_ม"
+   * แม่ เกย: โตย -> "โต_ย", ดอย -> "ด_อย"
+   * แม่ เกอว: แมว -> "แม_ว", ข้าว -> "ข้า_ว", แอ่ว -> "แอ่_ว", ตั๋ว -> "ตั๋_ว"
+   * อักษรนำ/ควบ: หมา -> "ห_มา", พระ -> "พ_ระ", แพร่ -> "แ_พ_ล่", ฉลาด -> "จ_รา_ด" (คำอ่าน: "[จะ-หลาด]"), ตลาด -> "ต_ลา_ด" (คำอ่าน: "[ตะ-หลาด]")
+   * ตัวอย่างชื่อบ้าน-นามเมือง: ท่าวังผา -> "ท่าวั_งผา", เวียงสา -> "ว_ย_งสา", สบปราบ -> "ส_บปา_บ", สันกำแพง -> "สั_นก_ำแ_พ_ง", น่าน -> "น่า_น", ลำปาง -> "ลำพา_ง", แม่ฮ่องสอน -> "แ_ม_่ร_่อ_งส_่อร", พะเยา -> "พยา \\uF027", สารภี -> "สารพ_ี", สอง -> "ส_รอ_ง"
+3. ข้อห้ามเด็ดขาด:
+   * ห้ามใส่ "_" หน้าพยัญชนะต้นของคำทั่วไป เช่น "ไป", "มา", "ดี", "บ่", "จะ" (ให้เขียน "จะไปไป", "จะไปมา" ห้ามเขียน "จะไ_ป" เด็ดขาด)
+   * ห้ามใส่ "_" หน้าสระเด็ดขาด (ห้าม _า, _ิ, _ี, _เ, _แ, _โ, _อ, _ไ, _ั, _ุ, _ู)
+   * ห้ามใส่ "_" ในฟิลด์ phonetic เด็ดขาด! (คำอ่านต้องเป็นตัวอักษรไทยล้วน เช่น "[จะ-ไป-ไป]" หรือ "[จะ-ไป-มา]")
+4. สระหน้า (เ, แ, โ, ใ, ไ) ต้องวางหน้าพยัญชนะต้นเสมอ
+
+ตอบกลับเป็น JSON เท่านั้น รูปแบบ:
+{
+  "kam_mueang": "คำแปลคำเมือง",
+  "lanna_notation": "โครงสร้างอักขระที่ใส่ _ นำหน้าตัวห้อย",
+  "phonetic": "[คำอ่านสำเนียงคำเมือง เป็นภาษาไทยล้วน ไม่มีเครื่องหมายขีดล่าง]",
+  "meaning": "คำอธิบายความหมายและหน้าที่ของคำ 1 ประโยค"
+}
+''';
+
+    for (final model in models) {
+      try {
+        final url = Uri.parse(
+          'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey',
+        );
+        final res = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'contents': [
+              {
+                'parts': [
+                  {
+                    'text': '$promptInstructions\n\nข้อความภาษาไทยที่ต้องการแปล: "$promptText"'
+                  }
+                ]
+              }
+            ]
+          }),
+        ).timeout(const Duration(seconds: 20));
+
+        if (res.statusCode == 200) {
+          final data = jsonDecode(res.body);
+          final raw = data['candidates'][0]['content']['parts'][0]['text'] as String;
+          final cleanJson = raw.replaceAll('```json', '').replaceAll('```', '').trim();
+          return jsonDecode(cleanJson) as Map<String, dynamic>;
+        }
+      } catch (e) {
+        debugPrint('Gemini AI Call error with model $model: $e');
+      }
+    }
+    return null;
   }
 
   // ================= MIC =================
@@ -344,26 +783,6 @@ class _TranslatePageState extends State<TranslatePage> {
         });
       },
     );
-  }
-
-  // ================= TTS =================
-  Future<void> _speak() async {
-    if (_resultText.isEmpty) return;
-
-    final textToSpeak = _thaiToLanna ? _inputCtrl.text : _resultText;
-
-    await _tts.stop();
-    await _tts.speak(textToSpeak);
-  }
-
-  Future<void> _speakReading(String reading) async {
-    if (reading.isEmpty) return;
-
-    await _tts.stop();
-    await _tts.setLanguage('th-TH');
-    await _tts.setSpeechRate(0.45);
-    await _tts.setPitch(1.0);
-    await _tts.speak(reading);
   }
 
   // ================= FAVORITE =================
@@ -478,11 +897,23 @@ class _TranslatePageState extends State<TranslatePage> {
                     _inputBox(),
                     const SizedBox(height: 16),
                     FilledButton.icon(
-                      onPressed: _inputCtrl.text.trim().isEmpty
+                      onPressed: (_inputCtrl.text.trim().isEmpty || _isTranslating)
                           ? null
                           : _translate,
-                      icon: const Icon(Icons.translate_rounded),
-                      label: const Text('แปล'),
+                      icon: _isTranslating
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(Icons.translate_rounded),
+                      label: Text(
+                        _isTranslating ? 'กำลังแปลด้วย AI...' : 'แปลภาษาล้านนา',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       style: FilledButton.styleFrom(
                         backgroundColor: kPrimaryOrange,
                         foregroundColor: Colors.white,
@@ -574,6 +1005,12 @@ class _TranslatePageState extends State<TranslatePage> {
                   controller: _inputCtrl,
                   maxLines: null,
                   minLines: 1,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (_) {
+                    if (_inputCtrl.text.trim().isNotEmpty && !_isTranslating) {
+                      _translate();
+                    }
+                  },
                   style: const TextStyle(
                     fontSize: 16,
                     height: 1.4,
@@ -663,14 +1100,16 @@ class _TranslatePageState extends State<TranslatePage> {
           if (_thaiToLanna)
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'ผลลัพธ์อักขระล้านนา (ตั๋วเมือง)',
+                      dictItem != null && dictItem.category.isNotEmpty
+                          ? 'ผลลัพธ์อักขระล้านนา (${dictItem.category})'
+                          : 'ผลลัพธ์อักขระล้านนา (ตั๋วเมือง)',
                       maxLines: 1,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF7A5C3A),
@@ -714,9 +1153,12 @@ class _TranslatePageState extends State<TranslatePage> {
                     child: Text(
                       _thaiToLanna
                           ? _conv.toTilokFontString(
-                              _inputCtrl.text.trim().isNotEmpty
-                                  ? _inputCtrl.text.trim()
-                                  : (dictItem?.lanna ?? _resultText),
+                              (dictItem?.lanna.isNotEmpty ?? false)
+                                  ? dictItem!.lanna
+                                  : (_resultText.isNotEmpty
+                                      ? _resultText
+                                      : _inputCtrl.text.trim()),
+                              _inputCtrl.text.trim(),
                             )
                           : (dictItem?.thaiSound ?? _resultText),
                       textAlign: TextAlign.center,
@@ -758,17 +1200,11 @@ class _TranslatePageState extends State<TranslatePage> {
             SizedBox(
               width: double.infinity,
               child: Text(
-                LannaRulesData.commonWordReadings[_inputCtrl.text.trim()] ??
-                    (dictItem != null &&
-                            LannaRulesData.commonWordReadings.containsKey(
-                              dictItem.thaiSound.trim(),
-                            )
-                        ? LannaRulesData.commonWordReadings[dictItem.thaiSound.trim()]!
-                        : (dictItem == null || dictItem.reading.isEmpty
-                            ? '[${_inputCtrl.text.trim()}]'
-                            : (dictItem.reading.startsWith('[')
-                                ? dictItem.reading
-                                : '[${dictItem.reading}]'))),
+                dictItem != null && dictItem.reading.isNotEmpty
+                    ? (dictItem.reading.startsWith('[')
+                        ? dictItem.reading
+                        : '[${dictItem.reading}]')
+                    : '[${_inputCtrl.text.trim()}]',
                 textAlign: TextAlign.center,
                 softWrap: true,
                 style: const TextStyle(
@@ -803,15 +1239,9 @@ class _TranslatePageState extends State<TranslatePage> {
             SizedBox(
               width: double.infinity,
               child: Text(
-                LannaRulesData.commonWordDefinitions[_inputCtrl.text.trim()] ??
-                    (dictItem != null &&
-                            LannaRulesData.commonWordDefinitions.containsKey(
-                              dictItem.thaiSound.trim(),
-                            )
-                        ? LannaRulesData.commonWordDefinitions[dictItem.thaiSound.trim()]!
-                        : (dictItem == null || dictItem.meaning.isEmpty
-                            ? 'ผลถอดอักษรอัตโนมัติ โปรดตรวจสอบ'
-                            : dictItem.meaning)),
+                dictItem != null && dictItem.meaning.isNotEmpty
+                    ? dictItem.meaning
+                    : 'ผลถอดอักษรอัตโนมัติ โปรดตรวจสอบ',
                 textAlign: TextAlign.center,
                 softWrap: true,
                 style: const TextStyle(
@@ -885,23 +1315,6 @@ class _TranslatePageState extends State<TranslatePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              _circularActionButton(
-                icon: Icons.volume_up_rounded,
-                color: hasText ? const Color(0xFFE16905) : Colors.grey.shade400,
-                bgColor: hasText
-                    ? const Color(0xFFFFF3E0)
-                    : Colors.grey.shade100,
-                onTap: hasText
-                    ? () {
-                        if (dictItem != null && dictItem.reading.isNotEmpty) {
-                          _speakReading(dictItem.reading);
-                        } else {
-                          _speak();
-                        }
-                      }
-                    : () {},
-              ),
-              const SizedBox(width: 12),
               _circularActionButton(
                 icon: _isFavorite
                     ? Icons.star_rounded

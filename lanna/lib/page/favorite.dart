@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 
 import '../services/favorite_store.dart';
 import '../services/api_service.dart';
@@ -335,21 +334,6 @@ class _FavoriteCardState extends State<FavoriteCard> {
   static const Color darkBrown = Color(0xFF2D1A00);
   static const Color warmBrown = Color(0xFF7A5C3A);
 
-  final FlutterTts _tts = FlutterTts();
-
-  Future<void> _speak() async {
-    await _tts.setLanguage('th-TH');
-    await _tts.setSpeechRate(0.45);
-    await _tts.setPitch(1.0);
-    await _tts.speak(widget.roman.isNotEmpty ? widget.roman : widget.thai);
-  }
-
-  @override
-  void dispose() {
-    _tts.stop();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -386,27 +370,6 @@ class _FavoriteCardState extends State<FavoriteCard> {
                 padding: const EdgeInsets.fromLTRB(14, 14, 8, 14),
                 child: Row(
                   children: [
-                    // Sound button (Circular Cream)
-                    GestureDetector(
-                      onTap: _speak,
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF5EAE1),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFFEADBC8), width: 1.0),
-                        ),
-                        child: const Icon(
-                          Icons.volume_up_rounded,
-                          color: Color(0xFF924E19),
-                          size: 22,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 14),
-
                     // Text content
                     Expanded(
                       child: Column(

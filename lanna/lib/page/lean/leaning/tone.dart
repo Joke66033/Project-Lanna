@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lanna/services/lanna_char_service.dart';
 import 'package:lanna/services/article_service.dart';
 import 'package:lanna/models/article_model.dart';
@@ -28,10 +27,12 @@ class LannaTone {
 
 class ToneGroup {
   final String name;
+  final String categoryCharId;
   final List<LannaTone> tones;
 
   const ToneGroup({
     required this.name,
+    required this.categoryCharId,
     required this.tones,
   });
 }
@@ -49,8 +50,6 @@ class TonePage extends StatefulWidget {
 }
 
 class _TonePageState extends State<TonePage> {
-  late final FlutterTts _tts;
-
   final LannaCharService _charService = LannaCharService();
   final ArticleService _articleService = ArticleService();
 
@@ -62,26 +61,11 @@ class _TonePageState extends State<TonePage> {
   @override
   void initState() {
     super.initState();
-    _tts = FlutterTts();
-    _initTts();
     _loadData();
-  }
-
-  Future<void> _initTts() async {
-    await _tts.setLanguage('th-TH');
-    await _tts.setSpeechRate(0.5);
-    await _tts.setPitch(1.0);
-    await _tts.setVolume(1.0);
-  }
-
-  Future<void> _speak(String text) async {
-    await _tts.stop();
-    await _tts.speak(text);
   }
 
   @override
   void dispose() {
-    _tts.stop();
     super.dispose();
   }
 
@@ -143,7 +127,11 @@ class _TonePageState extends State<TonePage> {
 
       setState(() {
         _groups = [
-          ToneGroup(name: catNames['CL0006'] ?? 'วรรณยุกต์ล้านนา', tones: listMain),
+          ToneGroup(
+            name: catNames['CL0006'] ?? 'วรรณยุกต์ล้านนา',
+            categoryCharId: 'CL0006',
+            tones: listMain,
+          ),
         ].where((g) => g.tones.isNotEmpty).toList();
         _isLoading = false;
       });
@@ -432,169 +420,6 @@ class _IntroCard extends StatelessWidget {
     );
   }
 }
-
-/// ============================================================================
-/// COMPONENT : TONE GRID CARD
-/// ============================================================================
-class _ToneCard extends StatelessWidget {
-  final LannaTone tone;
-  final VoidCallback onPlaySound;
-  final VoidCallback onTapStrokeOrder;
-  final VoidCallback onTapPractice;
-
-  const _ToneCard({
-    required this.tone,
-    required this.onPlaySound,
-    required this.onTapStrokeOrder,
-    required this.onTapPractice,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFEADBC8), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                // Square Lanna Character with Rounded corners background
-                Container(
-                  width: 64,
-                  height: 64,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5EAE1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    tone.char,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontFamily: 'LNTilok',
-                      color: Color(0xFF924E19),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                
-                // Reading and Thai equivalent
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'เสียงอ่าน: ${tone.reading}',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2C1A04),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'เทียบเสียงไทย: ${tone.thai}',
-                        style: const TextStyle(
-                          fontSize: 8,
-                          color: Color(0xFF7A5C3A),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Pronunciation Button (Small warm circle)
-                Material(
-                  color: const Color(0xFFF5EAE1),
-                  shape: const CircleBorder(),
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: onPlaySound,
-                    child: const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Icon(
-                        Icons.volume_up_rounded,
-                        color: Color(0xFF924E19),
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            const Divider(color: Color(0xFFEADBC8), thickness: 1),
-            const SizedBox(height: 8),
-            
-            // Description
-            Text(
-              tone.description,
-              style: TextStyle(
-                fontSize: 8,
-                color: Colors.grey.shade700,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Buttons: Stroke Order and Practice
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: onTapStrokeOrder,
-                    icon: const Icon(Icons.menu_book_rounded, size: 16),
-                    label: const Text('วิธีเขียน'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF5EAE1),
-                      foregroundColor: const Color(0xFF924E19),
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: onTapPractice,
-                    icon: const Icon(Icons.brush_rounded, size: 16),
-                    label: const Text('ฝึกเขียน'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF924E19),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }}
 
 
 // ============================================================================

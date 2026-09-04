@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 
 import '../services/lanna_transliterator.dart';
 import '../services/vocabulary_service.dart';
@@ -38,7 +37,6 @@ class DictionaryPage extends StatefulWidget {
 class _DictionaryPageState extends State<DictionaryPage> {
   final _searchCtrl = TextEditingController();
   final _vocabService = VocabularyService();
-  final FlutterTts _tts = FlutterTts();
   final _transliterator = LannaTransliterator();
 
   List<DictItem> _allItems = [];
@@ -51,21 +49,8 @@ class _DictionaryPageState extends State<DictionaryPage> {
   @override
   void initState() {
     super.initState();
-    _initTts();
     _loadData();
     _searchCtrl.addListener(() => setState(() => _currentPage = 1));
-  }
-
-  Future<void> _initTts() async {
-    await _tts.setLanguage('th-TH');
-    await _tts.setSpeechRate(0.45);
-    await _tts.setPitch(1.0);
-    await _tts.setVolume(1.0);
-  }
-
-  Future<void> _speak(String text) async {
-    await _tts.stop();
-    await _tts.speak(text);
   }
 
   Future<void> _loadData() async {
@@ -93,9 +78,10 @@ class _DictionaryPageState extends State<DictionaryPage> {
               : fallbackCategory;
 
           final rawLanna = v.lannaWord.trim();
-          final lannaText = (rawLanna.isNotEmpty && rawLanna != '-')
-              ? rawLanna
-              : _transliterator.thaiToLanna(v.thaiWord);
+          final lannaText = _transliterator.toTilokFontString(
+            (rawLanna.isNotEmpty && rawLanna != '-') ? rawLanna : v.thaiWord,
+            v.thaiWord,
+          );
 
           return DictItem(
             vocabId: v.vocabId,
@@ -270,7 +256,6 @@ class _DictionaryPageState extends State<DictionaryPage> {
   @override
   void dispose() {
     _searchCtrl.dispose();
-    _tts.stop();
     super.dispose();
   }
 
@@ -311,11 +296,6 @@ class _DictionaryPageState extends State<DictionaryPage> {
                                 delegate: SliverChildBuilderDelegate(
                                   (_, i) => _DictCard(
                                     item: _paged[i],
-                                    onSpeak: () => _speak(
-                                      _paged[i].reading.isNotEmpty
-                                          ? _paged[i].reading
-                                          : _paged[i].thaiSound,
-                                    ),
                                   ),
                                   childCount: _paged.length,
                                 ),
@@ -551,9 +531,8 @@ class _DictionaryPageState extends State<DictionaryPage> {
 // ─── Dictionary Card ──────────────────────────────────────────────────────────
 class _DictCard extends StatelessWidget {
   final DictItem item;
-  final VoidCallback onSpeak;
 
-  const _DictCard({required this.item, required this.onSpeak});
+  const _DictCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -576,7 +555,7 @@ class _DictCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row 1: Thai badge + speaker
+            // Row 1: Thai badge + category
             Row(
               children: [
                 if (item.thaiSound.isNotEmpty) ...[
@@ -624,36 +603,15 @@ class _DictCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                // Speaker
-                GestureDetector(
-                  onTap: onSpeak,
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFF7F2),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFFEADBC8),
-                        width: 1,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.volume_up_rounded,
-                      size: 17,
-                      color: _kPrimary,
-                    ),
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 10),
             // Lanna script
             Text(
-              item.lanna,
+              LannaTransliterator().toTilokFontString(item.lanna, item.thaiSound),
               style: const TextStyle(
                 fontFamily: 'LNTilok',
-                fontSize: 17,
+                fontSize: 20,
                 color: Color(0xFF924E19),
                 fontWeight: FontWeight.bold,
               ),

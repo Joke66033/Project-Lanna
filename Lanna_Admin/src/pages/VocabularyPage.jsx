@@ -177,15 +177,56 @@ export default function VocabularyPage() {
 
   const [errors, setErrors] = useState({});
 
-  const handleConvert = async () => {
-    if (!form.thai_word) return;
+  // 1. แปลภาษาอัตโนมัติจากคำศัพท์ไทย (Auto-Translate from Thai Word -> Reading & Lanna & Meaning)
+  const handleTranslateFromThai = async () => {
+    if (!form.thai_word.trim()) {
+      setErrors((prev) => ({ ...prev, thai_word: "กรุณากรอกคำศัพท์ไทยก่อนกดแปล" }));
+      return;
+    }
     const cleanThai = form.thai_word.trim();
     
-    // Check local client-side authoritative map first (instant & reliable)
+    // Check local client-side authoritative map first
     const localConverted = convertThaiToLanna(cleanThai, lannaMap);
     let lannaResult = localConverted || cleanThai;
-    let readingResult = cleanThai === 'สวัสดี' ? '[สวัด-สะ-ดี]' : (form.reading || `[${cleanThai}]`);
+    let readingResult = cleanThai === 'สวัสดี' ? 'สะ-หวัด-ดี' : cleanThai;
     let meaningResult = cleanThai === 'สวัสดี' ? 'คำทักทาย สวัสดิภาพ' : form.meaning;
+
+    // Northern fruits & dialect vocabulary map
+    const northernDialectMap = {
+      'มะม่วง': { reading: 'บะม่วง', lanna: convertThaiToLanna('บะม่วง'), meaning: 'ผลไม้ชนิดหนึ่ง รสเปรี้ยวหรือหวาน' },
+      'มะนาว': { reading: 'บะนาว', lanna: convertThaiToLanna('บะนาว'), meaning: 'ผลไม้รสเปรี้ยว ใช้ปรุงอาหาร' },
+      'มะพร้าว': { reading: 'บะป๊าว', lanna: convertThaiToLanna('บะป๊าว'), meaning: 'ผลไม้ยืนต้น มีกะลาและน้ำมะพร้าว' },
+      'มะเขือ': { reading: 'บะเขือ', lanna: convertThaiToLanna('บะเขือ'), meaning: 'พืชผักสวนครัว' },
+      'มะขาม': { reading: 'บะขาม', lanna: convertThaiToLanna('บะขาม'), meaning: 'ผลไม้รสเปรี้ยวอมหวาน' },
+      'ส้ม': { reading: 'ส้ม', lanna: convertThaiToLanna('ส้ม'), meaning: 'ผลไม้รสเปรี้ยวอมหวาน หรือ รสเปรี้ยว' },
+      'ส้มตำ': { reading: 'ตำส้ม', lanna: convertThaiToLanna('ตำส้ม'), meaning: 'อาหารคาวรสจัดจ้านทำจากมะละกอ' },
+      'พะเยา': { reading: 'พะเยา', lanna: '[พยา\uF027', meaning: 'จังหวัดพะเยา ในภาคเหนือของไทย' },
+      'เชียงใหม่': { reading: 'เจียงใหม่', lanna: 'ช\uF022ง\u0E43ห\uF021\u0E48', meaning: 'จังหวัดเชียงใหม่' },
+      'เชียงราย': { reading: 'เจียงฮาย', lanna: 'ช\uF022งรา\uF022', meaning: 'จังหวัดเชียงราย' },
+      'ลำพูน': { reading: 'ละปูน', lanna: 'ลตูร', meaning: 'จังหวัดลำพูน' },
+      'ลำปาง': { reading: 'ละปาง', lanna: 'ล\u0E4Dาพา\uF007', meaning: 'จังหวัดลำปาง' },
+      'น่าน': { reading: 'น่าน', lanna: '\u00A2\uF0A3\uF019', meaning: 'จังหวัดน่าน' },
+      'แพร่': { reading: 'แพร่', lanna: 'แ\u0E1E\uF025\u0E48', meaning: 'จังหวัดแพร่' },
+      'แม่ฮ่องสอน': { reading: 'แม่ฮ่องสอน', lanna: 'แม่ร\uF007่คส\uF007ร', meaning: 'จังหวัดแม่ฮ่องสอน' },
+      'ขอโทษ': { reading: 'สุมา', lanna: convertThaiToLanna('สุมา'), meaning: 'การกล่าวขออภัย ขอโทษ' },
+      'ขอบคุณ': { reading: 'ยินดี', lanna: convertThaiToLanna('ยินดี'), meaning: 'การแสดงความขอบคุณ ยินดีต้อนรับ' },
+      'กิน': { reading: 'กิ๋น', lanna: convertThaiToLanna('กิ๋น'), meaning: 'การรับประทานอาหาร' },
+      'อร่อย': { reading: 'ลำ', lanna: convertThaiToLanna('ลำ'), meaning: 'รสชาติอร่อย ถูกปาก' },
+      'สวย': { reading: 'งาม', lanna: convertThaiToLanna('งาม'), meaning: 'มีความงดงาม น่ามอง' },
+      'พูด': { reading: 'อู้', lanna: convertThaiToLanna('อู้'), meaning: 'การพูดคุย สนทนา' },
+    };
+
+    if (northernDialectMap[cleanThai]) {
+      const entry = northernDialectMap[cleanThai];
+      setForm((prev) => ({
+        ...prev,
+        reading: entry.reading,
+        lanna_word: entry.lanna,
+        meaning: entry.meaning || prev.meaning,
+      }));
+      setErrors((prev) => ({ ...prev, thai_word: null, reading: null, lanna_word: null }));
+      return;
+    }
 
     try {
       setLoading(true);
@@ -199,7 +240,7 @@ export default function VocabularyPage() {
           lannaResult = normalizeLannaText(apiData.lanna_word);
         }
         if (apiData.reading && cleanThai !== 'สวัสดี') {
-          readingResult = apiData.reading;
+          readingResult = apiData.reading.replace(/[\[\]]/g, '');
         }
         if (apiData.meaning && !apiData.meaning.includes("ผลถอดอักษรอัตโนมัติ") && cleanThai !== 'สวัสดี') {
           meaningResult = apiData.meaning;
@@ -209,11 +250,10 @@ export default function VocabularyPage() {
       console.warn("API translate fallback to client-side conversion:", e);
     } finally {
       setLoading(false);
-      // Ensure authoritative map takes highest precedence for special words
       if (cleanThai === 'สวัสดี' || tilokDirectMap[cleanThai]) {
         lannaResult = toTilokFontString(cleanThai);
         if (cleanThai === 'สวัสดี') {
-          readingResult = '[สวัด-สะ-ดี]';
+          readingResult = 'สะ-หวัด-ดี';
           meaningResult = 'คำทักทาย สวัสดิภาพ';
         }
       }
@@ -223,8 +263,26 @@ export default function VocabularyPage() {
         reading: readingResult || prev.reading,
         meaning: meaningResult || prev.meaning,
       }));
-      setErrors((prev) => ({ ...prev, lanna_word: null, reading: null, meaning: null }));
+      setErrors((prev) => ({ ...prev, thai_word: null, lanna_word: null, reading: null, meaning: null }));
     }
+  };
+
+  // 2. แปลงอักษรล้านนาจากคำอ่าน (Transliterate directly from Pronunciation / Northern Reading)
+  const handleConvertFromReading = () => {
+    const rawReading = form.reading.trim() || form.thai_word.trim();
+    if (!rawReading) {
+      setErrors((prev) => ({ ...prev, reading: "กรุณากรอกคำอ่านก่อนกดแปลง" }));
+      return;
+    }
+    // ลบเครื่องหมายก้ามปูและขีดแบ่งพยางค์เพื่อแปลงเป็นอักษรล้านนาได้อย่างถูกต้อง
+    const cleanReading = rawReading.replace(/[\[\]\-]/g, '').trim();
+    const lannaConverted = convertThaiToLanna(cleanReading, lannaMap);
+    
+    setForm((prev) => ({
+      ...prev,
+      lanna_word: lannaConverted,
+    }));
+    setErrors((prev) => ({ ...prev, reading: null, lanna_word: null }));
   };
 
   /* ===== AUTO CLOSE SUCCESS ===== */
@@ -599,32 +657,76 @@ export default function VocabularyPage() {
           >
             {/* SCROLLABLE BODY */}
             <div className="p-6 overflow-y-auto space-y-4 flex-1">
-              {/* คำศัพท์ไทย */}
-              <div>
-                <label className="text-sm font-medium">คำศัพท์ไทย</label>
-                <input
-                  value={form.thai_word}
-                  placeholder="ตัวอย่าง: สวัสดี"
-                  className={`mt-1 w-full border rounded-xl px-4 py-3 ${
-                    errors.thai_word ? "border-red-500" : ""
-                  }`}
-                  onChange={(e) => {
-                    setForm((prev) => ({ ...prev, thai_word: e.target.value }));
-                    setErrors((prev) => ({ ...prev, thai_word: null }));
-                  }}
-                />
-                {errors.thai_word && <p className="text-red-500 text-sm mt-1">{errors.thai_word}</p>}
+              {/* SECTION 1: คำศัพท์ไทย & คำอ่าน */}
+              <div className="bg-amber-50/40 border border-amber-100/80 rounded-2xl p-4 space-y-3">
+                <div>
+                  <label className="text-xs font-bold text-gray-700 block mb-1">
+                    คำศัพท์ภาษาไทย <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    value={form.thai_word}
+                    placeholder="ตัวอย่าง: สวัสดี, มะม่วง, พะเยา, ขอโทษ"
+                    className={`w-full border rounded-xl px-3.5 py-2.5 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 ${
+                      errors.thai_word ? "border-red-500" : "border-gray-200"
+                    }`}
+                    onChange={(e) => {
+                      setForm((prev) => ({ ...prev, thai_word: e.target.value }));
+                      setErrors((prev) => ({ ...prev, thai_word: null }));
+                    }}
+                  />
+                  {errors.thai_word && <p className="text-red-500 text-xs mt-1">{errors.thai_word}</p>}
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-700 block mb-1">
+                    คำอ่าน / ภาษาคำเมือง <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    value={form.reading}
+                    placeholder="ตัวอย่าง: สะ-หวัด-ดี, บะม่วง, พะเยา, สุมา"
+                    className={`w-full border rounded-xl px-3.5 py-2.5 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 ${
+                      errors.reading ? "border-red-500" : "border-gray-200"
+                    }`}
+                    onChange={(e) => {
+                      setForm((prev) => ({ ...prev, reading: e.target.value }));
+                      setErrors((prev) => ({ ...prev, reading: null }));
+                    }}
+                  />
+                  {errors.reading && <p className="text-red-500 text-xs mt-1">{errors.reading}</p>}
+                </div>
+
+                {/* ACTION BUTTONS (แปลจากไทย & แปลงจากคำอ่าน) */}
+                <div className="pt-1 flex flex-col sm:flex-row gap-2">
+                  <button
+                    type="button"
+                    onClick={handleTranslateFromThai}
+                    className="flex-1 flex items-center justify-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2.5 px-3 rounded-xl shadow-sm transition"
+                    title="ค้นหาคำอ่านและความหมายตามภาษาเหนืออัตโนมัติ"
+                  >
+                    <span>🌐</span> แปลอัตโนมัติจากคำศัพท์ไทย
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConvertFromReading}
+                    className="flex-1 flex items-center justify-center gap-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold py-2.5 px-3 rounded-xl shadow-sm transition"
+                    title="แปลงคำอ่านเป็นอักษรล้านนาแท้ (LN-TILOK)"
+                  >
+                    <span>✍️</span> แปลงอักษรจากคำอ่าน
+                  </button>
+                </div>
               </div>
 
-              {/* คำศัพท์ล้านนา */}
-              <div>
-                <label className="text-sm font-medium">คำศัพท์ล้านนา</label>
-                <div className="flex gap-2 mt-1 items-center">
+              {/* SECTION 2: คำศัพท์ล้านนา (Lanna Word & Preview) */}
+              <div className="bg-[#FFFDF9] border border-[#EADBC8] rounded-2xl p-4 space-y-3">
+                <div>
+                  <label className="text-xs font-bold text-[#7A5C3A] block mb-1">
+                    คำศัพท์ล้านนา <span className="text-red-500">*</span>
+                  </label>
                   <input
                     value={form.lanna_word}
-                    placeholder="พิมพ์เอง หรือกดปุ่มแปลงด้านขวา"
-                    className={`flex-1 min-w-0 border rounded-xl px-4 py-3 text-2xl lanna-text ${
-                      errors.lanna_word ? "border-red-500" : ""
+                    placeholder="พิมพ์เอง หรือกดปุ่มแปลงด้านบน"
+                    className={`w-full border rounded-xl px-4 py-2.5 text-2xl font-lanna lanna-text bg-white text-[#924E19] focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 ${
+                      errors.lanna_word ? "border-red-500" : "border-gray-200"
                     }`}
                     onChange={(e) => {
                       const normalized = normalizeLannaText(e.target.value);
@@ -632,75 +734,61 @@ export default function VocabularyPage() {
                       setErrors((prev) => ({ ...prev, lanna_word: null }));
                     }}
                   />
-                  <button
-                    type="button"
-                    onClick={handleConvert}
-                    className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-4 py-2 rounded-lg transition shrink-0 text-sm"
-                  >
-                    แปลงจากคำศัพท์ไทย
-                  </button>
+                  {errors.lanna_word && <p className="text-red-500 text-xs mt-1">{errors.lanna_word}</p>}
                 </div>
-                <p className="text-red-500 text-xs mt-1.5 font-normal leading-relaxed">
-                  * ผู้ใช้ต้องกดปุ่มนี้ทุกครั้ง ที่มีการแก้ไขคำศัพท์ภาษาไทย เพื่อให้คำศัพท์ล้านนาถูกแปลงใหม่
-                </p>
-                {form.lanna_word && /[\u0E00-\u0E7F]/.test(form.lanna_word) && (
-                  <p className="text-yellow-600 text-sm mt-1 font-medium">
-                    ⚠️ กรุณาตรวจสอบผลการแปลงก่อนบันทึก
-                  </p>
-                )}
-                {errors.lanna_word && <p className="text-red-500 text-sm mt-1">{errors.lanna_word}</p>}
+
+                {/* PREVIEW BOX (เหมือนสไตล์ในแอปมือถือ) */}
+                <div className="bg-[#F5EAE1]/70 border border-[#EADBC8] rounded-xl p-3 flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <span className="text-[11px] text-[#7A5C3A] font-medium block">ตัวอย่างอักษรล้านนา (LN-TILOK):</span>
+                    <span className="text-3xl text-[#924E19] font-lanna leading-relaxed block tracking-wide">
+                      {form.lanna_word || "—"}
+                    </span>
+                  </div>
+                  {form.lanna_word && (
+                    <span className="px-2.5 py-1 bg-green-100 text-green-700 border border-green-200 text-xs font-medium rounded-lg shrink-0">
+                      ✓ อักษรล้านนาพร้อมใช้งาน
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* คำอ่าน / ลำดับการพิมพ์ */}
+              {/* SECTION 3: ความหมาย & หมวดหมู่ */}
               <div>
-                <label className="text-sm font-medium">คำอ่าน / ลำดับการพิมพ์</label>
-                <input
-                  value={form.reading}
-                  placeholder="ตัวอย่าง: นายฯ / น่านฯ / เน + ้ + ๋ + ๑ + ฯ"
-                  className={`mt-1 w-full border rounded-xl px-4 py-3 ${
-                    errors.reading ? "border-red-500" : ""
-                  }`}
-                  onChange={(e) => {
-                    setForm((prev) => ({ ...prev, reading: e.target.value }));
-                    setErrors((prev) => ({ ...prev, reading: null }));
-                  }}
-                />
-                {errors.reading && <p className="text-red-500 text-sm mt-1">{errors.reading}</p>}
-              </div>
-
-              {/* ความหมาย */}
-              <div>
-                <label className="text-sm font-medium">ความหมาย</label>
+                <label className="text-xs font-bold text-gray-700 block mb-1">
+                  ความหมาย <span className="text-red-500">*</span>
+                </label>
                 <textarea
                   value={form.meaning}
-                  rows={3}
+                  rows={2}
                   placeholder="ตัวอย่าง: คำทักทายทั่วไปทางภาคเหนือ"
-                  className={`mt-1 w-full border rounded-xl px-4 py-3 ${
-                    errors.meaning ? "border-red-500" : ""
+                  className={`w-full border rounded-xl px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 ${
+                    errors.meaning ? "border-red-500" : "border-gray-200"
                   }`}
                   onChange={(e) => {
                     setForm((prev) => ({ ...prev, meaning: e.target.value }));
                     setErrors((prev) => ({ ...prev, meaning: null }));
                   }}
                 />
-                {errors.meaning && <p className="text-red-500 text-sm mt-1">{errors.meaning}</p>}
+                {errors.meaning && <p className="text-red-500 text-xs mt-1">{errors.meaning}</p>}
               </div>
 
-              {/* หมวดหมู่ */}
               <div>
-                <label className="text-sm font-medium">หมวดหมู่</label>
+                <label className="text-xs font-bold text-gray-700 block mb-1">
+                  หมวดหมู่คำศัพท์ <span className="text-red-500">*</span>
+                </label>
                 <select
                   value={form.category_vocab_id}
                   onChange={(e) => {
                     setForm((prev) => ({ ...prev, category_vocab_id: e.target.value }));
                     setErrors((prev) => ({ ...prev, category_vocab_id: null }));
                   }}
-                  className={`w-full border rounded-xl px-4 py-3 mt-1 ${
-                    errors.category_vocab_id ? "border-red-500" : ""
+                  className={`w-full border rounded-xl px-3.5 py-2.5 text-sm bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 ${
+                    errors.category_vocab_id ? "border-red-500" : "border-gray-200"
                   }`}
                 >
                   <option value="" disabled>
-                    เลือกหมวดหมู่คำศัพท์
+                    -- กรุณาเลือกหมวดหมู่คำศัพท์ --
                   </option>
                   {categories.map((c) => (
                     <option key={c.category_vocab_id} value={c.category_vocab_id}>
@@ -709,22 +797,22 @@ export default function VocabularyPage() {
                   ))}
                 </select>
                 {errors.category_vocab_id && (
-                  <p className="text-red-500 text-sm mt-1">{errors.category_vocab_id}</p>
+                  <p className="text-red-500 text-xs mt-1">{errors.category_vocab_id}</p>
                 )}
               </div>
             </div>
 
             {/* STICKY FOOTER */}
-            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0">
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/80 flex-shrink-0">
               <button
                 disabled={loading || !form.thai_word || !form.category_vocab_id}
-                className={`w-full py-3 rounded-xl font-semibold transition-all ${
+                className={`w-full py-3 rounded-xl font-bold text-sm transition-all shadow-sm ${
                   loading || !form.thai_word || !form.category_vocab_id
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#16A34A] hover:bg-[#15803D] text-white shadow"
+                    : "bg-[#16A34A] hover:bg-[#15803D] text-white shadow-md active:scale-[0.99]"
                 }`}
               >
-                บันทึกข้อมูล
+                {loading ? "กำลังดำเนินการ..." : "บันทึกข้อมูลคำศัพท์"}
               </button>
             </div>
           </form>

@@ -12,7 +12,17 @@ class LannaCharService {
     }
     final data = await ApiService.get(url);
     if (data == null) return [];
-    final list = (data as List).map((x) => LannaCharModel.fromJson(x)).toList();
+    var list = (data as List).map((x) => LannaCharModel.fromJson(x)).toList();
+
+    // กรองเครื่องหมายควบคุมที่ไม่มีรูปอักขระแสดงผล (เช่น พินทุ / ไม้สะกด ที่เป็นรหัสคำสั่ง) ออก
+    list = list.where((c) =>
+      c.lannaChar.trim().isNotEmpty &&
+      !c.thaiEquivalent.contains('พินทุ') &&
+      !c.thaiEquivalent.contains('ไม้สะกด') &&
+      !c.thaiEquivalent.contains('เครื่องหมายทำตัวห้อย') &&
+      c.lannaChar != '\u1A60' &&
+      c.lannaChar != '\u0E3A'
+    ).toList();
 
     if (categoryCharId != null && categoryCharId.trim().isNotEmpty) {
       final targetIds = categoryCharId.split(',').map((s) => s.trim().toUpperCase()).toSet();

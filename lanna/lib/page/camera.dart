@@ -15,11 +15,15 @@ const Color kPrimaryOrange = Color(0xFF924E19);
 
 class _CameraOcrResult {
   final String text;
+  final String? reading;
+  final String? meaning;
   final bool isLannaOutput;
   final String directionLabel;
 
   const _CameraOcrResult({
     required this.text,
+    this.reading,
+    this.meaning,
     required this.isLannaOutput,
     required this.directionLabel,
   });
@@ -48,6 +52,8 @@ class _CameraPageState extends State<CameraPage>
   bool _loading = false;
   bool _flashOn = false;
   String _resultText = '';
+  String? _resultReading;
+  String? _resultMeaning;
   bool _resultIsLanna = true;
   String _resultDirection = 'ภาษาไทย → ภาษาล้านนา';
 
@@ -212,21 +218,14 @@ class _CameraPageState extends State<CameraPage>
       );
       setState(() {
         _resultText = result.text;
+        _resultReading = result.reading;
+        _resultMeaning = result.meaning;
         _resultIsLanna = result.isLannaOutput;
         _resultDirection = result.directionLabel;
       });
     } catch (error) {
       debugPrint('Typhoon OCR unavailable, using local OCR: $error');
       await _processImageWithLocalOcr(file);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Typhoon OCR ยังไม่พร้อม ระบบจึงใช้การอ่านภาษาไทยบนเครื่องแทน',
-            ),
-          ),
-        );
-      }
     } finally {
       if (mounted) {
         setState(() => _loading = false);
@@ -242,6 +241,8 @@ class _CameraPageState extends State<CameraPage>
       if (mounted) {
         setState(() {
           _resultText = raw.isEmpty ? '' : _conv.thaiToLanna(raw);
+          _resultReading = null;
+          _resultMeaning = null;
           _resultIsLanna = true;
           _resultDirection = 'ภาษาไทย → ภาษาล้านนา';
         });
@@ -258,12 +259,14 @@ class _CameraPageState extends State<CameraPage>
       if (mounted) {
         setState(() {
           _resultText = result.text;
+          _resultReading = result.reading;
+          _resultMeaning = result.meaning;
           _resultIsLanna = result.isLannaOutput;
           _resultDirection = result.directionLabel;
         });
       }
     } catch (error) {
-      debugPrint('Typhoon OCR error: $error');
+      debugPrint('OCR error: $error');
       if (mounted) {
         final errStr = error.toString();
         final displayMsg = (errStr.contains('Failed to fetch') || errStr.contains('ClientException') || errStr.contains('SocketException'))
@@ -284,6 +287,17 @@ class _CameraPageState extends State<CameraPage>
     Uint8List imageBytes,
     String filename,
   ) async {
+    // 1. ใช้ Gemini Vision AI
+    try {
+      final geminiResult = await _requestGeminiVisionOcr(imageBytes);
+      if (geminiResult != null && geminiResult.text.trim().isNotEmpty) {
+        return geminiResult;
+      }
+    } catch (error) {
+      debugPrint('Gemini Vision OCR unavailable: $error');
+    }
+
+    // 2. Fallback ไปยัง Unified Backend OCR
     try {
       final request = http.MultipartRequest(
         'POST',
@@ -293,21 +307,22 @@ class _CameraPageState extends State<CameraPage>
         http.MultipartFile.fromBytes('file', imageBytes, filename: filename),
       );
       final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 150),
+        const Duration(seconds: 40),
       );
       final response = await http.Response.fromStream(streamedResponse);
-      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        final data = decoded['data'] as Map<String, dynamic>?;
-        final text = (data?['text'] as String? ?? '').trim();
-        final isLannaOutput = data?['is_lanna_output'] as bool? ?? false;
-        final direction = data?['direction'] as String? ?? '';
-        if (text.isNotEmpty) {
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          final translated = (data['translatedText'] ?? '').toString().trim();
+          final detected = (data['detectedText'] ?? '').toString().trim();
+          final isLannaToThai = (data['detectedLanguage'] ?? '') == 'lanna';
           return _CameraOcrResult(
-            text: text,
-            isLannaOutput: isLannaOutput,
-            directionLabel: direction == 'lanna_to_thai'
-                ? 'ภาษาล้านนา → ภาษาไทย (ทดลอง)'
+            text: translated.isNotEmpty ? translated : detected,
+            reading: data['reading']?.toString(),
+            meaning: data['meaning']?.toString(),
+            isLannaOutput: !isLannaToThai,
+            directionLabel: isLannaToThai
+                ? 'ภาษาล้านนา → ภาษาไทย (AI Vision)'
                 : 'ภาษาไทย → ภาษาล้านนา',
           );
         }
@@ -316,8 +331,82 @@ class _CameraPageState extends State<CameraPage>
       debugPrint('Unified OCR endpoint unavailable: $error');
     }
 
-    // Compatibility fallback while an older PHP backend is still deployed.
+    // Compatibility fallback
     return _requestLegacyAutoOcr(imageBytes, filename);
+  }
+
+  /// อ่านและแปลอักษรล้านนาจากภาพถ่ายด้วย Google Gemini Vision AI
+  Future<_CameraOcrResult?> _requestGeminiVisionOcr(Uint8List imageBytes) async {
+    const apiKey = 'AIzaSyCj8rr8MGBBYGOVJgP0oaIplIZLDe7ub-c';
+    final base64Img = base64Encode(imageBytes);
+    const models = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
+
+    const prompt = '''
+You are a leading expert in Tai Tham (Lanna script / ตั๋วเมือง), Northern Thai dialect (คำเมือง), and Thai typography/signboard OCR.
+
+Carefully inspect the image:
+1. Detect and transcribe the main text in the image. The text may be Lanna script (ตั๋วเมือง), Thai text, or a signboard with English subtitle (e.g. 'CHIWIT THAMMA DA' -> 'ชีวิตธรรมดา').
+2. Accurately decipher the Lanna script characters (e.g. ᨩᩦᩅᩥ᩠ᨲ = ชีวิต, ᨵᨾ᩠ᨾᨯᩣ = ธรรมดา, ᩈ᩠ᩅᩢᩔᨯᩦ = สวัสดี, ᨩ᩠ᨿᨦᩁᩣᨿ = เชียงราย, ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵ = เชียงใหม่, ᩃᩣ᩠ᨷ = ลาบ, ᩯᨾ᩵ᩁᩬ᩵ᨦᩈᩬᩁ = แม่ฮ่องสอน, etc.).
+3. Provide the accurate Thai translation, the Northern Thai / Thai phonetic pronunciation in square brackets, and a helpful contextual meaning/explanation.
+
+Output strictly pure JSON format:
+{
+  "detected_text": "ข้อความภาษาไทยที่แปล/ถอดความได้จากภาพ (เช่น ชีวิตธรรมดา หรือ สวัสดี)",
+  "reading": "[คำอ่านสำเนียง เช่น ชี-วิด-ทำ-มะ-ดา]",
+  "meaning": "คำอธิบายความหมาย บริบท หรือสถานที่ให้เข้าใจง่าย 1-2 ประโยค"
+}
+''';
+
+    for (final model in models) {
+      try {
+        final url = Uri.parse(
+          'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey',
+        );
+        final res = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'contents': [
+              {
+                'parts': [
+                  {'text': prompt},
+                  {
+                    'inline_data': {
+                      'mime_type': 'image/jpeg',
+                      'data': base64Img,
+                    }
+                  }
+                ]
+              }
+            ]
+          }),
+        ).timeout(const Duration(seconds: 25));
+
+        if (res.statusCode == 200) {
+          final data = jsonDecode(res.body);
+          final raw = data['candidates'][0]['content']['parts'][0]['text'] as String;
+          final cleanJson = raw.replaceAll('```json', '').replaceAll('```', '').trim();
+          final jsonMap = jsonDecode(cleanJson) as Map<String, dynamic>;
+
+          final detectedText = jsonMap['detected_text']?.toString().trim() ??
+              jsonMap['translated_text']?.toString().trim() ??
+              '';
+
+          if (detectedText.isNotEmpty) {
+            return _CameraOcrResult(
+              text: detectedText,
+              reading: jsonMap['reading']?.toString().trim(),
+              meaning: jsonMap['meaning']?.toString().trim(),
+              isLannaOutput: false,
+              directionLabel: 'ภาษาล้านนา → ภาษาไทย (AI Vision)',
+            );
+          }
+        }
+      } catch (e) {
+        debugPrint('Gemini Vision OCR Error with model $model: $e');
+      }
+    }
+    return null;
   }
 
   Future<_CameraOcrResult> _requestLegacyAutoOcr(
@@ -412,6 +501,8 @@ class _CameraPageState extends State<CameraPage>
       _image = null;
       _webImage = null;
       _resultText = '';
+      _resultReading = null;
+      _resultMeaning = null;
     });
   }
 
@@ -638,51 +729,93 @@ class _CameraPageState extends State<CameraPage>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.75),
+        color: const Color(0xE61E1E1E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kPrimaryOrange.withValues(alpha: 0.5)),
+        border: Border.all(color: kPrimaryOrange.withValues(alpha: 0.6)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
-              const Icon(Icons.translate, color: kPrimaryOrange, size: 18),
+              const Icon(Icons.auto_awesome, color: kPrimaryOrange, size: 18),
               const SizedBox(width: 6),
-              const Text(
-                'ผลการแปล',
-                style: TextStyle(
+              Text(
+                _resultDirection,
+                style: const TextStyle(
                   color: kPrimaryOrange,
-                  fontSize: 8,
+                  fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const Spacer(),
               GestureDetector(
-                onTap: () => setState(() => _resultText = ''),
-                child: const Icon(Icons.close, color: Colors.white54, size: 18),
+                onTap: _clearImage,
+                child: const Icon(Icons.close, color: Colors.white54, size: 20),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            _resultDirection,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 10),
           Text(
             _resultText,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 19,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
               fontFamily: _resultIsLanna ? 'LNTilok' : null,
-              height: 1.5,
+              height: 1.4,
             ),
           ),
+          if (_resultReading != null && _resultReading!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.record_voice_over, color: Color(0xFFFFB74D), size: 16),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'คำอ่าน: $_resultReading',
+                    style: const TextStyle(
+                      color: Color(0xFFFFB74D),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (_resultMeaning != null && _resultMeaning!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 2),
+                  child: Icon(Icons.menu_book_rounded, color: Colors.white60, size: 15),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    _resultMeaning!,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

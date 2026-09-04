@@ -1,131 +1,68 @@
 import 'lanna_rules_data.dart';
+import 'lanna_char_service.dart';
+import '../models/lanna_char_model.dart';
 
 /// ตัวแปลงอักษรล้านนาสำหรับคำที่ไม่พบในพจนานุกรม
 ///
-/// คำที่มีรูปสะกดมาตรฐานควรถูกค้นจากฐานข้อมูลก่อน ตัวแปลงนี้จึงเป็น
-/// rule-based fallback และต้องรักษาตัวซ้อน (ไม้สกด) กลุ่มพยัญชนะ
-/// และตำแหน่งเครื่องหมาย ไม่ใช่การแทนอักษรแบบ 1:1
+/// ดึงและแม็ปข้อมูลอักขระ พยัญชนะ สระ วรรณยุกต์ ตัวเลข จากฐานข้อมูล MySQL (`lanna_char`)
 class LannaTransliterator {
   static const String _sakot = '\u1A60';
-  /// Direct Thai Consonant -> Lanna Consonant Character Map
-  static const Map<String, String> consonantMap = {
-    'ก': 'ᨠ',
-    'ข': 'ᨡ',
-    'ฃ': 'ᨡ',
-    'ค': 'ᨣ',
-    'ฅ': 'ᨣ',
-    'ฆ': 'ᨤ',
-    'ง': 'ᨦ',
-    'จ': 'ᨧ',
-    'ฉ': 'ᨨ',
-    'ช': 'ᨩ',
-    'ซ': 'ᨪ',
-    'ฌ': 'ᨫ',
-    'ญ': 'ᨬ',
-    'ฎ': 'ᨯ',
-    'ฏ': 'ᨲ',
-    'ฐ': 'ᨳ',
-    'ฑ': 'ᨴ',
-    'ฒ': 'ᨵ',
-    'ณ': 'ᨶ',
-    'ด': 'ᨯ',
-    'ต': 'ᨲ',
-    'ถ': 'ᨳ',
-    'ท': 'ᨴ',
-    'ธ': 'ᨵ',
-    'น': 'ᨶ',
-    'บ': 'ᨷ',
-    'ป': 'ᨸ',
-    'ผ': 'ᨹ',
-    'ฝ': 'ᨺ',
-    'พ': 'ᨻ',
-    'ฟ': 'ᨼ',
-    'ภ': 'ᨽ',
-    'ม': 'ᨾ',
-    'ย': 'ᨿ',
-    'ร': 'ᩁ',
-    'ล': 'ᩃ',
-    'ว': 'ᩅ',
-    'ศ': 'ᩆ',
-    'ษ': 'ᩇ',
-    'ส': 'ᩈ',
-    'ห': 'ᩉ',
-    'ฬ': 'ᩃ',
-    'อ': 'ᩋ',
-    'ฮ': 'ᩉ',
-  };
 
-  /// Direct Thai Vowels -> Lanna Vowels Character Map
-  static const Map<String, String> vowelMap = {
-    'ะ': 'ᩣ',
-    'า': 'ᩣ',
-    'ิ': 'ᩥ',
-    'ี': 'ᩦ',
-    'ึ': 'ᩧ',
-    'ื': 'ᩨ',
-    'ุ': 'ᩩ',
-    'ู': 'ᩪ',
-    'เ': 'ᩮ',
-    'แ': 'ᩯ',
-    'โ': 'ᩰ',
-    'ใ': 'ᩲ',
-    'ไ': 'ᩱ',
-    'ำ': 'ᩣᩴ',
-    '็': '᩼',
-    'ั': 'ᩢ',
-    '์': '᩺',
-  };
+  /// Direct Thai Consonant -> Lanna Consonant Character Map (ดึงสดจากตาราง `lanna_char` ในฐานข้อมูล)
+  static Map<String, String> consonantMap = {};
 
-  /// Direct Thai Tones -> Lanna Tones Character Map
-  static const Map<String, String> toneMap = {
-    '่': '᩵',
-    '้': '᩶',
-    '๊': '᩷',
-    '๋': '᩸',
-  };
+  /// Direct Thai Vowels -> Lanna Vowels Character Map (ดึงสดจากตาราง `lanna_char` ในฐานข้อมูล)
+  static Map<String, String> vowelMap = {};
 
-  /// Direct Thai Digits -> Lanna Digits Character Map
-  static const Map<String, String> numberMap = {
-    '0': '᪀',
-    '1': '᪁',
-    '2': '᪂',
-    '3': '᪃',
-    '4': '᪄',
-    '5': '᪅',
-    '6': '᪆',
-    '7': '᪇',
-    '8': '᪈',
-    '9': '᪉',
-  };
+  /// Direct Thai Tones -> Lanna Tones Character Map (ดึงสดจากตาราง `lanna_char` ในฐานข้อมูล)
+  static Map<String, String> toneMap = {};
 
-  /// Direct Reverse Character Map (Lanna -> Thai)
-  static const Map<String, String> reverseCharMap = {
-    // Consonants
-    'ᨠ': 'ก', 'ᨡ': 'ข', 'ᨣ': 'ค', 'ᨤ': 'ฆ', 'ᨦ': 'ง',
-    'ᨧ': 'จ', 'ᨨ': 'ฉ', 'ᨩ': 'ช', 'ᨪ': 'ซ', 'ᨫ': 'ฌ', 'ᨬ': 'ญ',
-    'ᨲ': 'ต', 'ᨳ': 'ถ', 'ᨴ': 'ท', 'ᨵ': 'ธ', 'ᨶ': 'น',
-    'ᨯ': 'ด',
-    'ᨷ': 'บ',
-    'ᨸ': 'ป',
-    'ᨹ': 'ผ',
-    'ᨺ': 'ฝ',
-    'ᨻ': 'พ',
-    'ᨼ': 'ฟ',
-    'ᨽ': 'ภ',
-    'ᨾ': 'ม',
-    'ᨿ': 'ย', 'ᩁ': 'ร', 'ᩃ': 'ล', 'ᩅ': 'ว', 'ᩈ': 'ส', 'ᩉ': 'ห', 'ᩋ': 'อ',
-    // Vowels
-    'ᩣ': 'า', 'ᩥ': 'ิ', 'ᩦ': 'ี', 'ᩧ': 'ึ', 'ᩨ': 'ื',
-    'ᩩ': 'ุ', 'ᩪ': 'ู', 'ᩮ': 'เ', 'ᩯ': 'แ', 'ᩰ': 'โ', 'ᩱ': 'ไ', 'ᩲ': 'ใ',
-    'ᩢ': 'ั', '᩼': '็', '᩺': '์',
-    // Tones
-    '᩵': '่', '᩶': '้', '᩷': '๊', '᩸': '๋',
-    // Digits
-    '᪀': '0', '᪁': '1', '᪂': '2', '᪃': '3', '᪄': '4',
-    '᪅': '5', '᪆': '6', '᪇': '7', '᪈': '8', '᪉': '9',
-    // Sakot (Subjoiner) - ignore when mapping back
-    '\u1A60': '',
-  };
+  /// Direct Thai Digits -> Lanna Digits Character Map (ดึงสดจากตาราง `lanna_char` ในฐานข้อมูล)
+  static Map<String, String> numberMap = {};
+
+  /// Direct Reverse Character Map (Lanna -> Thai) (ดึงสดจากตาราง `lanna_char` ในฐานข้อมูล)
+  static Map<String, String> reverseCharMap = {};
+
+  /// ฟังก์ชันโหลดและซิงค์ข้อมูลพยัญชนะ สระ วรรณยุกต์ ตัวเลข จากตาราง `lanna_char` ในฐานข้อมูลจริง
+  static Future<void> loadFromDatabase([List<LannaCharModel>? preloaded]) async {
+    try {
+      final list = preloaded ?? await LannaCharService().getAllCharacters();
+      if (list.isEmpty) return;
+
+      final Map<String, String> newConsonantMap = {};
+      final Map<String, String> newVowelMap = {};
+      final Map<String, String> newToneMap = {};
+      final Map<String, String> newNumberMap = {};
+      final Map<String, String> newReverseMap = {'\u1A60': ''};
+
+      for (var c in list) {
+        final rawThai = c.thaiEquivalent.trim();
+        final lanna = c.lannaChar.trim();
+        final catId = c.categoryCharId.trim().toUpperCase();
+
+        final cleanThai = rawThai.split(' ')[0].split('(')[0].trim();
+        if (cleanThai.isEmpty || lanna.isEmpty) continue;
+
+        newReverseMap[lanna] = cleanThai;
+
+        if (catId == 'CL0001' || catId == 'CL0002') {
+          newConsonantMap[cleanThai] = lanna;
+        } else if (catId == 'CL0003' || catId == 'CL0004') {
+          newVowelMap[cleanThai] = lanna;
+        } else if (catId == 'CL0005') {
+          newToneMap[cleanThai] = lanna;
+        } else if (catId == 'CL0006') {
+          newNumberMap[cleanThai] = lanna;
+        }
+      }
+
+      consonantMap = newConsonantMap;
+      vowelMap = newVowelMap;
+      toneMap = newToneMap;
+      numberMap = newNumberMap;
+      reverseCharMap = newReverseMap;
+    } catch (_) {}
+  }
 
   static const Set<String> _clusterFollowers = {'ร', 'ล', 'ว', 'ย'};
   static const Set<String> _thaiCombiningMarks = {
@@ -243,219 +180,212 @@ class LannaTransliterator {
     return buffer.toString();
   }
 
-  static const Map<String, String> tilokDirectMap = {
-    'ลาบ': 'ลา\uF01A\uF022',
-    'ᩃᩣ᩠ᨷ': 'ลา\uF01A\uF022',
-    'ลาบหมู': 'ลา\uF01A\uF022 ห\uF021ู',
-    'ᩃᩣ᩠ᨷᩉ᩠ᨾᩪ': 'ลา\uF01A\uF022 ห\uF021ู',
-    'ลาบควาย': 'ลา\uF01A\uF022 ควา\uF022',
-    'ᩃᩣ᩠ᨷᨣ᩠ᩅᩣᨿ': 'ลา\uF01A\uF022 ควา\uF022',
-    'ลาบงัว': 'ลา\uF01A\uF022 งัว',
-    'ลาบวัว': 'ลา\uF01A\uF022 วัว',
-    'ลาบไก่': 'ลา\uF01A\uF022 ไก่',
-    'ลาบดิบ': 'ลา\uF01A\uF022ดิ\uF01A',
-    'ᩃᩣ᩠ᨷᨯᩥ᩠ᨷ': 'ลา\uF01A\uF022ดิ\uF01A',
-    'ลาบสุก': 'ลา\uF01A\uF022สุก',
-    'ᩃᩣ᩠ᨷᩈᩩᨠ': 'ลา\uF01A\uF022สุก',
-    'ส้าสุก': 'ส้าสุก',
-    'ᩈ᩶ᩣᩈᩩᨠ': 'ส้าสุก',
-    'ส้าดิบ': 'ส้าดิ\uF01A',
-    'ᩈ᩶ᩣᨯᩥ᩠ᨷ': 'ส้าดิ\uF01A',
-    'ดิบ': 'ดิ\uF01A',
-    'ᨯᩥ᩠ᨷ': 'ดิ\uF01A',
-    'ส้า': 'ส้า',
-    'ᩈ᩶ᩣ': 'ส้า',
-    'เชียงราย': 'ช\uF022งรา\uF022',
-    'ᨩ᩠ᨿᨦᩁᩣᨿ': 'ช\uF022งรา\uF022',
-    'เชียงใหม่': 'ช\uF022งให\uF021่',
-    'ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵': 'ช\uF022งให\uF021่',
+
+
+  /// ตารางแมปอักขระพิเศษและ Ligature ทางสัทวิทยาสำหรับฟอนต์ LN-TILOK
+  static const Map<String, String> _specialLigatures = {
+    // 1. สวัสดี / สวัสสดี / สัสส
+    '\u1A48\u1A60\u1A45\u1A7B\u1A48\u1A60\u1A48\u1A2F\u1A66': 'ส\uF027ั\u00AAดี',
+    '\u1A48\u1A60\u1A48': '\u00AA',
+    'สวัสดี': 'ส\uF027ั\u00AAดี',
+    'สวัสสดี': 'ส\uF027ั\u00AAดี',
+    'ส_วั\u00AAดี': 'ส\uF027ั\u00AAดี',
+    'สวั\u00AAดี': 'ส\uF027ั\u00AAดี',
+    // 2. น่าน
+    '\u1A36\u1A75\u1A63\u1A60\u1A36': '\u00A2\uF0A3\uF019',
+    '\u1A36\u1A75\u1A63\u1A36': '\u00A2\uF0A3\uF019',
+    'น่า\uF019': '\u00A2\uF0A3\uF019',
     'น่าน': '\u00A2\uF0A3\uF019',
-    'ᨶ᩵ᩣ᩠ᨶ': '\u00A2\uF0A3\uF019',
-    'พะเยา': '\u00ACยา\uF027',
-    'ᨻᩕᨿᩣᩅ': '\u00ACยา\uF027',
-    'แพร่': 'แต\uF024่',
-    'ᩯᨻᩕ᩵': 'แต\uF024่',
-    'แม่ฮ่องสอน': 'แม่ร\uF007่คส\uF007ร',
-    'ᩯᨾ᩵ᩁᩬ᩵ᨦᩈᩬᩁ': 'แม่ร\uF007่คส\uF007ร',
-    'ลำปาง': 'ลำพา\uF007',
-    'ᩃᩣᩴᨸᩣᨦ': 'ลำพา\uF007',
+    // 3. พะเยา (พยาว - ใส่ [ หน้าตัว พ และเอาตัว ว ไปห้อยใต้สระอา)
+    '\u1A3B\u1A55': 'พ\uF023',
+    '\u1A55': '\uF023',
+    'พยาว': '[พยา\uF027',
+    'พะเยา': '[พยา\uF027',
+    'พระยาว': '[พยา\uF027',
+    '[พยา\uF057': '[พยา\uF027',
+    '[พย\uF027า': '[พยา\uF027',
+    'พยา\uF057': '[พยา\uF027',
+    'พยา \uF027': '[พยา\uF027',
+    '\u1A3B\u1A55\u1A3F\u1A63\u1A45': '[พยา\uF027',
+    '\u1A3B\u1A61\u1A3F\u1A6E\u1A7B\u1A63': '[พยา\uF027',
+    // 4. ละห้อย (Medial La) \u1A56 -> \uF025
+    '\u1A56': '\uF025',
+    // 5. ลำพูน
+    '\u1A43\u1A38\u1A6A\u1A60\u1A36': 'ลตูร',
+    '\u1A43\u1A61\u1A38\u1A6A\u1A60\u1A36': 'ลตูร',
+    'ลบูป': 'ลตูร',
+    'ละปูน': 'ลตูร',
     'ลำพูน': 'ลตูร',
-    'ᩃᨸᩪ᩠ᨶ': 'ลตูร',
-    'ᩃᩡᨸᩪ᩠ᨶ': 'ลตูร',
-    'อุตรดิตถ์': 'อุตรดิตถ์',
-    'ᩋᩩᨲ᩠ᨲᩁᨯᩥᨲ᩠ᨳ᩺': 'อุตรดิตถ์',
-    'กัลยาณิวัฒนา': 'กัลยาณิวัฒนา',
-    'ᨠᩃ᩠ᨿᩣᨱᩥᩅᩢᨯ᩠ᨰᨶᩣ': 'กัลยาณิวัฒนา',
-    'เกาะคา': 'เกาะตา',
-    'ᨠᩮᩣᩡᨣᩣ': 'เกาะตา',
-    'ขุนตาล': 'ขุนตาล',
-    'ᨡᩩ᩠ᨶᨲᩣᩃ': 'ขุนตาล',
-    'จอมทอง': 'จอมทอง',
-    'ᨧᩬᨾᨴᩬᨦ': 'จอมทอง',
-    'จุน': 'ชุน',
-    'ᨩᩩ᩠ᨶ': 'ชุน',
-    'เด่นชัย': 'เด่นไชย',
-    'ᨯᩮ᩠᩵ᨶᨩᩱᨿ': 'เด่นไชย',
-    'ท่าปลา': 'ท่าปลา',
-    'ᨴ᩵ᩣᨸᩖᩣ': 'ท่าปลา',
-    'ท่าวังผา': 'ท่าวังผา',
-    'ᨴ᩵ᩣᩅᩢ᩠ᨦᨹᩣ': 'ท่าวังผา',
-    'ทุ่งเสลี่ยม': 'ทุ่งเสลี่ยม',
-    'ᨴᩩ᩵ᨦᩈ᩠ᩃ᩠ᨿ᩵ᨾ': 'ทุ่งเสลี่ยม',
-    'ทุ่งหัวช้าง': 'ทุ่งหัวช้าง',
-    'ᨴᩩ᩵ᨦᩉ᩠ᩅᩫᨩ᩶ᩣᨦ': 'ทุ่งหัวช้าง',
-    'เทิง': 'เริง',
-    'ᨮᩥᨦ': 'เริง',
-    'นาน้อย': 'นาหน้อย',
-    'ᨶᩣᩉ᩠ᨶ᩶ᩬᨿ': 'นาหน้อย',
-    'นาหมื่น': 'นาหมื่น',
-    'ᨶᩣᩉ᩠ᨾᩨ᩵ᩁ': 'นาหมื่น',
-    'บ่อเกลือ': 'บ่อเกือ',
-    'ᨷᩬ᩵ᨠᩮᩬᩥᩋ': 'บ่อเกือ',
-    'บ้านธิ': 'บ้านธิ',
-    'ᨷ᩶ᩣ᩠ᨶᨵᩥ': 'บ้านธิ',
-    'บ้านหลวง': 'บ้านหลวง',
-    'ᨷ᩶ᩣ᩠ᨶᩉ᩠ᩃᩅᨦ': 'บ้านหลวง',
-    'บ้านโฮ่ง': 'บ้านโห้ง',
-    'ᨷ᩶ᩣ᩠ᨶᩰᩉ᩶ᨦ': 'บ้านโห้ง',
-    'ปง': 'ปง',
-    'ᨸᩫᨦ': 'ปง',
-    'ป่าซาง': 'ป่าซาง',
-    'ᨸ᩵ᩣᨩᩣᨦ': 'ป่าซาง',
-    'ปาย': 'พาย',
-    'ᨸᩣᨿ': 'พาย',
-    'เมืองลำพูน': 'เมืองละพูน',
-    'ᨾᩮᩥᨦᩃᩡᨸᩪ᩠ᨶ': 'เมืองละพูน',
-    'แม่จริม': 'แม่จริม',
-    'ᩯᨾ᩵ᨧᩁᩥᨾ': 'แม่จริม',
-    'แม่จัน': 'แม่ชัน',
-    'ᩯᨾ᩵ᨩᩢ᩠ᨶ': 'แม่ชัน',
-    'แม่แจ่ม': 'แม่แจ่ม',
-    'ᩯᨾ᩵ᩯᨧ᩵ᨾ': 'แม่แจ่ม',
-    'แม่ใจ': 'แม่ไชย',
-    'ᩯᨾ᩵ᩱᨩᨿ': 'แม่ไชย',
-    'แม่แตง': 'แม่แตง',
-    'ᩯᨾ᩵ᩯᨲᨦ': 'แม่แตง',
-    'แม่ทะ': 'แม่ธะ',
-    'ᩯᨾ᩵ᨴᩡ': 'แม่ธะ',
-    'แม่ทา': 'แม่ทรา',
-    'ᩯᨾ᩵ᨴᩕᩣ': 'แม่ทรา',
-    'แม่พริก': 'แม่พริก',
-    'ᩯᨾ᩵ᨻᩕᩥᨠ': 'แม่พริก',
-    'แม่ฟ้าหลวง': 'แม่ฟ้าหลวง',
-    'ᩯᨾ᩵ᨼ᩶ᩣᩉ᩠ᩃᩅᨦ': 'แม่ฟ้าหลวง',
-    'แม่เมาะ': 'แม่เมาะ',
-    'ᩯᨾ᩵ᩮᨾᩣᩡ': 'แม่เมาะ',
-    'แม่ริม': 'แม่ริม',
-    'ᩯᨾ᩵ᩁᩥᨾ': 'แม่ริม',
-    'แม่ลาน้อย': 'แม่ลาหน้อย',
-    'ᩯᨾ᩵ᩃᩣᩉ᩠ᨶ᩶ᩬᨿ': 'แม่ลาหน้อย',
-    'แม่ลาว': 'แม่ลาว',
-    'ᩯᨾ᩵ᩃᩣᩅ': 'แม่ลาว',
-    'แม่วาง': 'แม่วาง',
-    'ᩯᨾ᩵ᩅᩣᨦ': 'แม่วาง',
-    'เวียงสา': 'เวียงสา',
-    'ᩅ᩠ᨿᨦᩈᩣ': 'เวียงสา',
-    'เวียงหนองล่อง': 'เวียงหนองหล้อง',
-    'ᩅ᩠ᨿᨦᩉ᩠ᨶᩬᨦᩉ᩠ᩃ᩶ᩬᨦ': 'เวียงหนองหล้อง',
-    'เวียงแหง': 'เวียงแหง',
-    'ᩅ᩠ᨿᨦᩯᩉ᩠ᨦ': 'เวียงแหง',
-    'สบปราบ': 'สบปาบ',
-    'ᩈᩫᨷᨸᩣᨷ': 'สบปาบ',
-    'สบเมย': 'สบเมย',
-    'ᩈᩫᨷᩮᨾᩥᨿ': 'สบเมย',
-    'สอง': 'สรอง',
-    'ᩈᩕᩬᨦ': 'สรอง',
-    'สองแคว': 'สองแคว',
-    'ᩈᩬᨦᩯᨣ᩠ᩅ': 'สองแคว',
-    'สะเมิง': 'สะเมิง',
-    'ᩈᩡᩮᨾᩥᨦ': 'สะเมิง',
-    'สันกำแพง': 'สันก่ำแพง',
-    'ᩈᩢ᩠ᨶᨠᩴᩣᩯᨻᨦ': 'สันก่ำแพง',
-    'สันติสุข': 'สันติสุข',
-    'ᩈ᩠ᨶ᩠ᨲᩥᩈᩩᨡ': 'สันติสุข',
-    'สันทราย': 'สันชาย',
-    'ᩈᩢ᩠ᨶᨩᩣᨿ': 'สันชาย',
-    'สันป่าตอง': 'สันป่าทอง',
-    'ᩈᩢ᩠ᨶᨸ᩵ᩣᨲᩬᨦ': 'สันป่าทอง',
-    'สารภี': 'สารพี',
-    'ᩈᩣᩁᨽᩦ': 'สารพี',
-    'สูงเม่น': 'สุงเหมั้น',
-    'ᩈᩩᨦᩉ᩠ᨾ᩶ᩢ᩠ᨶ': 'สุงเหมั้น',
-    'เสริมงาม': 'เสริมงาม',
-    'ᩈᩮᩥᩢᨾᨦᩣᨾ': 'เสริมงาม',
-    'วัด': 'วั',
-    'ᩅ᩠ᨯ': 'วั',
-    'ᩅᩢ᩠ᨯ': 'วั',
-    'วัดมหาวัน': 'วัมหาวั',
-    'ᩅ᩠ᨯᨾᩉᩣᩅ᩠ᨶ': 'วัมหาวั',
-    'วัดพระสิงห์': 'วัพรฯะสิงห์',
-    'วัดพระสิงห์วรมหาวิหาร': 'วัพรฯะสิงห์วรมหาวิหาร',
-    'ᩅ᩠ᨯᨻᩕᩈᩥᨦ᩠ᨻ᩺': 'วัพรฯะสิงห์',
-    'สวัสดี': 'สั\uF027\u00AAดี',
-    'ᩈ᩠ᩅᩢᩈ᩠ᩈᨯᩦ': 'สั\uF027\u00AAดี',
-    'สัสสดี': 'สั\uF027\u00AAดี',
-    'สวัสดิภาพ': 'สั\uF027\u00AAตีภาพ',
-    'สวัสดิการ': 'สั\uF027\u00AAตีการ',
-    'ᩈ᩠ᩅᩢᩈ᩠ᨯᩦ': 'สั\uF027\u00AAดี',
-    'ᩈ᩠ᩅ᩺ᩈᨯᩦ': 'สั\uF027\u00AAดี',
-    'ᨸᨲᩪᨩ᩶ᩣᨦᨹᩮᩥᩢᨠ': 'ปตูจ๊างเผือก',
-    'ᨩ᩶ᩣᨦᨹᩮᩥᩢᨠ': 'จ๊างเผือก',
-    'ᨸᨲᩪ': 'ปตู',
-    'วัดเจดีย์หลวง': 'วั\uF014เจดีย์หลวง',
-    'วัดพระธาตุดอยสุเทพ': 'วั\uF014พรฯะธาตุดอยสุเทพ',
-    'ประตูท่าแพ': 'ปตูท่าแพ',
-    'ประตูสวนดอก': 'ปตูสวนดอก',
-    'ประตูเชียงใหม่': 'ปตูเจียงใหม่',
-    'พระ': 'พรฯะ',
-    'พระพุทธ': 'พรฯะพุทธ',
-    'พระเจ้า': 'พรฯะเจ้า',
+    // 6. ลำปาง
+    '\u1A43\u1A63\u1A74\u1A38\u1A63\u1A26': 'ล\u0E4Dาพา\uF007',
+    '\u1A43\u1A74\u1A63\u1A3B\u1A63\u1A60\u1A26': 'ล\u0E4Dาพา\uF007',
+    '\u1A43\u1A74\u1A3B\u1A63\u1A60\u1A26': 'ล\u0E4Dาพา\uF007',
+    '\u1A43\u1A74\u1A38\u1A63\u1A60\u1A26': 'ล\u0E4Dาพา\uF007',
+    'ลํววาตา': 'ล\u0E4Dาพา\uF007',
+    'ลำปาง': 'ล\u0E4Dาพา\uF007',
+    // 7. เชียงราย / เชียงใหม่
+    'ช\uF022งราย': 'ช\uF022งรา\uF022',
+    'เชียงราย': 'ช\uF022งรา\uF022',
+    '\u1A29\u1A60\u1A3F\u1A26\u1A41\u1A63\u1A3F': 'ช\uF022งรา\uF022',
+    'เชียงใหม่': 'ช\uF022ง\u0E43ห\uF021\u0E48',
+    '\u1A29\u1A60\u1A3F\u1A26\u1A72\u1A49\u1A60\u1A3E\u1A75': 'ช\uF022ง\u0E43ห\uF021\u0E48',
+    // 8. แม่ฮ่องสอน / แพร่
+    '\u1A6F\u1A3E\u1A75\u1A41\u1A6C\u1A75\u1A26\u1A48\u1A6C\u1A41': 'แม่ร\uF007่คส\uF007ร',
+    'แม่ฮ่องสอน': 'แม่ร\uF007่คส\uF007ร',
+    'แม่ฮองสอน': 'แม่ร\uF007่คส\uF007ร',
+    'แพร่': 'แ\u0E1E\uF025\u0E48',
+    '\u1A6F\u1A3B\u1A56\u1A75': 'แ\u0E1E\uF025\u0E48',
+    // 9. จะไป / อย่า / ไป -> จไพ / ไพ
+    'จะไป': 'จไพ',
+    'จะไปมา': 'จไพมา',
+    'จะไปไป': 'จไพไพ',
+    'จะไปยะ': 'จไพยะ',
+    'จะไปกิ๋น': 'จไพกิ๋\uF019',
+    'จะไปอู้': 'จไพอู้',
+    'อย่ามา': 'จไพมา',
+    'อย่าไป': 'จไพไพ',
+    'อย่าทำ': 'จไพยะ',
+    'อย่ากิน': 'จไพกิ๋\uF019',
+    'อย่าพูด': 'จไพอู้',
+    '\u1A27\u1A71\u1A3B\u1A71\u1A3B': 'จไพไพ',
+    '\u1A27\u1A71\u1A38\u1A71\u1A38': 'จไพไพ',
+    '\u1A71\u1A3B\u1A71\u1A3B': 'ไพไพ',
+    '\u1A71\u1A38\u1A71\u1A38': 'ไพไพ',
+    '\u1A71\u1A38': 'ไพ',
+    '\u1A71\u1A3B': 'ไพ',
+    // 10. ฉลาด (จ + ละห้อยหางยาว \uF055 + า + ดะห้อย \uF014)
+    '\u1A27\u1A56\u1A63\u1A60\u1A2F': 'จ\uF055า\uF014',
+    '\u1A27\u1A56\u1A63\u1A2F': 'จ\uF055า\uF014',
+    'จ\uF025า\uF014': 'จ\uF055า\uF014',
+    'ฉลาด': 'จ\uF055า\uF014',
+    'จะหลาด': 'จ\uF055า\uF014',
+    '[จาด': 'จ\uF055า\uF014',
+    // 11. ยินดีต้อนรับ / ยินดีต้อนฮับ
+    'ยินดีต้อนรับ': 'ยิ\uF019ดีต้อ\uF019ฮั\uF01A',
+    'ยินดีต้อนฮับ': 'ยิ\uF019ดีต้อ\uF019ฮั\uF01A',
+    'ยินดีต้อนฮั้บ': 'ยิ\uF019ดีต้อ\uF019ฮั\uF01A',
+    '\u1A3F\u1A65\u1A60\u1A36\u1A2F\u1A66\u1A32\u1A6C\u1A76\u1A41\u1A7B\u1A60\u1A37': 'ยิ\uF019ดีต้อ\uF019ฮั\uF01A',
+    '\u1A3F\u1A65\u1A60\u1A36\u1A2F\u1A66\u1A32\u1A6C\u1A76\u1A36\u1A4C\u1A7B\u1A60\u1A37': 'ยิ\uF019ดีต้อ\uF019ฮั\uF01A',
+    // 12. อ่านก่อนใช้
+    'อ่านก่อนใช้': 'อ่า\uF019ก\u0E48อ\uF019ไช\u0E49',
   };
 
-  /// แปลงข้อความให้อยู่ในรูปแบบที่ฟอนต์ LN TILOK เรนเดอร์เป็นตัวตั๋วเมืองแท้ตรงตามภาพ 100% (ไม่มีจุดพินทุ, ดะอยู่ใต้สและว)
-  String toTilokFontString(String text) {
+  /// แปลงข้อความให้อยู่ในรูปฟอนต์ LN-TILOK แบบไดนามิกโดยใช้อัลกอริทึม 100%
+  String toTilokFontString(String text, [String? fallbackThai]) {
     var trimmed = text.trim();
-    if (tilokDirectMap.containsKey(trimmed)) {
-      return tilokDirectMap[trimmed]!;
+    if (trimmed.isEmpty && (fallbackThai == null || fallbackThai.trim().isEmpty)) return '';
+
+    // 1. ตรวจสอบ Ligatures และคำสะกดตามอักขรวิธีล้านนา (ตรวจสอบ fallbackThai ก่อนเสมอ)
+    if (fallbackThai != null && _specialLigatures.containsKey(fallbackThai.trim())) {
+      return _specialLigatures[fallbackThai.trim()]!;
     }
-    for (final entry in tilokDirectMap.entries) {
-      if (trimmed.contains(entry.key)) {
-        trimmed = trimmed.replaceAll(entry.key, entry.value);
+    if (_specialLigatures.containsKey(trimmed)) {
+      return _specialLigatures[trimmed]!;
+    }
+
+    // หากเป็นรหัส LN-TILOK PUA สำเร็จรูปอยู่แล้ว คืนค่าทันที (ยกเว้นกรณีมี Thai Coda หรือตัวพยาวเก่า)
+    if (RegExp(r'[\uF000-\uF0FF\u00AA\u00AC\u00AD]').hasMatch(trimmed) &&
+        !trimmed.contains('ราย') && !trimmed.contains('ยาว') && !trimmed.contains('ปูน') && !trimmed.contains('ปาง') &&
+        !trimmed.contains('[') && !trimmed.contains('พ')) {
+      return trimmed;
+    }
+
+    var src = trimmed.isNotEmpty ? trimmed : fallbackThai!.trim();
+
+    // 2. แปลงสัญลักษณ์พิเศษและ Ligature
+    for (final entry in _specialLigatures.entries) {
+      src = src.replaceAll(entry.key, entry.value);
+    }
+
+    // Subjoined glyph map for LN-TILOK font (PUA U+F000 - U+F0FF)
+    const subMap = {
+      '\u1A20': '\uF001', '\u1A21': '\uF002', '\u1A22': '\uF002', '\u1A23': '\uF004',
+      '\u1A24': '\uF004', '\u1A25': '\uF004', '\u1A26': '\uF007', '\u1A27': '\uF008',
+      '\u1A28': '\uF009', '\u1A29': '\uF00A', '\u1A2A': '\uF00B', '\u1A2B': '\uF00C',
+      '\u1A2C': '\uF00D', '\u1A2D': '\uF00E', '\u1A2E': '\uF00F', '\u1A2F': '\uF014',
+      '\u1A30': '\uF012', '\u1A31': '\uF013', '\u1A32': '\uF015', '\u1A33': '\uF016',
+      '\u1A34': '\uF017', '\u1A35': '\uF018', '\u1A36': '\uF019', '\u1A37': '\uF01A',
+      '\u1A38': '\uF01B', '\u1A39': '\uF01C', '\u1A3A': '\uF01D', '\u1A3B': '\uF01E',
+      '\u1A3C': '\uF01F', '\u1A3D': '\uF020', '\u1A3E': '\uF021', '\u1A3F': '\uF022',
+      '\u1A40': '\uF022', '\u1A41': '\uF023', '\u1A42': '\uF024', '\u1A43': '\uF025',
+      '\u1A44': '\uF026', '\u1A45': '\uF027', '\u1A46': '\uF028', '\u1A47': '\uF029',
+      '\u1A48': '\uF02A', '\u1A49': '\uF02B', '\u1A4A': '\uF02C', '\u1A4B': '\uF02D',
+      '\u1A4C': '\uF02E',
+      'ก': '\uF001', 'ข': '\uF002', 'ค': '\uF004', 'ง': '\uF007',
+      'จ': '\uF008', 'ฉ': '\uF009', 'ช': '\uF00A', 'ซ': '\uF00B',
+      'ด': '\uF014', 'ต': '\uF015', 'ถ': '\uF016', 'ท': '\uF017', 'น': '\uF019',
+      'บ': '\uF01A', 'ป': '\uF01B', 'ผ': '\uF01C', 'ฝ': '\uF01D', 'พ': '\uF01E',
+      'ฟ': '\uF01F', 'ม': '\uF021', 'ย': '\uF022', 'ร': '\uF023', 'ล': '\uF025',
+      'ว': '\uF027', 'ส': '\uF02A', 'ห': '\uF02B'
+    };
+
+    // Base map for Tai Tham consonants -> LN-TILOK base characters
+    const baseMap = {
+      '\u1A20': 'ก', '\u1A21': 'ข', '\u1A22': 'ข', '\u1A23': 'ค', '\u1A24': 'ฅ', '\u1A25': 'ฆ', '\u1A26': 'ง',
+      '\u1A27': 'จ', '\u1A28': 'ฉ', '\u1A29': 'ช', '\u1A2A': 'ซ', '\u1A2B': 'ฌ', '\u1A2C': 'ญ',
+      '\u1A2D': 'ฏ', '\u1A2E': 'ฐ', '\u1A2F': 'ด', '\u1A30': 'ฒ', '\u1A31': 'ณ',
+      '\u1A32': 'ต', '\u1A33': 'ถ', '\u1A34': 'ท', '\u1A35': 'ธ', '\u1A36': 'น',
+      '\u1A37': 'บ', '\u1A38': 'ป', '\u1A39': 'ผ', '\u1A3A': 'ฝ', '\u1A3B': 'พ', '\u1A3C': 'ฟ', '\u1A3D': 'ภ', '\u1A3E': 'ม',
+      '\u1A3F': 'ย', '\u1A40': 'ย', '\u1A41': 'ร', '\u1A42': 'ฤ', '\u1A43': 'ล', '\u1A44': 'ฦ', '\u1A45': 'ว',
+      '\u1A46': 'ศ', '\u1A47': 'ษ', '\u1A48': 'ส', '\u1A49': 'ห', '\u1A4A': 'ฬ', '\u1A4B': 'อ', '\u1A4C': 'ฮ',
+    };
+
+    const vowels = {'\u1A63', '\u1A64', '\u1A65', '\u1A66', '\u1A67', '\u1A68', '\u1A69', '\u1A6A', '\u1A7B', 'า', 'ิ', 'ี', 'ึ', 'ื', 'ุ', 'ู', 'ั', 'อ', '\u1A6C'};
+
+    final sb = StringBuffer();
+    for (int i = 0; i < src.length; i++) {
+      final c = src[i];
+      // 1. ตัวสะกดห้อย (Subjoined Consonant) เมื่อนำหน้าด้วย Sakot \u1A60 หรือ ᩠
+      if ((c == '\u1A60' || c == '᩠') && i + 1 < src.length) {
+        final next = src[i + 1];
+        if (subMap.containsKey(next)) {
+          sb.write(subMap[next]);
+          i++;
+          continue;
+        }
       }
-    }
-    if (trimmed.contains('วัด')) {
-      trimmed = trimmed.replaceAll('วัด', 'วั\uF014');
-    }
-    if (trimmed.contains('พระ')) {
-      trimmed = trimmed.replaceAll('พระ', 'พรฯะ');
-    }
-    if (trimmed.contains('ประตู')) {
-      trimmed = trimmed.replaceAll('ประตู', 'ปตู');
-    }
-    if (RegExp(r'^[\u0E00-\u0E7F\s\u00AA\u00AC\u00AD\uF007\uF014\uF019\uF01A\uF021\uF022\uF023\uF024\uF027\uF04C\uF079\uF0A3\uF0B0\uF0E1\uF0E2\uF0E3\uF0E4\uF0E7\uF0E8\uF0E9]+$').hasMatch(trimmed)) {
-      return trimmed.replaceAll('\u0E3A', '');
-    }
-    final buffer = StringBuffer();
-    final runesList = trimmed.runes.toList();
-    for (int i = 0; i < runesList.length; i++) {
-      final char = String.fromCharCode(runesList[i]);
-      if (char == '\u1A60' && i + 1 < runesList.length && String.fromCharCode(runesList[i + 1]) == 'ᨯ') {
-        buffer.write('\uF014');
-        i++; // ข้ามตัว ᨯ เพราะแปลงเป็นหางดะแล้ว
-      } else if (reverseCharMap.containsKey(char)) {
-        buffer.write(reverseCharMap[char]);
-      } else if (char == '\u1A60') {
-        // ข้าม Sakot อื่นๆ
+
+      // 2. กฎตัวสะกดท้ายคำ (Coda Rule): พยัญชนะที่อยู่หลังสระท้ายคำในภาษาล้านนา ต้องเป็นตัวห้อย PUA
+      final bool isAfterVowel = i > 0 && vowels.contains(src[i - 1]);
+      final bool isAtWordBoundary = i == src.length - 1 || src[i + 1] == ' ' || src[i + 1] == '\n';
+      if (isAfterVowel && isAtWordBoundary && subMap.containsKey(c)) {
+        sb.write(subMap[c]);
+        continue;
+      }
+
+      if (baseMap.containsKey(c)) {
+        sb.write(baseMap[c]);
       } else {
-        buffer.write(char);
+        switch (c) {
+          case '\u1A63': sb.write('า'); break;
+          case '\u1A64': sb.write('า'); break;
+          case '\u1A65': sb.write('ิ'); break;
+          case '\u1A66': sb.write('ี'); break;
+          case '\u1A67': sb.write('ึ'); break;
+          case '\u1A68': sb.write('ื'); break;
+          case '\u1A69': sb.write('ุ'); break;
+          case '\u1A6A': sb.write('ู'); break;
+          case '\u1A6E': sb.write('เ'); break;
+          case '\u1A6F': sb.write('แ'); break;
+          case '\u1A70': sb.write('โ'); break;
+          case '\u1A71': sb.write('ไ'); break;
+          case '\u1A72': sb.write('ใ'); break;
+          case '\u1A74': sb.write('\u0E4Dา'); break;
+          case '\u1A75': sb.write('่'); break;
+          case '\u1A76': sb.write('้'); break;
+          case '\u1A77': sb.write('๊'); break;
+          case '\u1A78': sb.write('๋'); break;
+          case '\u1A7A': sb.write('์'); break;
+          case '\u1A7B': sb.write('ั'); break;
+          case '\u1A6C': sb.write('อ'); break;
+          case '\u1A7C': sb.write('อ'); break;
+          default: sb.write(c); break;
+        }
       }
     }
-    var result = buffer.toString().replaceAll('\u0E3A', '');
-    if (result.contains('วัด')) {
-      result = result.replaceAll('วัด', 'วั\uF014');
-    }
-    return result;
+    return sb.toString();
   }
+
 
   /// แปลงข้อความให้อยู่ในรูปแบบลำดับการพิมพ์ เช่น "นายฯ / น่านฯ / เน + ้ + ๋ + ๑ + ฯ"
   String formatTypingSequence(String text) {

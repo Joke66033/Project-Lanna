@@ -32129,7 +32129,7 @@
   },
   {
     "thai": "ฉลาด",
-    "lanna": "ᨨᩃᩣᨯ",
+    "lanna": "จา",
     "pronunciation": "[สะ - หลาด]",
     "definition": "ว. เฉียบแหลม ปัญญาดี",
     "category": "ลักษณะและคุณสมบัติ",
@@ -32142,7 +32142,9 @@
     "needs_review": false,
     "senses": [],
     "lanna_variants": [],
-    "initial": "ฉ"
+    "initial": "ฉ",
+    "reading": "[จะ-หลาด]",
+    "meaning": "มีไหวพริบ มีปัญญาเฉียบแหลม รู้เท่าทัน"
   },
   {
     "thai": "ฉลุ",
@@ -65652,7 +65654,7 @@
   },
   {
     "thai": "น่าน",
-    "lanna": "ᨶ᩵ᩣ᩠ᨶ",
+    "lanna": "¢",
     "pronunciation": "[น่าน]",
     "definition": "น. เขตน่าน ชื่อจังหวัดน่าน",
     "category": "สถานที่และภูมิศาสตร์",
@@ -65665,7 +65667,9 @@
     "needs_review": false,
     "senses": [],
     "lanna_variants": [],
-    "initial": "น"
+    "initial": "น",
+    "reading": "[น่าน]",
+    "meaning": "จังหวัดน่าน"
   },
   {
     "thai": "น่านน้ำ",
@@ -86614,7 +86618,7 @@
   },
   {
     "thai": "เชียงราย",
-    "lanna": "ᩮᨩᩦᨿᨦᩁᩣ᩠ᨿ",
+    "lanna": "ชงรา",
     "pronunciation": "[เจียง - ฮาย]",
     "definition": "น. ชื่อเมืองโบราณที่ตั้งขึ้นเมื่อ พ.ศ. ๑๘๐๕ อยู่ในตัวจังหวัดเชียงรายปัจจุบัน; ชื่อกล้วยชนิดหนึ่งคล้ายกล้วยน้ำไทย",
     "category": "สถานที่ ประวัติศาสตร์และพืช",
@@ -86627,7 +86631,9 @@
     "needs_review": false,
     "senses": [],
     "lanna_variants": [],
-    "initial": "ช"
+    "initial": "ช",
+    "reading": "[เชียง-ราย]",
+    "meaning": "จังหวัดเชียงราย"
   },
   {
     "thai": "เชียงแสน",
@@ -86648,7 +86654,7 @@
   },
   {
     "thai": "เชียงใหม่",
-    "lanna": "ᩮᨩᩦᨿᨦᩉ᩠ᨾᩱ᩵",
+    "lanna": "ชงให่",
     "pronunciation": "[เจียง - ใหม่]",
     "definition": "น. ชื่อเมืองที่พระยามังรายตั้งขึ้นเมื่อ พ.ศ. ๑๘๓๙ อยู่ในตัวจังหวัดเชียงใหม่ปัจจุบัน; เรียกชื่อทำนองหรือระบำที่ใช้เริ่มต้นในการซอว่า ระบำขึ้นเชียงใหม่",
     "category": "สถานที่ ประวัติศาสตร์และศิลปะ",
@@ -86661,7 +86667,9 @@
     "needs_review": false,
     "senses": [],
     "lanna_variants": [],
-    "initial": "ช"
+    "initial": "ช",
+    "reading": "[เชียง-ใหม่]",
+    "meaning": "จังหวัดเชียงใหม่"
   },
   {
     "thai": "เชียน",
@@ -105175,5 +105183,149 @@
     "senses": [],
     "lanna_variants": [],
     "initial": "อ"
+  },
+  {
+    "vocab_id": "CUSTOM_5998",
+    "thai": "อย่าไป",
+    "canonical_thai": "อย่าไป",
+    "lanna": "จไพไพ",
+    "reading": "[จะ-ไพ-ไพ]",
+    "meaning": "คำสั่งห้ามไป หรืออย่าเดินทางไป",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_5999",
+    "thai": "จะไปไป",
+    "canonical_thai": "จะไปไป",
+    "lanna": "จไพไพ",
+    "reading": "[จะ-ไพ-ไพ]",
+    "meaning": "คำสั่งห้ามไป หรืออย่าเดินทางไป",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6000",
+    "thai": "ไปไป",
+    "canonical_thai": "ไปไป",
+    "lanna": "ไพไพ",
+    "reading": "[ไพ-ไพ]",
+    "meaning": "ไป",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6001",
+    "thai": "จะหลาด",
+    "canonical_thai": "จะหลาด",
+    "lanna": "จา",
+    "reading": "[จะ-หลาด]",
+    "meaning": "ฉลาด มีไหวพริบ",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6002",
+    "thai": "อ่านก่อนใช้",
+    "canonical_thai": "อ่านก่อนใช้",
+    "lanna": "อ่าก่อไช้",
+    "reading": "[อ่าน-ก่อน-ใช้]",
+    "meaning": "ควรอ่านคำแนะนำก่อนใช้งาน",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6003",
+    "thai": "ลำพูน",
+    "canonical_thai": "ลำพูน",
+    "lanna": "ลตูร",
+    "reading": "[ลำ-พูน]",
+    "meaning": "จังหวัดลำพูน",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6004",
+    "thai": "ลำปาง",
+    "canonical_thai": "ลำปาง",
+    "lanna": "ลําพา",
+    "reading": "[ลำ-ปาง]",
+    "meaning": "จังหวัดลำปาง",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6005",
+    "thai": "แม่ฮ่องสอน",
+    "canonical_thai": "แม่ฮ่องสอน",
+    "lanna": "แม่ร่คสร",
+    "reading": "[แม่-ฮ่อง-สอน]",
+    "meaning": "จังหวัดแม่ฮ่องสอน",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6006",
+    "thai": "พะเยา",
+    "canonical_thai": "พะเยา",
+    "lanna": "[พยา",
+    "reading": "[พะ-เยา]",
+    "meaning": "จังหวัดพะเยา",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6007",
+    "thai": "แพร่",
+    "canonical_thai": "แพร่",
+    "lanna": "แพ่",
+    "reading": "[แพร่]",
+    "meaning": "จังหวัดแพร่",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6008",
+    "thai": "ตลาด",
+    "canonical_thai": "ตลาด",
+    "lanna": "ตาด",
+    "reading": "[กาด / ตลาด]",
+    "meaning": "ตลาด แหล่งค้าขาย",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6009",
+    "thai": "ลาบ",
+    "canonical_thai": "ลาบ",
+    "lanna": "ลา",
+    "reading": "[ลาบ]",
+    "meaning": "อาหารพื้นเมืองประเภทลาบ",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6010",
+    "thai": "ลาบหมู",
+    "canonical_thai": "ลาบหมู",
+    "lanna": "ลา หู",
+    "reading": "[ลาบ-หมู]",
+    "meaning": "ลาบหมู",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6011",
+    "thai": "ลาบควาย",
+    "canonical_thai": "ลาบควาย",
+    "lanna": "ลา คา",
+    "reading": "[ลาบ-ควาย]",
+    "meaning": "ลาบควาย",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6012",
+    "thai": "ส้าสุก",
+    "canonical_thai": "ส้าสุก",
+    "lanna": "ส้าสุก",
+    "reading": "[ส้า-สุก]",
+    "meaning": "ส้าสุก",
+    "category": "คำศัพท์ทั่วไป"
+  },
+  {
+    "vocab_id": "CUSTOM_6013",
+    "thai": "ส้าดิบ",
+    "canonical_thai": "ส้าดิบ",
+    "lanna": "ส้าดิ",
+    "reading": "[ส้า-ดิบ]",
+    "meaning": "ส้าดิบ",
+    "category": "คำศัพท์ทั่วไป"
   }
 ]

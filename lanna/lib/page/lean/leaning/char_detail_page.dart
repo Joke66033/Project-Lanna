@@ -822,9 +822,6 @@ class _LocalStrokePainter extends CustomPainter {
       );
     }
 
-    // Paint the true authentic font glyph in the background so it matches the card 100%
-    glyphLayout.paint(canvas, const Color(0xFFE8DFD5));
-
     final usesGeneratedGuide = strokes.isNotEmpty;
     if (usesGeneratedGuide) {
       final guidePaint = Paint()
@@ -837,12 +834,9 @@ class _LocalStrokePainter extends CustomPainter {
         if (stroke.isEmpty) continue;
         canvas.drawPath(buildStrokePath(stroke, strokeScale), guidePaint);
       }
-    }
-
-    // Never fake handwriting with a horizontal colour reveal. If a character
-    // genuinely has no path data, keep only the pale glyph guide. Supported
-    // multi-character forms are composed into real paths in stroke_data.dart.
-    if (strokes.isEmpty) {
+    } else {
+      // Fallback: Paint font glyph only when no stroke path data exists
+      glyphLayout.paint(canvas, const Color(0xFFE8DFD5));
       return;
     }
 

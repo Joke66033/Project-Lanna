@@ -82,7 +82,9 @@ export default function Articles() {
           const res = await fetch(`${BASE}/endpoints/learning_category_api.php?action=getAll`);
           const json = await res.json();
           learnData = json.data || [];
-        } catch (e) {}
+        } catch (e) {
+          console.warn("learning_category fetch fallback:", e);
+        }
 
         if (!Array.isArray(learnData) || learnData.length === 0) {
           const { data } = await supabase
@@ -104,7 +106,9 @@ export default function Articles() {
           const res = await fetch(`${BASE}/endpoints/category_lanna_char_api.php?action=getAll`);
           const json = await res.json();
           charCats = json.data || [];
-        } catch (e) {}
+        } catch (e) {
+          console.warn("category_lanna_char fetch fallback:", e);
+        }
 
         if (!Array.isArray(charCats) || charCats.length === 0) {
           const { data } = await supabase
@@ -114,8 +118,14 @@ export default function Articles() {
           charCats = data || [];
         }
 
-        const activeCharCats = charCats.filter(
-          (c) => !c.learning_category_code || activeCodes.has(c.learning_category_code)
+        const mappedCharCats = charCats.map((c) => ({
+          ...c,
+          learning_category_code: c.learning_category_code || c.learning_category?.category_code || "",
+          learning_category_title: c.learning_category?.title || "",
+        }));
+
+        const activeCharCats = mappedCharCats.filter(
+          (c) => !c.learning_category_code || activeCodes.size === 0 || activeCodes.has(c.learning_category_code)
         );
         setCharCategories(activeCharCats);
       } catch (err) {
@@ -229,7 +239,7 @@ export default function Articles() {
 
   const getCharCategoryName = (item) => {
     if (item.category_lanna_char?.name) return item.category_lanna_char.name;
-    const cat = charCategories.find((c) => c.category_char_id === item.category_char_id);
+    const cat = charCategories.find((c) => String(c.category_char_id) === String(item.category_char_id));
     return cat ? cat.name : "—";
   };
 
@@ -237,12 +247,22 @@ export default function Articles() {
     if (item.category_lanna_char?.learning_category?.title) {
       return item.category_lanna_char.learning_category.title;
     }
-    const charCat = charCategories.find((c) => c.category_char_id === item.category_char_id);
-    if (charCat) {
-      const learnCat = learningCategories.find((l) => l.category_code === charCat.learning_category_code);
-      return learnCat ? learnCat.title : "ทั่วไป";
+    if (item.learning_category?.title) {
+      return item.learning_category.title;
     }
-    return "ทั่วไป";
+    const charCat = charCategories.find((c) => String(c.category_char_id) === String(item.category_char_id));
+    if (charCat) {
+      if (charCat.learning_category?.title) return charCat.learning_category.title;
+      if (charCat.learning_category_title) return charCat.learning_category_title;
+      const lCode = charCat.learning_category_code || charCat.learning_category?.category_code;
+      const learnCat = learningCategories.find((l) => String(l.category_code) === String(lCode));
+      if (learnCat?.title) return learnCat.title;
+    }
+    if (item.learning_category_code) {
+      const learnCat = learningCategories.find((l) => String(l.category_code) === String(item.learning_category_code));
+      if (learnCat?.title) return learnCat.title;
+    }
+    return "พยัญชนะล้านนา";
   };
 
   // Auto-fill using debounce and matched keywords for both dropdowns

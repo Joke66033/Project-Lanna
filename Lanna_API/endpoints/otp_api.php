@@ -260,10 +260,67 @@ switch ($action) {
         jsonError('Unknown action: กรุณาระบุ action เป็น send, verify หรือ resetPassword');
 }
 
-// =============================================
-// ฟังก์ชันส่งอีเมล OTP ผ่าน PHPMailer
-// =============================================
 function sendOtpEmail(string $toEmail, string $otpCode): array {
+    // 1. ส่งผ่าน Google Apps Script Webhook (ส่งจากบัญชี Google ของคุณโดยตรงผ่าน HTTPS ไม่โดนบล็อกพอร์ต)
+    $googleWebhook = $_ENV['GOOGLE_MAIL_WEBHOOK'] ?? getenv('GOOGLE_MAIL_WEBHOOK') ?? '';
+    if (!empty($googleWebhook)) {
+        $ch = curl_init($googleWebhook);
+        $payload = json_encode([
+            'to' => $toEmail,
+            'subject' => '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา',
+            'html' => buildOtpEmailHtml($otpCode),
+        ]);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => $payload
+        ]);
+        $resp = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($code >= 200 && $code < 400) {
+            return ['success' => true, 'error' => null];
+        }
+    }
+
+    // 2. ส่งผ่าน Brevo API (HTTPS Port 443)
+    $brevoKey = $_ENV['BREVO_API_KEY'] ?? getenv('BREVO_API_KEY') ?? '';
+    if (!empty($brevoKey)) {
+        $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+        $payload = json_encode([
+            'sender' => [
+                'name' => 'แปลภาษาล้านนา',
+                'email' => $_ENV['MAIL_FROM_ADDRESS'] ?? '661463033@crru.ac.th'
+            ],
+            'to' => [
+                ['email' => $toEmail]
+            ],
+            'subject' => '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา',
+            'htmlContent' => buildOtpEmailHtml($otpCode),
+        ]);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_HTTPHEADER => [
+                'api-key: ' . $brevoKey,
+                'Content-Type: application/json',
+                'Accept: application/json'
+            ],
+            CURLOPT_POSTFIELDS => $payload
+        ]);
+        $resp = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($code >= 200 && $code < 300) {
+            return ['success' => true, 'error' => null];
+        }
+    }
+
+    // 3. ส่งผ่าน Google SMTP (PHPMailer)
     $mail = new PHPMailer(true);
 
     try {
@@ -272,14 +329,21 @@ function sendOtpEmail(string $toEmail, string $otpCode): array {
         
         if ($mailerType === 'smtp') {
             $mail->isSMTP();
-            $mail->Host       = $_ENV['MAIL_HOST'] ?? 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $_ENV['MAIL_USERNAME'] ?? '661463033@crru.ac.th';
-            $mail->Password   = $_ENV['MAIL_PASSWORD'] ?? 'auzanrhfbtujbvuw';
-            $mail->SMTPSecure = ($_ENV['MAIL_ENCRYPTION'] ?? 'ssl') === 'tls'
-                ? PHPMailer::ENCRYPTION_STARTTLS
-                : PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port       = (int)($_ENV['MAIL_PORT'] ?? 465);
+            $mail->Host       = $_ENV['MAIL_HOST'] ?? '127.0.0.1';
+            $mail->SMTPAuth   = !empty($_ENV['MAIL_PASSWORD']);
+            $mail->Username   = $_ENV['MAIL_USERNAME'] ?? 'siripaporn';
+            $mail->Password   = $_ENV['MAIL_PASSWORD'] ?? '';
+            
+            $enc = strtolower($_ENV['MAIL_ENCRYPTION'] ?? 'none');
+            if ($enc === 'ssl') {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            } elseif ($enc === 'tls') {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            } else {
+                $mail->SMTPSecure = false;
+                $mail->SMTPAutoTLS = false;
+            }
+            $mail->Port       = (int)($_ENV['MAIL_PORT'] ?? 25);
             $mail->Timeout    = 10;
             $mail->SMTPOptions = [
                 'ssl' => [

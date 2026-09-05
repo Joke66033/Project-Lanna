@@ -14,6 +14,10 @@ class ApiConfig {
   // Only the translate page calls this local AI service.
   static const String aiTranslationBaseUrl = 'http://localhost:8005';
 
+  // Google Gemini API Key for Live Vision and Smart Translation
+  // You can obtain a free key at: https://aistudio.google.com/app/apikey
+  static const String geminiApiKey = 'AIzaSyCj8rr8MGBBYGOVJgP0oaIplIZLDe7ub-c';
+
   // Base URLs for different environments (Localhost/Debug)
   static const String _androidEmulatorUrl = 'http://10.10.100.104:8000';
   static const String _localhostUrl = 'http://10.10.100.104:8000';

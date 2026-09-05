@@ -362,7 +362,7 @@ class _CameraPageState extends State<CameraPage>
         http.MultipartFile.fromBytes('file', imageBytes, filename: filename),
       );
       final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 30),
+        const Duration(seconds: 6),
       );
       final response = await http.Response.fromStream(streamedResponse);
       if (response.statusCode == 200) {
@@ -391,7 +391,7 @@ class _CameraPageState extends State<CameraPage>
 
   /// อ่านและแปลอักษรล้านนาจากภาพถ่ายด้วย Google Gemini Vision AI
   Future<_CameraOcrResult?> _requestGeminiVisionOcr(Uint8List imageBytes) async {
-    const apiKey = 'AIzaSyCj8rr8MGBBYGOVJgP0oaIplIZLDe7ub-c';
+    final apiKey = ApiConfig.geminiApiKey;
     final base64Img = base64Encode(imageBytes);
     const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
 

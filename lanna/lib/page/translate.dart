@@ -13,6 +13,7 @@ import '../services/vocabulary_service.dart';
 import '../services/translate_log_service.dart';
 import '../services/auth_provider.dart';
 import '../widgets/app_header.dart';
+import '../core/api_config.dart';
 
 const Color kPrimaryOrange = Color(0xFF924E19);
 
@@ -900,7 +901,7 @@ class _TranslatePageState extends State<TranslatePage> {
 
   /// เรียก Gemini Flash AI Live
   Future<Map<String, dynamic>?> _callGeminiAi(String promptText) async {
-    const apiKey = 'AIzaSyCj8rr8MGBBYGOVJgP0oaIplIZLDe7ub-c';
+    final apiKey = ApiConfig.geminiApiKey;
     const models = ['gemini-flash-lite-latest', 'gemini-3.5-flash', 'gemini-flash-latest'];
     const promptInstructions = '''
 คุณคือผู้เชี่ยวชาญระดับศาสตราจารย์ด้านภาษาศาสตร์ล้านนา อักขรวิธีตั๋วเมืองตามตำราพจนานุกรมล้านนา มรภ.เชียงใหม่ (หน้า 17-22) และคู่มือฟอนต์ LN-TILOK มหาวิทยาลัยเชียงใหม่

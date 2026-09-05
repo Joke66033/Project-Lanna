@@ -751,7 +751,7 @@ export default function VocabularyPage() {
                     onClick={handleAiTranslate}
                     disabled={aiLoading}
                     className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition transform active:scale-[0.99] text-xs sm:text-sm cursor-pointer disabled:opacity-50"
-                    title="กดเพื่อให้ AI ช่วยแปลงคำศัพท์ คำอ่าน และอักขระล้านนาอัตโนมัติ"
+                    title="กดเพื่อให้ AI ช่วยแปลงคำศัพท์ คำอ่าน ความหมาย และหมวดหมู่อัตโนมัติ"
                   >
                     {aiLoading ? (
                       <>
@@ -765,6 +765,12 @@ export default function VocabularyPage() {
                       </>
                     )}
                   </button>
+                  <p className="text-[11px] text-purple-700/80 bg-purple-50/80 border border-purple-100 rounded-lg px-2.5 py-1.5 mt-1.5 leading-relaxed flex items-start gap-1.5">
+                    <span className="font-semibold shrink-0">💡 หมายเหตุ:</span>
+                    <span>
+                      หากกดปุ่มนี้ AI จะช่วยวิเคราะห์และกรอก<strong>คำอ่าน อักขระล้านนา ความหมาย และเลือกหมวดหมู่</strong>ให้โดยอัตโนมัติ (ไม่บังคับ จะกดหรือไม่กดก็ได้ สามารถพิมพ์กรอกเองได้ตามต้องการ)
+                    </span>
+                  </p>
                 </div>
               </div>
 
@@ -797,6 +803,12 @@ export default function VocabularyPage() {
                     <span>⚡</span>
                     <span>แปลงจากคำอ่าน</span>
                   </button>
+                  <p className="text-[11px] text-amber-800/80 bg-amber-50/80 border border-amber-100 rounded-lg px-2.5 py-1.5 mt-1.5 leading-relaxed flex items-start gap-1.5">
+                    <span className="font-semibold shrink-0">💡 หมายเหตุ:</span>
+                    <span>
+                      หากกดปุ่มนี้ ระบบจะแปลงคำอ่านเป็น<strong>ตัวอักขระล้านนา</strong>ตามกฎอักขรวิธีให้โดยอัตโนมัติ (ไม่บังคับ สามารถแก้ไขหรือพิมพ์เองได้)
+                    </span>
+                  </p>
                 </div>
               </div>
 

@@ -703,30 +703,9 @@ export default function VocabularyPage() {
             <div className="p-6 overflow-y-auto space-y-4 flex-1">
               {/* 1. คำภาษาไทย */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-gray-700">
-                    1. คำภาษาไทย <span className="text-red-500">*</span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleAiTranslate}
-                    disabled={aiLoading}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm transition active:scale-95 disabled:opacity-50 cursor-pointer"
-                    title="กดเพื่อให้ AI ช่วยแปลงคำศัพท์ คำอ่าน และอักขระล้านนาอัตโนมัติ"
-                  >
-                    {aiLoading ? (
-                      <>
-                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>กำลังประมวลผลด้วย AI...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>✨</span>
-                        <span>แปลงโดยใช้ AI อัตโนมัติ</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+                <label className="text-xs font-bold text-gray-700 block mb-1">
+                  1. คำภาษาไทย <span className="text-red-500">*</span>
+                </label>
                 <input
                   value={form.thai_word}
                   placeholder="ตัวอย่าง: สวัสดี, มะม่วง, ยินดีต้อนรับ, ส้มตำ, กินข้าว"
@@ -745,6 +724,29 @@ export default function VocabularyPage() {
                   }}
                 />
                 {errors.thai_word && <p className="text-red-500 text-xs mt-1">{errors.thai_word}</p>}
+                
+                {/* ปุ่มแปลงด้วย AI ใต้กล่องคำภาษาไทย */}
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    onClick={handleAiTranslate}
+                    disabled={aiLoading}
+                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition transform active:scale-[0.99] text-xs sm:text-sm cursor-pointer disabled:opacity-50"
+                    title="กดเพื่อให้ AI ช่วยแปลงคำศัพท์ คำอ่าน และอักขระล้านนาอัตโนมัติ"
+                  >
+                    {aiLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>กำลังประมวลผลด้วย AI...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>✨</span>
+                        <span>แปลงโดยใช้ AI อัตโนมัติ</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {/* 2. คำอ่านภาษาล้านนา */}
@@ -764,49 +766,25 @@ export default function VocabularyPage() {
                   }}
                 />
                 {errors.reading && <p className="text-red-500 text-xs mt-1">{errors.reading}</p>}
-              </div>
-
-              {/* 3. ปุ่มกดแปลง (แปลงจากคำอ่านเพื่อสร้างตัวอักขระล้านนา หรือใช้ AI) */}
-              <div className="pt-1 pb-1 space-y-2">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={handleAiTranslate}
-                    disabled={aiLoading}
-                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-2.5 px-3 rounded-xl shadow-md transition transform active:scale-[0.99] text-xs sm:text-sm cursor-pointer disabled:opacity-50"
-                    title="ใช้ AI ถอดคำอ่านและอักขระล้านนาอัตโนมัติ"
-                  >
-                    {aiLoading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>กำลังแปลงด้วย AI...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>✨</span>
-                        <span>แปลงโดยใช้ AI อัตโนมัติ</span>
-                      </>
-                    )}
-                  </button>
+                
+                {/* ปุ่มแปลงจากคำอ่าน */}
+                <div className="mt-2">
                   <button
                     type="button"
                     onClick={handleConvert}
-                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-2.5 px-3 rounded-xl shadow-md transition transform active:scale-[0.99] text-xs sm:text-sm cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition transform active:scale-[0.99] text-xs sm:text-sm cursor-pointer"
                     title="กดเพื่อแปลงคำอ่านเป็นตัวอักขระล้านนาตามกฎในระบบ"
                   >
                     <span>⚡</span>
                     <span>แปลงจากคำอ่าน</span>
                   </button>
                 </div>
-                <p className="text-[11px] text-gray-500 text-center">
-                  * กด <b>&quot;แปลงโดยใช้ AI อัตโนมัติ&quot;</b> เพื่อให้ระบบดึงคำอ่านและอักขระล้านนา หรือกด <b>&quot;แปลงจากคำอ่าน&quot;</b> เพื่อแปลงด้วยตนเอง
-                </p>
               </div>
 
-              {/* 4. ตัวอักขระล้านนา (แสดงผลอัตโนมัติจากการกดแปลง) */}
+              {/* 3. ตัวอักขระล้านนา (แสดงผลอัตโนมัติจากการกดแปลง) */}
               <div>
                 <label className="text-xs font-bold text-gray-700 block mb-1">
-                  4. ตัวอักขระล้านนา <span className="text-red-500">*</span>
+                  3. ตัวอักขระล้านนา <span className="text-red-500">*</span>
                 </label>
                 <div
                   className={`w-full min-h-[64px] border rounded-xl px-4 py-3 bg-[#FFFDF9] flex items-center justify-between transition-all ${
@@ -841,10 +819,10 @@ export default function VocabularyPage() {
                 {errors.lanna_word && <p className="text-red-500 text-xs mt-1">{errors.lanna_word}</p>}
               </div>
 
-              {/* 5. ความหมาย */}
+              {/* 4. ความหมาย */}
               <div>
                 <label className="text-xs font-bold text-gray-700 block mb-1">
-                  5. ความหมาย <span className="text-red-500">*</span>
+                  4. ความหมาย <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   value={form.meaning}
@@ -861,10 +839,10 @@ export default function VocabularyPage() {
                 {errors.meaning && <p className="text-red-500 text-xs mt-1">{errors.meaning}</p>}
               </div>
 
-              {/* 6. หมวดหมู่ */}
+              {/* 5. หมวดหมู่ */}
               <div>
                 <label className="text-xs font-bold text-gray-700 block mb-1">
-                  6. หมวดหมู่ <span className="text-red-500">*</span>
+                  5. หมวดหมู่ <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={form.category_vocab_id}

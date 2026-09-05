@@ -401,6 +401,25 @@ function dbInsert(string $table, array $data): array {
 }
 
 function dbUpdate(string $table, array $filters, array $data): array {
+    // Defense: If arguments were swapped ($data as 2nd arg, $filters as 3rd arg), auto-swap them
+    $filtersHasFilter = false;
+    foreach ($filters as $k => $v) {
+        if (is_string($v) && (str_starts_with($v, 'eq.') || str_starts_with($v, 'in.') || str_starts_with($v, 'ilike.'))) {
+            $filtersHasFilter = true;
+            break;
+        }
+    }
+    if (!$filtersHasFilter) {
+        foreach ($data as $k => $v) {
+            if (is_string($v) && (str_starts_with($v, 'eq.') || str_starts_with($v, 'in.') || str_starts_with($v, 'ilike.'))) {
+                $tmp = $filters;
+                $filters = $data;
+                $data = $tmp;
+                break;
+            }
+        }
+    }
+
     $pdo = getPdo();
     $params = [];
     

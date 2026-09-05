@@ -140,7 +140,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'update':
-            $id = $_GET['id'] ?? '';
+            $id = $_GET['id'] ?? $body['vocab_id'] ?? $body['id'] ?? '';
             if ($id === '') { jsonError('Missing id'); break; }
             if (empty($body['lanna_word']) && (!empty($body['thai_word']) || !empty($body['reading']))) {
                 $baseText = !empty($body['thai_word']) ? $body['thai_word'] : ($body['reading'] ?? '');
@@ -154,7 +154,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (array_key_exists('meaning', $body))           $updateData['meaning'] = $body['meaning'];
             if (array_key_exists('category_vocab_id', $body)) $updateData['category_vocab_id'] = !empty($body['category_vocab_id']) ? $body['category_vocab_id'] : null;
 
-            $res = dbUpdate('vocabulary', $updateData, ['vocab_id' => 'eq.' . rawurlencode($id)]);
+            $res = dbUpdate('vocabulary', ['vocab_id' => 'eq.' . rawurlencode($id)], $updateData);
             if ($res['error']) { jsonError($res['error']['message']); break; }
 
             $resRow = dbSelectSingle('vocabulary', '*,category_vocab(name)', ['vocab_id' => 'eq.' . rawurlencode($id)]);

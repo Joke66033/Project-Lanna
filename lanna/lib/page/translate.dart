@@ -901,8 +901,8 @@ class _TranslatePageState extends State<TranslatePage> {
 
   /// เรียก Gemini Flash AI Live
   Future<Map<String, dynamic>?> _callGeminiAi(String promptText) async {
-    final apiKey = ApiConfig.geminiApiKey;
-    const models = ['gemini-flash-lite-latest', 'gemini-3.5-flash', 'gemini-flash-latest'];
+    final apiKey = await ApiConfig.getActiveGeminiApiKey();
+    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
     const promptInstructions = '''
 คุณคือผู้เชี่ยวชาญระดับศาสตราจารย์ด้านภาษาศาสตร์ล้านนา อักขรวิธีตั๋วเมืองตามตำราพจนานุกรมล้านนา มรภ.เชียงใหม่ (หน้า 17-22) และคู่มือฟอนต์ LN-TILOK มหาวิทยาลัยเชียงใหม่
 

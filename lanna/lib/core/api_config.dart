@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiConfig {
   // --- HOSTING CONFIGURATION ---
@@ -17,6 +18,30 @@ class ApiConfig {
   // Google Gemini API Key for Live Vision and Smart Translation
   // You can obtain a free key at: https://aistudio.google.com/app/apikey
   static const String geminiApiKey = 'AIzaSyCj8rr8MGBBYGOVJgP0oaIplIZLDe7ub-c';
+  static String? _customGeminiApiKey;
+
+  static Future<String> getActiveGeminiApiKey() async {
+    if (_customGeminiApiKey != null && _customGeminiApiKey!.isNotEmpty) {
+      return _customGeminiApiKey!;
+    }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getString('custom_gemini_api_key');
+      if (saved != null && saved.trim().isNotEmpty) {
+        _customGeminiApiKey = saved.trim();
+        return _customGeminiApiKey!;
+      }
+    } catch (_) {}
+    return geminiApiKey;
+  }
+
+  static Future<void> saveCustomGeminiApiKey(String key) async {
+    _customGeminiApiKey = key.trim();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('custom_gemini_api_key', key.trim());
+    } catch (_) {}
+  }
 
   // Base URLs for different environments (Localhost/Debug)
   static const String _androidEmulatorUrl = 'http://10.10.100.104:8000';

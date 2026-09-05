@@ -391,9 +391,15 @@ class _CameraPageState extends State<CameraPage>
 
   /// อ่านและแปลอักษรล้านนาจากภาพถ่ายด้วย Google Gemini Vision AI
   Future<_CameraOcrResult?> _requestGeminiVisionOcr(Uint8List imageBytes) async {
-    final apiKey = ApiConfig.geminiApiKey;
+    final apiKey = await ApiConfig.getActiveGeminiApiKey();
     final base64Img = base64Encode(imageBytes);
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
+    const models = [
+      'gemini-2.5-flash',
+      'gemini-2.0-flash',
+      'gemini-1.5-flash',
+      'gemini-flash-latest',
+      'gemini-flash-lite-latest',
+    ];
 
     const prompt = '''
 คุณคือผู้เชี่ยวชาญระดับศาสตราจารย์ด้านอักษรธรรมล้านนา (ตั๋วเมือง), ภาษาไทยวน/คำเมือง, และศิลาจารึก-ป้ายอักษรล้านนาภาคเหนือ
@@ -484,6 +490,14 @@ class _CameraPageState extends State<CameraPage>
               directionLabel: 'ภาษาล้านนา → ภาษาไทย (AI Vision)',
             );
           }
+        } else if (res.statusCode == 403 || (res.statusCode == 400 && res.body.contains('API_KEY'))) {
+          debugPrint('Gemini API Key Error (HTTP ${res.statusCode}): ${res.body}');
+          if (mounted) {
+            _showApiKeyDialog(
+              errorMessage: 'Google Gemini API Key ถูกระงับหรือยังไม่ถูกต้อง (403 Forbidden)\nกรุณากรอก API Key ใหม่ (ฟรี) จาก Google AI Studio เพื่อใช้งาน',
+            );
+          }
+          return null;
         }
       } catch (e) {
         debugPrint('Gemini Vision OCR Error with model $model: $e');
@@ -579,6 +593,106 @@ class _CameraPageState extends State<CameraPage>
     return text;
   }
 
+  void _showApiKeyDialog({String? errorMessage}) async {
+    final currentKey = await ApiConfig.getActiveGeminiApiKey();
+    final controller = TextEditingController(
+      text: currentKey == ApiConfig.geminiApiKey ? '' : currentKey,
+    );
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: const [
+            Icon(Icons.vpn_key, color: kPrimaryOrange),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'ตั้งค่า Gemini API Key',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (errorMessage != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Text(
+                    errorMessage,
+                    style: TextStyle(color: Colors.red.shade800, fontSize: 13),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              const Text(
+                'ระบบกล้องใช้ Google Gemini Vision AI ในการอ่านและแปลอักษรล้านนาจากภาพถ่าย\n\nสามารถรับ API Key ฟรีได้ที่:\nhttps://aistudio.google.com/app/apikey',
+                style: TextStyle(fontSize: 13, color: Colors.black87),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  labelText: 'Gemini API Key (AIza...)',
+                  hintText: 'วาง API Key ที่นี่',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  prefixIcon: const Icon(Icons.key, color: kPrimaryOrange),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('ยกเลิก', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kPrimaryOrange,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () async {
+              final newKey = controller.text.trim();
+              if (newKey.isNotEmpty) {
+                await ApiConfig.saveCustomGeminiApiKey(newKey);
+                if (ctx.mounted) Navigator.pop(ctx);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('บันทึก Gemini API Key เรียบร้อยแล้ว'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  // ถ้ามีรูปที่ค้างอยู่ ให้ลองส่งไปประมวลผลใหม่ทันที
+                  if (_webImage != null) {
+                    _processImageWeb(_webImage!, 'camera_retry.jpg');
+                  }
+                }
+              }
+            },
+            child: const Text('บันทึกและใช้งาน', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _clearImage() {
     setState(() {
       _image = null;
@@ -617,6 +731,16 @@ class _CameraPageState extends State<CameraPage>
                     child: _iconBtn(
                       _flashOn ? Icons.flash_on : Icons.flash_off_outlined,
                       onTap: () => setState(() => _flashOn = !_flashOn),
+                    ),
+                  ),
+
+                  // Floating Settings / Key Button (Top Right)
+                  Positioned(
+                    top: 16,
+                    right: hasImage ? 64 : 16,
+                    child: _iconBtn(
+                      Icons.vpn_key_outlined,
+                      onTap: () => _showApiKeyDialog(),
                     ),
                   ),
 

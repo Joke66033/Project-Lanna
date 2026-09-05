@@ -110,7 +110,7 @@ switch ($action) {
 
         // สร้าง OTP 6 หลัก
         $otpCode = str_pad((string)rand(100000, 999999), 6, '0', STR_PAD_LEFT);
-        $expiresAt = time() + 600; // หมดอายุใน 10 นาที (Unix timestamp)
+        $expiresAt = time() + 120; // หมดอายุใน 2 นาที (Unix timestamp)
 
         // สร้าง Token ที่เก็บข้อมูลรหัส OTP
         $payload = [
@@ -353,22 +353,25 @@ function sendOtpEmail(string $toEmail, string $otpCode): array {
                 ]
             ];
             
-            // ผู้ส่ง
-            $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? $_ENV['MAIL_USERNAME'] ?? '661463033@crru.ac.th';
-            $fromName    = $_ENV['MAIL_FROM_NAME'] ?? 'แปลภาษาล้านนา';
-            $mail->setFrom($fromAddress, $fromName);
-            
-            // ผู้รับ
-            $mail->addAddress($toEmail);
-            
-            // เนื้อหา
-            $mail->isHTML(true);
-            $mail->Subject = '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา';
-            $mail->Body    = buildOtpEmailHtml($otpCode);
-            $mail->AltBody = "รหัส OTP ของคุณคือ: $otpCode (หมดอายุใน 10 นาที)";
-            
-            $mail->send();
-            return ['success' => true, 'error' => null];
+        $mail->CharSet = 'UTF-8';
+        $mail->Encoding = 'base64';
+        
+        // ผู้ส่ง
+        $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? 'siripaporn@siripaporn.lnw.mn';
+        $fromName    = $_ENV['MAIL_FROM_NAME'] ?? 'แปลภาษาล้านนา';
+        $mail->setFrom($fromAddress, $fromName);
+        
+        // ผู้รับ
+        $mail->addAddress($toEmail);
+        
+        // เนื้อหา
+        $mail->isHTML(true);
+        $mail->Subject = '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา';
+        $mail->Body    = buildOtpEmailHtml($otpCode);
+        $mail->AltBody = "รหัส OTP ของคุณคือ: $otpCode (หมดอายุใน 2 นาที)";
+        
+        $mail->send();
+        return ['success' => true, 'error' => null];
         }
         
         return ['success' => false, 'error' => 'Mailer configuration not supported'];
@@ -417,7 +420,7 @@ function buildOtpEmailHtml(string $otpCode): string {
         </div>
 
         <p style="color:#6B7280; font-size:14px; line-height:1.5; margin:0;">
-          ⏱️ รหัสนี้จะหมดอายุใน <strong style="color:#DC2626;">10 นาที</strong><br>
+          ⏱️ รหัสนี้จะหมดอายุใน <strong style="color:#DC2626;">2 นาที</strong><br>
           หากคุณไม่ได้ร้องขอรีเซ็ตรหัสผ่าน กรุณาเพิกเฉยอีเมลนี้
         </p>
       </td>

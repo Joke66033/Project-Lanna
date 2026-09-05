@@ -23,7 +23,7 @@ export default function Otp() {
   const [apiSuccess, setApiSuccess] = useState("")
   
   const [otpSentAt, setOtpSentAt] = useState(initialOtpSentAt)
-  const [timeLeft, setTimeLeft] = useState(180)
+  const [timeLeft, setTimeLeft] = useState(120)
 
   // Redirect back to forgot-password if email is missing
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function Otp() {
 
     const calculateTimeLeft = () => {
       const diffSeconds = Math.floor((Date.now() - otpSentAt) / 1000);
-      const remaining = 180 - diffSeconds;
+      const remaining = 120 - diffSeconds;
       return remaining > 0 ? remaining : 0;
     };
 

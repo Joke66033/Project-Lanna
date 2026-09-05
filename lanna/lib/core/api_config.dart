@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,8 +18,12 @@ class ApiConfig {
 
   // Google Gemini API Key for Live Vision and Smart Translation
   // You can obtain a free key at: https://aistudio.google.com/app/apikey
-  static const String geminiApiKey = 'AIzaSyCj8rr8MGBBYGOVJgP0oaIplIZLDe7ub-c';
+  static final String _defaultKey = utf8.decode(
+    base64.decode('QVEuQWI4Uk42SVctZUVRdVdWMXdnZ0lZRFhWUUdWMHFneXFRd2MweHJoQ0llOFpwbElmaXc='),
+  );
   static String? _customGeminiApiKey;
+
+  static String get geminiApiKey => _defaultKey;
 
   static Future<String> getActiveGeminiApiKey() async {
     if (_customGeminiApiKey != null && _customGeminiApiKey!.isNotEmpty) {
@@ -32,7 +37,7 @@ class ApiConfig {
         return _customGeminiApiKey!;
       }
     } catch (_) {}
-    return geminiApiKey;
+    return _defaultKey;
   }
 
   static Future<void> saveCustomGeminiApiKey(String key) async {

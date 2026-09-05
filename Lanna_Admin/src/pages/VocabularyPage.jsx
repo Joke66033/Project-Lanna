@@ -183,7 +183,7 @@ export default function VocabularyPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [isAiConverted, setIsAiConverted] = useState(false);
 
-  // แปลงโดยใช้ AI อัตโนมัติ (Gemini Flash แบบเดียวกับในแอปพลิเคชัน)
+  // แปลงโดยใช้ AI อัตโนมัติ (Gemini Flash & Intelligent Linguistic Engine)
   const handleAiTranslate = async () => {
     const rawThai = form.thai_word ? form.thai_word.trim() : "";
     if (!rawThai) {
@@ -196,12 +196,29 @@ export default function VocabularyPage() {
 
     try {
       setAiLoading(true);
-      const aiResult = await translateWithAi(rawThai, lannaMap);
+      const aiResult = await translateWithAi(rawThai, categories);
+      
+      // ค้นหาหมวดหมู่ที่ตรงกับที่ AI วิเคราะห์ได้
+      let matchedCategoryId = null;
+      if (aiResult.category && categories && categories.length > 0) {
+        const catTarget = aiResult.category.trim().toLowerCase();
+        let found = categories.find((c) => c.name && c.name.trim().toLowerCase() === catTarget);
+        if (!found) {
+          found = categories.find(
+            (c) => c.name && (c.name.includes(catTarget) || catTarget.includes(c.name))
+          );
+        }
+        if (found) {
+          matchedCategoryId = found.category_vocab_id;
+        }
+      }
+
       setForm((prev) => ({
         ...prev,
         reading: aiResult.reading || prev.reading || rawThai,
         lanna_word: aiResult.lanna_word || prev.lanna_word,
-        meaning: prev.meaning || aiResult.meaning || "",
+        meaning: aiResult.meaning || prev.meaning || "",
+        category_vocab_id: matchedCategoryId || prev.category_vocab_id || (categories[0]?.category_vocab_id || ""),
       }));
       setIsAiConverted(true);
       setErrors((prev) => ({
@@ -209,6 +226,8 @@ export default function VocabularyPage() {
         thai_word: null,
         reading: null,
         lanna_word: null,
+        meaning: null,
+        category_vocab_id: null,
       }));
     } catch (err) {
       console.error("AI Translation Error:", err);

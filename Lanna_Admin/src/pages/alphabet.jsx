@@ -371,13 +371,21 @@ export default function AlphabetPage() {
   const handleDelete = async () => {
     try {
       setLoading(true);
-      const targetId = deleteItem.char_id || deleteItem.id;
+      const targetId = deleteItem.char_id || deleteItem.id || "";
       const res = await fetch(
         `${BASE}/endpoints/lanna_char_api.php?action=delete&id=${encodeURIComponent(targetId)}`,
-        { method: "POST" }
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            char_id: targetId,
+            lanna_char: deleteItem.ln || deleteItem.lanna_char || "",
+            thai_equivalent: deleteItem.th || deleteItem.thai_equivalent || "",
+          }),
+        }
       );
-      const { error: resError } = await res.json();
-      if (resError) throw resError;
+      const resJson = await res.json();
+      if (resJson.error) throw resJson.error;
 
       setShowDelete(false);
       setDeleteItem(null);

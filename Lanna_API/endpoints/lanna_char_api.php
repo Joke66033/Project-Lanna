@@ -119,11 +119,44 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'delete':
-            $id = $_GET['id'] ?? '';
-            if ($id === '') { jsonError('Missing id'); break; }
-            $res = dbDelete('lanna_char', ['char_id' => 'eq.' . rawurlencode($id)]);
-            if ($res['error']) { jsonError($res['error']['message']); break; }
-            jsonOk($res['data']);
+            $id = $_GET['id'] ?? $body['char_id'] ?? $body['id'] ?? null;
+            $thai = $_GET['thai_equivalent'] ?? $body['thai_equivalent'] ?? $body['th'] ?? null;
+            $lanna = $_GET['lanna_char'] ?? $body['lanna_char'] ?? $body['ln'] ?? null;
+
+            try {
+                $pdo = getPdo();
+                if ($id !== null && $id !== '') {
+                    $stmt = $pdo->prepare("DELETE FROM `lanna_char` WHERE `char_id` = ?");
+                    $stmt->execute([$id]);
+                    jsonOk(['deleted' => true, 'char_id' => $id]);
+                } elseif ($thai !== null || $lanna !== null) {
+                    $conditions = [];
+                    $params = [];
+                    if ($thai !== null) {
+                        $conditions[] = "`thai_equivalent` = ?";
+                        $params[] = $thai;
+                    }
+                    if ($lanna !== null) {
+                        $conditions[] = "`lanna_char` = ?";
+                        $params[] = $lanna;
+                    }
+                    if ($id === '') {
+                        $conditions[] = "(`char_id` = '' OR `char_id` IS NULL)";
+                    }
+                    $sql = "DELETE FROM `lanna_char` WHERE " . implode(" AND ", $conditions);
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute($params);
+                    jsonOk(['deleted' => true]);
+                } elseif ($id === '') {
+                    $stmt = $pdo->prepare("DELETE FROM `lanna_char` WHERE `char_id` = '' OR `char_id` IS NULL LIMIT 1");
+                    $stmt->execute();
+                    jsonOk(['deleted' => true]);
+                } else {
+                    jsonError('Missing id');
+                }
+            } catch (Exception $e) {
+                jsonError($e->getMessage());
+            }
             break;
 
         default:

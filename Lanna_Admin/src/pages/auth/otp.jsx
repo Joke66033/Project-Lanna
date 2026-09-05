@@ -131,10 +131,10 @@ export default function Otp() {
       }
 
       setOtpSentAt(Date.now())
-      setApiSuccess("ส่งรหัส OTP ใหม่เรียบร้อยแล้ว")
+      setApiSuccess("ส่งรหัส OTP ใหม่ไปยังอีเมลของท่านเรียบร้อยแล้ว")
       setTimeout(() => {
         setApiSuccess("")
-      }, 3000)
+      }, 5000)
     } catch (err) {
       console.error("Resend OTP error:", err)
       setApiError("ไม่สามารถส่งรหัส OTP ใหม่ได้ กรุณาลองอีกครั้ง")

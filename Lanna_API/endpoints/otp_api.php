@@ -121,7 +121,7 @@ switch ($action) {
         ];
         $token = encryptToken($payload, $encryptionKey);
 
-        // ส่งอีเมล OTP ผ่าน PHPMailer
+        // ส่งอีเมล OTP
         $mailSent = sendOtpEmail($email, $otpCode);
 
         if (!$mailSent['success']) {
@@ -268,65 +268,46 @@ function sendOtpEmail(string $toEmail, string $otpCode): array {
 
     try {
         $mail->CharSet = 'UTF-8';
-        $mailerType = $_ENV['MAIL_MAILER'] ?? 'mail';
+        $mailerType = $_ENV['MAIL_MAILER'] ?? 'smtp';
         
         if ($mailerType === 'smtp') {
-            try {
-                // ตั้งค่า SMTP Server
-                $mail->isSMTP();
-                $mail->Host       = $_ENV['MAIL_HOST'] ?? 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = $_ENV['MAIL_USERNAME'] ?? '';
-                $mail->Password   = $_ENV['MAIL_PASSWORD'] ?? '';
-                $mail->SMTPSecure = ($_ENV['MAIL_ENCRYPTION'] ?? 'ssl') === 'tls'
-                    ? PHPMailer::ENCRYPTION_STARTTLS
-                    : PHPMailer::ENCRYPTION_SMTPS;
-                $mail->Port       = (int)($_ENV['MAIL_PORT'] ?? 465);
-                $mail->Timeout    = 5; // 5 seconds timeout
-                
-                // ผู้ส่ง
-                $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? $_ENV['MAIL_USERNAME'] ?? '';
-                $fromName    = $_ENV['MAIL_FROM_NAME'] ?? 'แปลภาษาล้านนา';
-                $mail->setFrom($fromAddress, $fromName);
-                
-                // ผู้รับ
-                $mail->addAddress($toEmail);
-                
-                // เนื้อหา
-                $mail->isHTML(true);
-                $mail->Subject = '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา';
-                $mail->Body    = buildOtpEmailHtml($otpCode);
-                $mail->AltBody = "รหัส OTP ของคุณคือ: $otpCode (หมดอายุใน 10 นาที)";
-                
-                $mail->send();
-                return ['success' => true, 'error' => null];
-            } catch (\Exception $e) {
-                // If SMTP fails, clear recipients and try using local mail() function as fallback
-                $mail->clearAddresses();
-                $mail->clearAttachments();
-            }
+            $mail->isSMTP();
+            $mail->Host       = $_ENV['MAIL_HOST'] ?? 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $_ENV['MAIL_USERNAME'] ?? '661463033@crru.ac.th';
+            $mail->Password   = $_ENV['MAIL_PASSWORD'] ?? 'auzanrhfbtujbvuw';
+            $mail->SMTPSecure = ($_ENV['MAIL_ENCRYPTION'] ?? 'ssl') === 'tls'
+                ? PHPMailer::ENCRYPTION_STARTTLS
+                : PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port       = (int)($_ENV['MAIL_PORT'] ?? 465);
+            $mail->Timeout    = 10;
+            $mail->SMTPOptions = [
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                ]
+            ];
+            
+            // ผู้ส่ง
+            $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? $_ENV['MAIL_USERNAME'] ?? '661463033@crru.ac.th';
+            $fromName    = $_ENV['MAIL_FROM_NAME'] ?? 'แปลภาษาล้านนา';
+            $mail->setFrom($fromAddress, $fromName);
+            
+            // ผู้รับ
+            $mail->addAddress($toEmail);
+            
+            // เนื้อหา
+            $mail->isHTML(true);
+            $mail->Subject = '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา';
+            $mail->Body    = buildOtpEmailHtml($otpCode);
+            $mail->AltBody = "รหัส OTP ของคุณคือ: $otpCode (หมดอายุใน 10 นาที)";
+            
+            $mail->send();
+            return ['success' => true, 'error' => null];
         }
         
-        // Fallback to local mail() function
-        $mail->isMail();
-        
-        // ผู้ส่ง
-        $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? 'no-reply@siripaporn.lnw.mn';
-        $fromName    = $_ENV['MAIL_FROM_NAME'] ?? 'แปลภาษาล้านนา';
-        $mail->setFrom($fromAddress, $fromName);
-        
-        // ผู้รับ
-        $mail->addAddress($toEmail);
-        
-        // เนื้อหา
-        $mail->isHTML(true);
-        $mail->Subject = '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา';
-        $mail->Body    = buildOtpEmailHtml($otpCode);
-        $mail->AltBody = "รหัส OTP ของคุณคือ: $otpCode (หมดอายุใน 10 นาที)";
-        
-        $mail->send();
-        return ['success' => true, 'error' => null];
-        
+        return ['success' => false, 'error' => 'Mailer configuration not supported'];
     } catch (Exception $e) {
         return ['success' => false, 'error' => $mail->ErrorInfo ?: $e->getMessage()];
     }

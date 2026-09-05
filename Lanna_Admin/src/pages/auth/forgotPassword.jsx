@@ -101,11 +101,17 @@ export default function ForgotPassword() {
         throw new Error(resData.error?.message || "เกิดข้อผิดพลาดในการส่ง OTP");
       }
 
-      setApiSuccess("ส่งรหัส OTP เรียบร้อยแล้ว")
+      setApiSuccess("ส่งรหัส OTP ไปยังอีเมลของท่านเรียบร้อยแล้ว")
       const sentTime = Date.now();
       setTimeout(() => {
         setApiSuccess("")
-        navigate("/otp", { state: { email: email.trim(), token: resData.data.token, otpSentAt: sentTime } })
+        navigate("/otp", { 
+          state: { 
+            email: email.trim(), 
+            token: resData.data.token, 
+            otpSentAt: sentTime
+          } 
+        })
       }, 1000)
     } catch (err) {
       console.error("Step 1 error:", err)

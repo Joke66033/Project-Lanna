@@ -242,7 +242,19 @@ export const SUB_WORDS = {
 
 // 3. Subjoined character map (PUA for LN-TILOK font)
 export const SUB_MAP = {
-  'ก': '\uF001', 'ข': '\uF002', 'ฃ': '\uF003', 'ค': '\uF004', 'ฅ': '\uF005', 'ฆ': '\uF006',
+  '\u1A20': '\uF001', '\u1A21': '\uF002', '\u1A22': '\uF002', '\u1A23': '\uF004',
+  '\u1A24': '\uF004', '\u1A25': '\uF004', '\u1A26': '\uF007', '\u1A27': '\uF008',
+  '\u1A28': '\uF009', '\u1A29': '\uF00A', '\u1A2A': '\uF00B', '\u1A2B': '\uF00C',
+  '\u1A2C': '\uF00D', '\u1A2D': '\uF00E', '\u1A2E': '\uF00F', '\u1A2F': '\uF014',
+  '\u1A30': '\uF012', '\u1A31': '\uF013', '\u1A32': '\uF015', '\u1A33': '\uF016',
+  '\u1A34': '\uF017', '\u1A35': '\uF018', '\u1A36': '\uF019', '\u1A37': '\uF01A',
+  '\u1A38': '\uF01B', '\u1A39': '\uF01C', '\u1A3A': '\uF01D', '\u1A3B': '\uF01E',
+  '\u1A3C': '\uF01F', '\u1A3D': '\uF020', '\u1A3E': '\uF021', '\u1A3F': '\uF022',
+  '\u1A40': '\uF022', '\u1A41': '\uF023', '\u1A42': '\uF024', '\u1A43': '\uF025',
+  '\u1A44': '\uF026', '\u1A45': '\uF027', '\u1A46': '\uF028', '\u1A47': '\uF029',
+  '\u1A48': '\uF02A', '\u1A49': '\uF02B', '\u1A4A': '\uF02C', '\u1A4B': '\uF02D',
+  '\u1A4C': '\uF02E',
+  'ก': '\uF001', 'ข': '\uF002', 'ฃ': '\uF002', 'ค': '\uF004', 'ฅ': '\uF005', 'ฆ': '\uF006',
   'ง': '\uF007', 'จ': '\uF008', 'ฉ': '\uF009', 'ช': '\uF00A', 'ซ': '\uF00B', 'ฌ': '\uF00C',
   'ญ': '\uF00D', 'ฎ': '\uF00E', 'ฏ': '\uF00F', 'ฐ': '\uF010', 'ฑ': '\uF011', 'ฒ': '\uF012',
   'ณ': '\uF013', 'ด': '\uF014', 'ต': '\uF015', 'ถ': '\uF016', 'ท': '\uF017', 'ธ': '\uF018',
@@ -253,23 +265,59 @@ export const SUB_MAP = {
   'สฺส': '\u00AA',
 };
 
+// Base map for Tai Tham consonants -> LN-TILOK base characters
+const baseMap = {
+  '\u1A20': 'ก', '\u1A21': 'ข', '\u1A22': 'ข', '\u1A23': 'ค', '\u1A24': 'ฅ', '\u1A25': 'ฆ', '\u1A26': 'ง',
+  '\u1A27': 'จ', '\u1A28': 'ฉ', '\u1A29': 'ช', '\u1A2A': 'ซ', '\u1A2B': 'ฌ', '\u1A2C': 'ญ',
+  '\u1A2D': 'ฏ', '\u1A2E': 'ฐ', '\u1A2F': 'ด', '\u1A30': 'ฒ', '\u1A31': 'ณ',
+  '\u1A32': 'ต', '\u1A33': 'ถ', '\u1A34': 'ท', '\u1A35': 'ธ', '\u1A36': 'น',
+  '\u1A37': 'บ', '\u1A38': 'ป', '\u1A39': 'ผ', '\u1A3A': 'ฝ', '\u1A3B': 'พ', '\u1A3C': 'ฟ', '\u1A3D': 'ภ', '\u1A3E': 'ม',
+  '\u1A3F': 'ย', '\u1A40': 'ย', '\u1A41': 'ร', '\u1A42': 'ฤ', '\u1A43': 'ล', '\u1A44': 'ฦ', '\u1A45': 'ว',
+  '\u1A46': 'ศ', '\u1A47': 'ษ', '\u1A48': 'ส', '\u1A49': 'ห', '\u1A4A': 'ฬ', '\u1A4B': 'อ', '\u1A4C': 'ฮ',
+};
+
+const vowels = new Set(['\u1A63', '\u1A64', '\u1A65', '\u1A66', '\u1A67', '\u1A68', '\u1A69', '\u1A6A', '\u1A7B', 'า', 'ิ', 'ี', 'ึ', 'ื', 'ุ', 'ู', 'ั', 'อ', '\u1A6C']);
+
 // 4. Special Ligatures for LN-TILOK Font
 export const SPECIAL_LIGATURES = {
+  '\u1A48\u1A60\u1A45\u1A7B\u1A48\u1A60\u1A48\u1A2F\u1A66': 'ส\uF027ั\u00AAดี',
+  '\u1A48\u1A60\u1A48': '\u00AA',
+  'ᩈᩅᩢᩔᨯᩦ': 'ส\uF027ั\u00AAดี',
   'สวัสดี': 'ส\uF027ั\u00AAดี',
   'สวัสสดี': 'ส\uF027ั\u00AAดี',
   'ส_วั\u00AAดี': 'ส\uF027ั\u00AAดี',
   'สวั\u00AAดี': 'ส\uF027ั\u00AAดี',
+  '\u1A36\u1A75\u1A63\u1A60\u1A36': '\u00A2\uF0A3\uF019',
+  '\u1A36\u1A75\u1A63\u1A36': '\u00A2\uF0A3\uF019',
+  'น่า\uF019': '\u00A2\uF0A3\uF019',
   'น่าน': '\u00A2\uF0A3\uF019',
+  'ᨶ᩵ᩣ᩠ᨶ': '\u00A2\uF0A3\uF019',
+  '\u1A3B\u1A55': 'พ\uF023',
+  '\u1A55': '\uF023',
+  'พยาว': '[พยา\uF027',
   'พะเยา': '[พยา\uF027',
   'พระยาว': '[พยา\uF027',
-  'พยาว': '[พยา\uF027',
-  'ลำพูน': 'ลตูร',
+  'ᨻ᩠ᨿᩣᩅ': '[พยา\uF027',
+  '\u1A43\u1A38\u1A6A\u1A60\u1A36': 'ลตูร',
+  '\u1A43\u1A61\u1A38\u1A6A\u1A60\u1A36': 'ลตูร',
+  'ลบูป': 'ลตูร',
   'ละปูน': 'ลตูร',
+  'ลำพูน': 'ลตูร',
+  'ᩃᩣᩴᨻᩪ᩠ᨶ': 'ลตูร',
+  '\u1A43\u1A63\u1A74\u1A38\u1A63\u1A26': 'ล\u0E4Dาพา\uF007',
+  '\u1A43\u1A74\u1A63\u1A3B\u1A63\u1A60\u1A26': 'ล\u0E4Dาพา\uF007',
+  '\u1A43\u1A74\u1A3B\u1A63\u1A60\u1A26': 'ล\u0E4Dาพา\uF007',
+  '\u1A43\u1A74\u1A38\u1A63\u1A60\u1A26': 'ล\u0E4Dาพา\uF007',
   'ลำปาง': 'ล\u0E4Dาพา\uF007',
+  'ᩃᩣᩴᨸᩣ᩠ᨦ': 'ล\u0E4Dาพา\uF007',
   'เชียงราย': 'ช\uF022งรา\uF022',
+  'ᨩ᩠ᨿᨦᩁᩣ᩠ᨿ': 'ช\uF022งรา\uF022',
   'เชียงใหม่': 'ช\uF022ง\u0E43ห\uF021\u0E48',
+  'ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵': 'ช\uF022ง\u0E43ห\uF021\u0E48',
   'แม่ฮ่องสอน': 'แม่ร\uF007่คส\uF007ร',
+  'ᩯᨾ᩵ᩁᩬ᩵ᨦᩈᩬᩁ': 'แม่ร\uF007่คส\uF007ร',
   'แพร่': 'แ\u0E1E\uF025\u0E48',
+  'ᩯᨻᩕ᩵': 'แ\u0E1E\uF025\u0E48',
   'จะไป': 'จไพ',
   'จะไปมา': 'จไพมา',
   'จะไปไป': 'จไพไพ',
@@ -284,47 +332,126 @@ export const SPECIAL_LIGATURES = {
   'ฉลาด': 'จ\uF055า\uF014',
   'ยินดีต้อนรับ': 'ยิ\uF019ดีต้อ\uF019ฮั\uF01A',
   'ยินดีต้อนฮับ': 'ยิ\uF019ดีต้อ\uF019ฮั\uF01A',
+  'ᨿᩥ᩠ᨶᨯᩦᨲᩬ᩶ᩁᩁᩢ᩠ᨷ': 'ยิ\uF019ดีต้อ\uF019ฮั\uF01A',
+  'ᨿᩥ᩠ᨶᨯᩦᨲ᩶ᩬᩁᩢ᩠ᨷ': 'ยิ\uF019ดีต้อ\uF019ฮั\uF01A',
+  'กินข้าว': 'ก๋ิ\uF019ข้า\uF027',
+  'กิ๋นข้าว': 'ก๋ิ\uF019ข้า\uF027',
+  'ᨠᩥ᩠᩵ᨶᨡ᩶ᩣᩅ': 'ก๋ิ\uF019ข้า\uF027',
   'อ่านก่อนใช้': 'อ่า\uF019ก\u0E48อ\uF019ไช\u0E49',
 };
 
 export const tilokDirectMap = { ...SPECIAL_LIGATURES };
 
 /**
- * แปลง Notation ที่มีขีดล่าง _ ให้เป็นอักขระฟอนต์ LN-TILOK และสลับวรรณยุกต์ยกสูง
+ * แปลงทั้ง Tai Tham Unicode (U+1A20 - U+1A80), Thai Notation (_), และคำพิเศษ ให้เป็นฟอนต์ LN-TILOK PUA
  */
-export function parseLannaNotation(notation, fallbackThai = '') {
-  let text = (notation || '').trim();
+export function toTilokFontString(text, fallbackThai = '') {
+  let trimmed = (text || '').trim();
   const rawThai = (fallbackThai || '').trim();
 
-  // 0. ตรวจสอบ Special Ligatures ก่อนเสมอ
+  // 0. ตรวจสอบ Special Ligatures
   if (rawThai && SPECIAL_LIGATURES[rawThai]) {
     return SPECIAL_LIGATURES[rawThai];
   }
-  if (SPECIAL_LIGATURES[text]) {
-    return SPECIAL_LIGATURES[text];
+  if (SPECIAL_LIGATURES[trimmed]) {
+    return SPECIAL_LIGATURES[trimmed];
+  }
+
+  // Already converted to LN-TILOK PUA and contains no raw Tai Tham
+  if (/[\uF000-\uF0FF\u00AA\u00AC\u00AD]/.test(trimmed) && !/[\u1A20-\u1A80]/.test(trimmed)) {
+    return trimmed;
+  }
+
+  let src = trimmed || rawThai;
+  for (const [k, v] of Object.entries(SPECIAL_LIGATURES)) {
+    src = src.replaceAll(k, v);
   }
 
   // 1. จัดการสระเอียล้านนา: สระเอียในตั๋วเมืองแท้ใช้ สระอี + ย ห้อย
-  let cleanNotation = text.replace(
+  src = src.replace(
     /เ([ก-ฮ])([ีิ])([่้๊๋]?)(ย|_ย)([ก-ฮ]|_[ก-ฮ])?/g,
     (match, p1, p2, p3, p4, p5) => `${p1}${p3 || ''}${p2}_ย${p5 || ''}`
   );
 
+  // 2. แปลงตัวสะกดห้อย / Sakot และแมปรหัส Tai Tham Unicode -> LN-TILOK
   let sb = '';
-  for (let i = 0; i < cleanNotation.length; i++) {
-    if (cleanNotation[i] === '_' && i + 1 < cleanNotation.length) {
-      const next = cleanNotation[i + 1];
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i];
+    
+    // ตรวจสอบ Sakot \u1A60, \u1A54, ᩠, หรือ _
+    if ((c === '\u1A60' || c === '᩠' || c === '_') && i + 1 < src.length) {
+      const next = src[i + 1];
       if (SUB_MAP[next]) {
         sb += SUB_MAP[next];
         i++;
         continue;
       }
     }
-    sb += cleanNotation[i];
+
+    const isAfterVowel = i > 0 && vowels.has(src[i - 1]);
+    const isAtWordBoundary = i === src.length - 1 || src[i + 1] === ' ' || src[i + 1] === '\n';
+    if (isAfterVowel && isAtWordBoundary && SUB_MAP[c]) {
+      sb += SUB_MAP[c];
+      continue;
+    }
+
+    if (baseMap[c]) {
+      sb += baseMap[c];
+    } else if (SUB_MAP[c] && c >= '\uF000') {
+      sb += c;
+    } else {
+      switch (c) {
+        case '\u1A53': sb += '\uF022'; break; // Medial Ra/Ya
+        case '\u1A54': sb += '\u00AA'; break; // Double Sa
+        case '\u1A55': sb += '\uF023'; break; // Medial Ra
+        case '\u1A56': sb += '\uF025'; break; // Medial La
+        case '\u1A57': sb += '\uF025'; break; // La Tan
+        case '\u1A61': sb += 'ะ'; break;
+        case '\u1A62': sb += 'ั'; break;
+        case '\u1A63': sb += 'า'; break;
+        case '\u1A64': sb += 'า'; break;
+        case '\u1A65': sb += 'ิ'; break;
+        case '\u1A66': sb += 'ี'; break;
+        case '\u1A67': sb += 'ึ'; break;
+        case '\u1A68': sb += 'ื'; break;
+        case '\u1A69': sb += 'ุ'; break;
+        case '\u1A6A': sb += 'ู'; break;
+        case '\u1A6B': sb += 'ั'; break; // Mai Kang Hang
+        case '\u1A6C': sb += 'อ'; break;
+        case '\u1A6D': sb += 'ิ'; break;
+        case '\u1A6E': sb += 'เ'; break;
+        case '\u1A6F': sb += 'แ'; break;
+        case '\u1A70': sb += 'โ'; break;
+        case '\u1A71': sb += 'ไ'; break;
+        case '\u1A72': sb += 'ใ'; break;
+        case '\u1A73': sb += 'ำ'; break;
+        case '\u1A74': sb += '\u0E4Dา'; break;
+        case '\u1A75': sb += '่'; break;
+        case '\u1A76': sb += '้'; break;
+        case '\u1A77': sb += '๊'; break;
+        case '\u1A78': sb += '๋'; break;
+        case '\u1A79': sb += '\u0E4C'; break;
+        case '\u1A7A': sb += '์'; break;
+        case '\u1A7B': sb += 'ั'; break;
+        case '\u1A7C': sb += 'อ'; break;
+        case '\u1A80': sb += '0'; break;
+        case '\u1A81': sb += '1'; break;
+        case '\u1A82': sb += '2'; break;
+        case '\u1A83': sb += '3'; break;
+        case '\u1A84': sb += '4'; break;
+        case '\u1A85': sb += '5'; break;
+        case '\u1A86': sb += '6'; break;
+        case '\u1A87': sb += '7'; break;
+        case '\u1A88': sb += '8'; break;
+        case '\u1A89': sb += '9'; break;
+        default: sb += c; break;
+      }
+    }
   }
+
   let result = sb;
 
-  // 2. สลับลำดับสระบนและวรรณยุกต์ เพื่อให้วรรณยุกต์ลอยขึ้นไปบนชั้น 4 ในฟอนต์ LN-TILOK
+  // 3. สลับลำดับสระบนและวรรณยุกต์ เพื่อให้วรรณยุกต์ลอยขึ้นไปบนชั้น 4 ในฟอนต์ LN-TILOK
   const upperVowels = ['\u0E34', '\u0E35', '\u0E36', '\u0E37', '\u0E31']; // ิ, ี, ึ, ื, ั
   const tones = ['\u0E48', '\u0E49', '\u0E4A', '\u0E4B', '\u0E4C']; // ่, ้, ๊, ๋, ์
   for (const v of upperVowels) {
@@ -335,15 +462,14 @@ export function parseLannaNotation(notation, fallbackThai = '') {
     }
   }
 
-  // 3. ลบเครื่องหมาย _ ที่อาจหลงเหลืออยู่ออกให้หมด
+  // 4. ลบเครื่องหมาย _ ที่อาจหลงเหลืออยู่ออก
   result = result.replaceAll('_', '');
 
-  // 4. ตรวจสอบ Ligatures ที่อาจแมปได้
-  for (const [k, v] of Object.entries(SPECIAL_LIGATURES)) {
-    result = result.replaceAll(k, v);
-  }
-
   return result;
+}
+
+export function parseLannaNotation(notation, fallbackThai = '') {
+  return toTilokFontString(notation, fallbackThai);
 }
 
 /**
@@ -360,7 +486,7 @@ export function translateKamMueangOffline(thaiText) {
     notation = notation.replaceAll(k, v);
   }
 
-  const lanna = parseLannaNotation(notation, thaiText);
+  const lanna = toTilokFontString(notation, thaiText);
   return {
     kam_mueang: km,
     notation: notation,
@@ -378,13 +504,9 @@ export function convertThaiToLanna(input) {
   const text = String(input).trim();
   if (!text) return '';
 
-  const cleanText = text.replace(/[\[\]\-]/g, '');
+  const cleanText = text.replace(/[\\[\\]\\-]/g, '');
   const offline = translateKamMueangOffline(cleanText);
   return offline.lanna_word;
-}
-
-export function toTilokFontString(text, fallbackThai) {
-  return parseLannaNotation(text, fallbackThai);
 }
 
 export async function loadLannaMap() {

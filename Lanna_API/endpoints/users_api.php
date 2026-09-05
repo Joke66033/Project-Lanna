@@ -319,7 +319,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'update':
-            $id = $_GET['id'] ?? '';
+            $id = $_GET['id'] ?? $body['user_id'] ?? $body['id'] ?? $_POST['user_id'] ?? $_POST['id'] ?? '';
             if ($id === '') { jsonError('Missing id'); break; }
 
             // ตรวจสอบสิทธิ์โดยแกะ Token
@@ -333,13 +333,12 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // หากการอัปเดตมีข้อมูลส่วนตัว ต้องเช็คสิทธิ์ (เว้นแต่เป็นการแก้ไขเฉพาะสถานะจากฝั่งแอดมิน)
             $requiresAuth = true;
-            if (empty($authHeader)) {
-                $hasPersonalFields = isset($body['username']) || isset($body['name']) || isset($body['email']) || isset($body['avatar']) || isset($body['password']) 
-                    || isset($_POST['username']) || isset($_POST['name']) || isset($_POST['email']) || isset($_POST['avatar']) || isset($_POST['password'])
-                    || isset($_FILES['file']) || isset($_FILES['avatar']);
-                if ((isset($body['status']) || isset($_POST['status'])) && !$hasPersonalFields) {
-                    $requiresAuth = false;
-                }
+            $hasPersonalFields = isset($body['username']) || isset($body['name']) || isset($body['email']) || isset($body['avatar']) || isset($body['password']) 
+                || isset($_POST['username']) || isset($_POST['name']) || isset($_POST['email']) || isset($_POST['avatar']) || isset($_POST['password'])
+                || isset($_FILES['file']) || isset($_FILES['avatar']);
+            
+            if ((isset($body['status']) || isset($_POST['status']) || isset($_GET['status']) || isset($_REQUEST['status'])) && !$hasPersonalFields) {
+                $requiresAuth = false;
             }
 
             if ($requiresAuth) {
@@ -373,10 +372,10 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($passVal !== '') {
                 $dbBody['password_hash'] = password_hash($passVal, PASSWORD_BCRYPT);
             }
-            $statusVal = $body['status'] ?? $_POST['status'] ?? null;
+            $statusVal = $body['status'] ?? $_POST['status'] ?? $_GET['status'] ?? $_REQUEST['status'] ?? null;
             if ($statusVal !== null) {
-                $sStr = strtolower((string)$statusVal);
-                if ($sStr === 'active' || $sStr === '1') {
+                $sStr = strtolower(trim((string)$statusVal));
+                if ($sStr === 'active' || $sStr === '1' || $statusVal === 1 || $statusVal === true) {
                     $dbBody['status'] = 1;
                 } else {
                     $dbBody['status'] = 0;

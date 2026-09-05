@@ -475,8 +475,26 @@ function jsonError(string $message, int $status = 400): void {
 
 // ===== Read JSON body =====
 function getJsonBody(): array {
+    static $body = null;
+    if ($body !== null) return $body;
+
     $raw = file_get_contents('php://input');
-    return json_decode($raw, true) ?? [];
+    if (!empty($raw)) {
+        $raw = preg_replace('/^\xEF\xBB\xBF/', '', trim($raw));
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded)) {
+            $body = $decoded;
+            return $body;
+        }
+    }
+
+    if (!empty($_POST)) {
+        $body = $_POST;
+        return $body;
+    }
+
+    $body = [];
+    return $body;
 }
 
 // ===== Token Encryption/Decryption Helpers (AES-256-CBC) =====

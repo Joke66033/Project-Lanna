@@ -19,15 +19,15 @@ export default function ForgotPassword() {
   const [errors, setErrors] = useState({})
   const [cooldown, setCooldown] = useState(0)
 
-  // เคลียร์ error และตรวจนับเวลาถอยหลัง 2 นาที (120 วินาที)
+  // เคลียร์ error และตรวจนับเวลาถอยหลัง 3 นาที (180 วินาที)
   useEffect(() => {
     setApiError("");
     setErrors({});
     const lastSent = localStorage.getItem("admin_otp_sent_at");
     if (lastSent) {
       const diff = Math.floor((Date.now() - parseInt(lastSent, 10)) / 1000);
-      if (diff < 120) {
-        setCooldown(120 - diff);
+      if (diff < 180) {
+        setCooldown(180 - diff);
       }
     }
   }, []);
@@ -132,7 +132,7 @@ export default function ForgotPassword() {
       setApiSuccess("ส่งรหัส OTP ไปยังอีเมลของท่านเรียบร้อยแล้ว")
       const sentTime = Date.now();
       localStorage.setItem("admin_otp_sent_at", sentTime.toString());
-      setCooldown(120);
+      setCooldown(180);
 
       setTimeout(() => {
         setApiSuccess("")

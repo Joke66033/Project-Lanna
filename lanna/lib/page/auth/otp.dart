@@ -17,7 +17,7 @@ class OtpPage extends StatefulWidget {
 }
 
 class _OtpPageState extends State<OtpPage> {
-  static const int _startSeconds = 119;
+  static const int _startSeconds = 179;
   int _secondsLeft = _startSeconds;
   Timer? _timer;
   late String _currentToken;

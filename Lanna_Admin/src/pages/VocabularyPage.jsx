@@ -605,7 +605,7 @@ export default function VocabularyPage() {
 
                     {/* คำศัพท์ล้านนา */}
                     <td className="text-left text-lg">
-                      <LannaText>{d.lanna_word}</LannaText>
+                      <LannaText fallbackThai={d.thai_word}>{d.lanna_word}</LannaText>
                     </td>
 
                     {/* คำศัพท์ไทย */}
@@ -818,9 +818,9 @@ export default function VocabularyPage() {
                   }`}
                 >
                   {form.lanna_word ? (
-                    <span className="text-3xl text-[#924E19] font-lanna leading-none tracking-wide select-all">
+                    <LannaText fallbackThai={form.thai_word} className="text-3xl text-[#924E19] leading-none tracking-wide select-all">
                       {form.lanna_word}
-                    </span>
+                    </LannaText>
                   ) : (
                     <span className="text-sm text-gray-400 italic">
                       (กดปุ่มแปลงด้านบนเพื่อแสดงตัวอักขระล้านนา)

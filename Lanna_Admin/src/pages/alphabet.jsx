@@ -508,7 +508,7 @@ export default function AlphabetPage() {
 
                   {/* ✅ ใส่ฟอนต์ล้านนาให้แน่นอน */}
                   <td className="text-2xl text-left">
-                    <LannaText>{d.ln}</LannaText>
+                    <LannaText fallbackThai={d.th}>{d.ln}</LannaText>
                   </td>
 
                   <td className="text-left lanna-cell-main">{d.th}</td>

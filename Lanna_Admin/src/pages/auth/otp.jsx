@@ -239,7 +239,7 @@ export default function Otp() {
                     ? 'bg-orange-500 text-white ring-4 ring-orange-100'
                     : s === 1
                     ? 'bg-green-500 text-white'
-                    : 'bg-gray-100 text-gray-400'
+                    : 'bg-gray-100 text-black font-bold'
                 }`}
               >
                 {s === 1 ? '✓' : s}
@@ -257,8 +257,8 @@ export default function Otp() {
 
         {/* HEADER */}
         <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">ยืนยันรหัส OTP</h2>
-          <p className="text-gray-500 text-sm mt-1">กรอกรหัส OTP 6 หลักที่ส่งไปยัง {email}</p>
+          <h2 className="text-2xl font-bold text-black">ยืนยันรหัส OTP</h2>
+          <p className="text-black font-medium text-sm mt-1">กรอกรหัส OTP 6 หลักที่ส่งไปยัง {email}</p>
         </div>
 
         {/* MESSAGES */}
@@ -277,7 +277,7 @@ export default function Otp() {
         {timeLeft > 0 ? (
           <form onSubmit={handleSubmitOtp} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3 text-center">
+              <label className="block text-sm font-semibold text-black mb-3 text-center">
                 รหัสยืนยัน OTP (6 หลัก)
               </label>
               
@@ -292,7 +292,7 @@ export default function Otp() {
                     value={digit}
                     onChange={(e) => handleOtpChange(e.target.value, idx)}
                     onKeyDown={(e) => handleOtpKeyDown(e, idx)}
-                    className="w-12 h-12 border-2 border-gray-200 text-center text-2xl font-bold rounded-xl focus:border-[#f97316] focus:outline-none focus:ring-2 focus:ring-orange-200 transition"
+                    className="w-12 h-12 border-2 border-gray-200 text-center text-2xl font-bold text-black rounded-xl focus:border-[#f97316] focus:outline-none focus:ring-2 focus:ring-orange-200 transition"
                   />
                 ))}
               </div>

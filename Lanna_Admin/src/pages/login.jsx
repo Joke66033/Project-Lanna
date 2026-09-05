@@ -89,14 +89,14 @@ export default function Login() {
                 <img src={logo} alt="Lanna Logo" className="w-full h-full object-cover" style={{ borderRadius: '50%' }} />
               </div>
 
-              <h1 className="mt-6 text-2xl md:text-3xl font-extrabold text-gray-900">
+              <h1 className="mt-6 text-2xl md:text-3xl font-extrabold text-black">
                 ระบบแปลภาษาล้านนา
               </h1>
-              <p className="mt-2 text-gray-500 text-sm md:text-base">
+              <p className="mt-2 text-black font-medium text-sm md:text-base">
                 เข้าสู่ระบบผู้ดูแลเพื่อจัดการข้อมูลในระบบ
               </p>
 
-              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 border text-sm text-gray-600">
+              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 border text-sm text-black font-medium">
                 <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
                 Admin Panel
               </div>
@@ -106,10 +106,10 @@ export default function Login() {
           {/* RIGHT */}
           <div className="p-8 md:p-10">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-black">
                 เข้าสู่ระบบผู้ดูแล
               </h2>
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-black font-medium text-sm mt-1">
                 กรุณากรอกข้อมูลเพื่อเข้าสู่ระบบ
               </p>
             </div>
@@ -124,7 +124,7 @@ export default function Login() {
 
               {/* EMAIL */}
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-semibold text-black">
                   อีเมล
                 </label>
                 <input
@@ -132,7 +132,7 @@ export default function Login() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="admin@gmail.com"
-                  className={`mt-1 w-full rounded-2xl border px-4 py-3 outline-none focus:ring-2 focus:ring-orange-200 ${
+                  className={`mt-1 w-full rounded-2xl border px-4 py-3 text-black outline-none focus:ring-2 focus:ring-orange-200 ${
                     errors.email ? "border-red-400" : "border-gray-200"
                   }`}
                 />
@@ -143,7 +143,7 @@ export default function Login() {
 
               {/* PASSWORD + EYE ICON */}
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-semibold text-black">
                   รหัสผ่าน
                 </label>
 
@@ -159,7 +159,7 @@ export default function Login() {
                       setForm({ ...form, password: e.target.value })
                     }
                     placeholder="123456"
-                    className="flex-1 outline-none bg-transparent"
+                    className="flex-1 outline-none bg-transparent text-black"
                   />
 
                   <button

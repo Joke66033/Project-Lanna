@@ -164,7 +164,7 @@ export default function ForgotPassword() {
                 className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
                   s === 1
                     ? 'bg-orange-500 text-white ring-4 ring-orange-100'
-                    : 'bg-gray-100 text-gray-400'
+                    : 'bg-gray-100 text-black font-bold'
                 }`}
               >
                 {s}
@@ -179,7 +179,7 @@ export default function ForgotPassword() {
         {/* HEADER */}
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-bold text-gray-900">กู้คืนรหัสผ่าน</h2>
-          <p className="text-gray-500 text-sm mt-1">กรุณากรอกอีเมลของท่านเพื่อรับรหัส OTP</p>
+          <p className="text-black font-medium text-sm mt-1">กรุณากรอกอีเมลของท่านเพื่อรับรหัส OTP</p>
         </div>
 
         {/* MESSAGES */}
@@ -196,13 +196,13 @@ export default function ForgotPassword() {
 
         <form onSubmit={handleSendOtp} className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">อีเมลผู้ดูแล</label>
+            <label className="text-sm font-semibold text-black">อีเมลผู้ดูแล</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="example@gmail.com"
-              className={`mt-1 w-full rounded-2xl border px-4 py-3 outline-none focus:ring-2 focus:ring-orange-200 transition ${
+              className={`mt-1 w-full rounded-2xl border px-4 py-3 text-black outline-none focus:ring-2 focus:ring-orange-200 transition ${
                 errors.email ? "border-red-400" : "border-gray-200"
               }`}
             />

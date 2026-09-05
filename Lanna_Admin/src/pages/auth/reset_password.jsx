@@ -121,8 +121,8 @@ export default function ResetPassword() {
 
         {/* HEADER */}
         <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">ตั้งรหัสผ่านใหม่</h2>
-          <p className="text-gray-500 text-sm mt-1">กรุณากรอกรหัสผ่านใหม่ที่ต้องการใช้งาน</p>
+          <h2 className="text-2xl font-bold text-black">ตั้งรหัสผ่านใหม่</h2>
+          <p className="text-black font-medium text-sm mt-1">กรุณากรอกรหัสผ่านใหม่ที่ต้องการใช้งาน</p>
         </div>
 
         {/* MESSAGES */}
@@ -139,7 +139,7 @@ export default function ResetPassword() {
 
         <form onSubmit={handleSubmitReset} className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">รหัสผ่านใหม่</label>
+            <label className="text-sm font-semibold text-black">รหัสผ่านใหม่</label>
             <div
               className={`mt-1 input-group ${
                 errors.password ? "border-red-400" : ""
@@ -150,12 +150,12 @@ export default function ResetPassword() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="กรอกรหัสผ่านอย่างน้อย 6 ตัวอักษร"
-                className="flex-1 outline-none bg-transparent"
+                className="flex-1 outline-none bg-transparent text-black"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="text-gray-400 hover:text-orange-600 ml-2"
+                className="text-gray-500 hover:text-black ml-2"
                 aria-label="toggle password"
               >
                 {showPassword ? (
@@ -178,7 +178,7 @@ export default function ResetPassword() {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700">ยืนยันรหัสผ่านใหม่</label>
+            <label className="text-sm font-semibold text-black">ยืนยันรหัสผ่านใหม่</label>
             <div
               className={`mt-1 input-group ${
                 errors.confirmPassword ? "border-red-400" : ""
@@ -189,12 +189,12 @@ export default function ResetPassword() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="กรอกรหัสผ่านใหม่อีกครั้ง"
-                className="flex-1 outline-none bg-transparent"
+                className="flex-1 outline-none bg-transparent text-black"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="text-gray-400 hover:text-orange-600 ml-2"
+                className="text-gray-500 hover:text-black ml-2"
                 aria-label="toggle confirm password"
               >
                 {showConfirmPassword ? (

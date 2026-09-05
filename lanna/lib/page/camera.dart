@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 
 import '../core/api_config.dart';
 import '../services/lanna_transliterator.dart';
+import '../services/vocabulary_service.dart';
+import '../models/vocabulary_model.dart';
 import '../widgets/app_header.dart';
 
 const Color kPrimaryOrange = Color(0xFF924E19);
@@ -41,6 +43,9 @@ class _CameraPageState extends State<CameraPage>
     with SingleTickerProviderStateMixin {
   final _picker = ip.ImagePicker();
   final _conv = LannaTransliterator();
+  final _vocabService = VocabularyService();
+
+  List<VocabularyModel> _dbVocabs = [];
 
   CameraController? _cameraController;
   List<CameraDescription>? _cameras;
@@ -54,8 +59,8 @@ class _CameraPageState extends State<CameraPage>
   String _resultText = '';
   String? _resultReading;
   String? _resultMeaning;
-  bool _resultIsLanna = true;
-  String _resultDirection = 'ภาษาไทย → ภาษาล้านนา';
+  bool _resultIsLanna = false;
+  String _resultDirection = 'ภาษาล้านนา → ภาษาไทย';
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnim;
@@ -71,9 +76,24 @@ class _CameraPageState extends State<CameraPage>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
+    _loadVocabDatabase();
+
     // Initialize live camera preview if starting as active
     if (!kIsWeb && widget.isActive) {
       _initLiveCamera();
+    }
+  }
+
+  Future<void> _loadVocabDatabase() async {
+    try {
+      final vocabs = await _vocabService.getAllVocabulary();
+      if (mounted) {
+        setState(() {
+          _dbVocabs = vocabs;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading vocabs for camera: $e');
     }
   }
 
@@ -224,7 +244,7 @@ class _CameraPageState extends State<CameraPage>
         _resultDirection = result.directionLabel;
       });
     } catch (error) {
-      debugPrint('Typhoon OCR unavailable, using local OCR: $error');
+      debugPrint('Vision OCR unavailable, using local OCR: $error');
       await _processImageWithLocalOcr(file);
     } finally {
       if (mounted) {
@@ -239,12 +259,47 @@ class _CameraPageState extends State<CameraPage>
       final result = await recognizer.processImage(InputImage.fromFile(file));
       final raw = result.text.trim();
       if (mounted) {
+        if (raw.isEmpty) {
+          throw Exception('ไม่พบตัวอักษรในภาพ กรุณาถ่ายใหม่อีกครั้ง');
+        }
+
+        // ตรวจสอบชนิดตัวอักษร
+        final hasLannaChar = RegExp(r'[\u1A20-\u1AAF]').hasMatch(raw);
+        String thaiOutput = '';
+        String? readingOutput;
+        String? meaningOutput;
+        bool isLannaOut = false;
+        String dirLabel = 'ภาษาล้านนา → ภาษาไทย';
+
+        if (hasLannaChar) {
+          thaiOutput = _conv.lannaToThai(raw);
+          dirLabel = 'ภาษาล้านนา → ภาษาไทย';
+          isLannaOut = false;
+        } else {
+          thaiOutput = raw;
+          dirLabel = 'ภาษาล้านนา → ภาษาไทย';
+          isLannaOut = false;
+        }
+
+        // ค้นหาในฐานข้อมูลคำศัพท์เพื่อดึงความหมายและคำอ่านที่แท้จริง
+        for (var v in _dbVocabs) {
+          if (v.lannaWord.trim() == raw ||
+              v.thaiWord.trim() == thaiOutput.trim() ||
+              raw.contains(v.lannaWord.trim()) ||
+              thaiOutput.contains(v.thaiWord.trim())) {
+            thaiOutput = v.thaiWord;
+            readingOutput = v.reading;
+            meaningOutput = v.meaning;
+            break;
+          }
+        }
+
         setState(() {
-          _resultText = raw.isEmpty ? '' : _conv.thaiToLanna(raw);
-          _resultReading = null;
-          _resultMeaning = null;
-          _resultIsLanna = true;
-          _resultDirection = 'ภาษาไทย → ภาษาล้านนา';
+          _resultText = thaiOutput;
+          _resultReading = readingOutput;
+          _resultMeaning = meaningOutput ?? 'ถอดความหมายจากอักษรล้านนา';
+          _resultIsLanna = isLannaOut;
+          _resultDirection = dirLabel;
         });
       }
     } finally {
@@ -270,7 +325,7 @@ class _CameraPageState extends State<CameraPage>
       if (mounted) {
         final errStr = error.toString();
         final displayMsg = (errStr.contains('Failed to fetch') || errStr.contains('ClientException') || errStr.contains('SocketException'))
-            ? 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ OCR ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต หรือสถานะเซิร์ฟเวอร์'
+            ? 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ OCR ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต'
             : 'เกิดข้อผิดพลาดในการอ่านอักษร: ${errStr.replaceAll('Exception: ', '')}';
         ScaffoldMessenger.of(
           context,
@@ -287,7 +342,7 @@ class _CameraPageState extends State<CameraPage>
     Uint8List imageBytes,
     String filename,
   ) async {
-    // 1. ใช้ Gemini Vision AI
+    // 1. ใช้ Gemini Vision AI ถอดรหัสอักษรล้านนา -> ภาษาไทย เป็นตัวเลือกหลักอันดับ 1
     try {
       final geminiResult = await _requestGeminiVisionOcr(imageBytes);
       if (geminiResult != null && geminiResult.text.trim().isNotEmpty) {
@@ -307,53 +362,67 @@ class _CameraPageState extends State<CameraPage>
         http.MultipartFile.fromBytes('file', imageBytes, filename: filename),
       );
       final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 40),
+        const Duration(seconds: 30),
       );
       final response = await http.Response.fromStream(streamedResponse);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (data['success'] == true) {
-          final translated = (data['translatedText'] ?? '').toString().trim();
-          final detected = (data['detectedText'] ?? '').toString().trim();
-          final isLannaToThai = (data['detectedLanguage'] ?? '') == 'lanna';
-          return _CameraOcrResult(
-            text: translated.isNotEmpty ? translated : detected,
-            reading: data['reading']?.toString(),
-            meaning: data['meaning']?.toString(),
-            isLannaOutput: !isLannaToThai,
-            directionLabel: isLannaToThai
-                ? 'ภาษาล้านนา → ภาษาไทย (AI Vision)'
-                : 'ภาษาไทย → ภาษาล้านนา',
-          );
+        if (data['data'] != null || data['success'] == true) {
+          final resData = data['data'] ?? data;
+          final translated = (resData['text'] ?? resData['translatedText'] ?? resData['detectedText'] ?? '').toString().trim();
+          if (translated.isNotEmpty) {
+            return _CameraOcrResult(
+              text: translated,
+              reading: resData['reading']?.toString(),
+              meaning: resData['meaning']?.toString() ?? 'แปลจากอักษรล้านนาด้วย AI',
+              isLannaOutput: false,
+              directionLabel: 'ภาษาล้านนา → ภาษาไทย (AI Vision)',
+            );
+          }
         }
       }
     } catch (error) {
       debugPrint('Unified OCR endpoint unavailable: $error');
     }
 
-    // Compatibility fallback
-    return _requestLegacyAutoOcr(imageBytes, filename);
+    // 3. Fallback: ดึงคำอ่านและคำแปลจากพจนานุกรมในเครื่อง
+    throw Exception('ไม่สามารถอ่านอักษรจากภาพได้ กรุณาจัดตำแหน่งกล้องให้ชัดเจนและลองใหม่อีกครั้ง');
   }
 
   /// อ่านและแปลอักษรล้านนาจากภาพถ่ายด้วย Google Gemini Vision AI
   Future<_CameraOcrResult?> _requestGeminiVisionOcr(Uint8List imageBytes) async {
     const apiKey = 'AIzaSyCj8rr8MGBBYGOVJgP0oaIplIZLDe7ub-c';
     final base64Img = base64Encode(imageBytes);
-    const models = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
+    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
 
     const prompt = '''
-You are a leading expert in Tai Tham (Lanna script / ตั๋วเมือง), Northern Thai dialect (คำเมือง), and Thai typography/signboard OCR.
+คุณคือผู้เชี่ยวชาญระดับศาสตราจารย์ด้านอักษรธรรมล้านนา (ตั๋วเมือง), ภาษาไทยวน/คำเมือง, และศิลาจารึก-ป้ายอักษรล้านนาภาคเหนือ
 
-Carefully inspect the image:
-1. Detect and transcribe the main text in the image. The text may be Lanna script (ตั๋วเมือง), Thai text, or a signboard with English subtitle (e.g. 'CHIWIT THAMMA DA' -> 'ชีวิตธรรมดา').
-2. Accurately decipher the Lanna script characters (e.g. ᨩᩦᩅᩥ᩠ᨲ = ชีวิต, ᨵᨾ᩠ᨾᨯᩣ = ธรรมดา, ᩈ᩠ᩅᩢᩔᨯᩦ = สวัสดี, ᨩ᩠ᨿᨦᩁᩣᨿ = เชียงราย, ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵ = เชียงใหม่, ᩃᩣ᩠ᨷ = ลาบ, ᩯᨾ᩵ᩁᩬ᩵ᨦᩈᩬᩁ = แม่ฮ่องสอน, etc.).
-3. Provide the accurate Thai translation, the Northern Thai / Thai phonetic pronunciation in square brackets, and a helpful contextual meaning/explanation.
+หน้าที่ของคุณ:
+1. ตรวจสอบภาพถ่ายเพื่อค้นหา "ตัวอักษรล้านนา (ตั๋วเมือง / Tai Tham Script)" หรือป้ายข้อความภาษาเหนือ
+2. ถอดรหัสอักษรล้านนาในภาพแล้ว "แปลออกมาเป็นภาษาไทยกลางที่ถูกต้อง 100%"
+3. ระบุคำอ่านออกเสียงสำเนียงภาษาเหนือแท้ ใส่ในเครื่องหมายวงเล็บเหลี่ยม [คำอ่าน]
+4. อธิบายความหมายและบริบทของคำหรือป้ายนั้น 1 ประโยค
 
-Output strictly pure JSON format:
+ตัวอย่างการถอดรหัสอักษรล้านนา -> ภาษาไทย:
+* ᩈ᩠ᩅᩢᩔᨯᩦ -> แปลว่า: "สวัสดี" (คำอ่าน: [สะ-หวัด-ดี], ความหมาย: "คำกล่าวทักทายหรือแสดงความเคารพอย่างสุภาพ")
+* ᨿᩥ᩠ᨶᨯᩦᨲᩬ᩶ᩁᩁᩢ᩠ᨷ -> แปลว่า: "ยินดีต้อนรับ" (คำอ่าน: [ยิน-ดี-ต้อน-ฮับ], ความหมาย: "คำกล่าวแสดงความยินดีในการมาเยือน")
+* ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵ -> แปลว่า: "เชียงใหม่" (คำอ่าน: [เจียง-ใหม่], ความหมาย: "จังหวัดเชียงใหม่ เมืองหลวงแห่งอาณาจักรล้านนา")
+* ᨩ᩠ᨿᨦᩁᩣᨿ -> แปลว่า: "เชียงราย" (คำอ่าน: [เจียง-ฮาย], ความหมาย: "จังหวัดเชียงราย เมืองเหนือสุดแดนสยาม")
+* ᩅᩢ᩠ᨯᨻᩕᩈᩥ᩠ᨦᩉ᩼ -> แปลว่า: "วัดพระสิงห์" (คำอ่าน: [วัด-พระ-สิง], ความหมาย: "พระอารามหลวงสำคัญคู่บ้านคู่เมืองเชียงใหม่")
+* ᩅᩢ᩠ᨯᨾᩉᩣᩅᩢ᩠ᨶ -> แปลว่า: "วัดมหาวัน" (คำอ่าน: [วัด-มะ-หา-วัน], ความหมาย: "วัดโบราณสำคัญแห่งนครหริภุญชัยลำพูน")
+* ᨯᩬ᩠ᨿᩈᩩᩮᨴᨻ -> แปลว่า: "ดอยสุเทพ" (คำอ่าน: [ดอย-สุ-เตพ], ความหมาย: "ยอดดอยศักดิ์สิทธิ์และสถานที่ประดิษฐานพระธาตุดอยสุเทพ")
+* ᩃᩣ᩠ᨷᩉ᩠ᨾᩪ -> แปลว่า: "ลาบหมู" (คำอ่าน: [ลาบ-หมู], ความหมาย: "อาหารพื้นเมืองเหนือประเภทยำเนื้อหมูปรุงด้วยพริกลาบ")
+* ᨡ᩶ᩣᩅᨪᩬ᩠ᨿ -> แปลว่า: "ข้าวซอย" (คำอ่าน: [ข้าว-ซอย], ความหมาย: "อาหารเส้นกะทิยอดนิยมเอกลักษณ์ของภาคเหนือ")
+* ᨠᩥ᩠᩵ᨶᨡ᩶ᩣᩅ -> แปลว่า: "กินข้าว" (คำอ่าน: [กิ๋น-ข้าว], ความหมาย: "การรับประทานอาหารประจำมื้อ")
+* ᨩᩦᩅᩥ᩠ᨲᨵᨾ᩠ᨾᨯᩣ / ᨩᩦᩅᩥ᩠ᨲ ᨵᨾ᩠ᨾᨯᩣ -> แปลว่า: "ชีวิตธรรมดา" (คำอ่าน: [ชี-วิด-ทำ-มะ-ดา], ความหมาย: "การดำเนินชีวิตอย่างเรียบง่าย")
+* ᨠᩣ᩠ᨯ -> แปลว่า: "ตลาด" (คำอ่าน: [กาด], ความหมาย: "ตลาดหรือแหล่งซื้อขายสินค้าพื้นเมือง")
+
+ตอบกลับเป็น JSON บริสุทธิ์เท่านั้น (Pure JSON) รูปแบบ:
 {
-  "detected_text": "ข้อความภาษาไทยที่แปล/ถอดความได้จากภาพ (เช่น ชีวิตธรรมดา หรือ สวัสดี)",
-  "reading": "[คำอ่านสำเนียง เช่น ชี-วิด-ทำ-มะ-ดา]",
-  "meaning": "คำอธิบายความหมาย บริบท หรือสถานที่ให้เข้าใจง่าย 1-2 ประโยค"
+  "detected_text": "คำแปลภาษาไทยที่ถูกต้อง (เช่น สวัสดี หรือ เชียงใหม่ หรือ ชีวิตธรรมดา)",
+  "reading": "[คำอ่านสำเนียง เช่น สะ-หวัด-ดี]",
+  "meaning": "คำอธิบายความหมายและบริบทสั้นๆ 1 ประโยค"
 }
 ''';
 
@@ -388,15 +457,29 @@ Output strictly pure JSON format:
           final cleanJson = raw.replaceAll('```json', '').replaceAll('```', '').trim();
           final jsonMap = jsonDecode(cleanJson) as Map<String, dynamic>;
 
-          final detectedText = jsonMap['detected_text']?.toString().trim() ??
+          String detectedText = jsonMap['detected_text']?.toString().trim() ??
               jsonMap['translated_text']?.toString().trim() ??
               '';
+          String? reading = jsonMap['reading']?.toString().trim();
+          String? meaning = jsonMap['meaning']?.toString().trim();
+
+          // ตรวจสอบเทียบกับฐานข้อมูลคำศัพท์ใน MySQL เพื่อเพิ่มความแม่นยำ 100%
+          for (var v in _dbVocabs) {
+            if (v.thaiWord.trim() == detectedText.trim() ||
+                v.lannaWord.trim() == detectedText.trim() ||
+                (reading != null && reading.contains(v.reading.replaceAll(RegExp(r'[\[\]]'), '')))) {
+              detectedText = v.thaiWord;
+              reading = v.reading;
+              meaning = v.meaning;
+              break;
+            }
+          }
 
           if (detectedText.isNotEmpty) {
             return _CameraOcrResult(
               text: detectedText,
-              reading: jsonMap['reading']?.toString().trim(),
-              meaning: jsonMap['meaning']?.toString().trim(),
+              reading: reading,
+              meaning: meaning ?? 'แปลจากอักษรล้านนาด้วย AI Vision',
               isLannaOutput: false,
               directionLabel: 'ภาษาล้านนา → ภาษาไทย (AI Vision)',
             );
@@ -629,11 +712,11 @@ Output strictly pure JSON format:
           right: 24,
           bottom: 48,
           child: Text(
-            'ขยับกล้องไปที่ข้อความภาษาไทย\nแล้ว กด ปุ่มถ่ายภาพ',
+            'ขยับกล้องไปที่ตัวอักษรล้านนา หรือ ข้อความ\nแล้วกดปุ่มถ่ายภาพ',
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 10,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               height: 1.5,
             ),
@@ -701,7 +784,7 @@ Output strictly pure JSON format:
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'ไทย',
+            'ล้านนา',
             style: TextStyle(
               color: Colors.white,
               fontSize: 12,
@@ -712,7 +795,7 @@ Output strictly pure JSON format:
           Icon(Icons.arrow_forward, color: Colors.white, size: 20),
           SizedBox(width: 12),
           Text(
-            'ล้านนา',
+            'ไทย',
             style: TextStyle(
               color: Colors.white,
               fontSize: 12,

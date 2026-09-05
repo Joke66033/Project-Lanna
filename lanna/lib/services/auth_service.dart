@@ -4,11 +4,12 @@ import 'api_service.dart';
 
 class AuthService {
   /// Register a new user
-  Future<UserModel> register(String username, String email, String password) async {
+  Future<UserModel> register(String username, String email, String password, {String? registerToken}) async {
     final body = {
       'username': username,
       'email': email,
       'password': password,
+      if (registerToken != null && registerToken.isNotEmpty) 'registerToken': registerToken,
     };
     final data = await ApiService.post('${ApiConfig.users}?action=register', body);
     

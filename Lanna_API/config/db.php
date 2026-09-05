@@ -478,3 +478,49 @@ function getJsonBody(): array {
     $raw = file_get_contents('php://input');
     return json_decode($raw, true) ?? [];
 }
+
+// ===== Token Encryption/Decryption Helpers (AES-256-CBC) =====
+if (!function_exists('encryptToken')) {
+    function encryptToken(array $payload, string $key): string {
+        $cipher = 'aes-256-cbc';
+        $ivLen = openssl_cipher_iv_length($cipher);
+        $iv = openssl_random_pseudo_bytes($ivLen);
+        
+        $rawKey = base64_decode($key);
+        if (strlen($rawKey) !== 32) {
+            $rawKey = str_pad(substr($key, 0, 32), 32, "\0");
+        }
+        
+        $jsonData = json_encode($payload);
+        $encrypted = openssl_encrypt($jsonData, $cipher, $rawKey, OPENSSL_RAW_DATA, $iv);
+        
+        return base64_encode($iv . $encrypted);
+    }
+}
+
+if (!function_exists('decryptToken')) {
+    function decryptToken(string $token, string $key): ?array {
+        try {
+            $cipher = 'aes-256-cbc';
+            $ivLen = openssl_cipher_iv_length($cipher);
+            $decoded = base64_decode($token, true);
+            if (!$decoded || strlen($decoded) <= $ivLen) return null;
+            
+            $iv = substr($decoded, 0, $ivLen);
+            $encrypted = substr($decoded, $ivLen);
+            
+            $rawKey = base64_decode($key);
+            if (strlen($rawKey) !== 32) {
+                $rawKey = str_pad(substr($key, 0, 32), 32, "\0");
+            }
+            
+            $decrypted = openssl_decrypt($encrypted, $cipher, $rawKey, OPENSSL_RAW_DATA, $iv);
+            if ($decrypted === false) return null;
+            
+            return json_decode($decrypted, true);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+}
+

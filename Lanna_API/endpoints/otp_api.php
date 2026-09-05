@@ -36,58 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $body = getJsonBody();
 $encryptionKey = $_ENV['ENCRYPTION_KEY'] ?? 'default_key_lanna_translation_12345';
 
-// =============================================
-// ฟังก์ชันช่วยเข้ารหัสและถอดรหัส Token (AES-256-CBC)
-// =============================================
-function encryptToken(array $payload, string $key): string {
-    $cipher = 'aes-256-cbc';
-    $ivLen = openssl_cipher_iv_length($cipher);
-    $iv = openssl_random_pseudo_bytes($ivLen);
-    
-    // คีย์ต้องเป็น 32 ไบต์ (256 บิต) — หากเป็น Base64 ให้ถอดรหัสก่อน
-    $rawKey = base64_decode($key);
-    if (strlen($rawKey) !== 32) {
-        $rawKey = str_pad(substr($key, 0, 32), 32, "\0");
-    }
-    
-    $jsonData = json_encode($payload);
-    $encrypted = openssl_encrypt($jsonData, $cipher, $rawKey, OPENSSL_RAW_DATA, $iv);
-    
-    return base64_encode($iv . $encrypted);
-}
-
-function decryptToken(string $token, string $key): ?array {
-    try {
-        $cipher = 'aes-256-cbc';
-        $ivLen = openssl_cipher_iv_length($cipher);
-        $decoded = base64_decode($token, true);
-        if (!$decoded || strlen($decoded) <= $ivLen) return null;
-        
-        $iv = substr($decoded, 0, $ivLen);
-        $encrypted = substr($decoded, $ivLen);
-        
-        $rawKey = base64_decode($key);
-        if (strlen($rawKey) !== 32) {
-            $rawKey = str_pad(substr($key, 0, 32), 32, "\0");
-        }
-        
-        $decrypted = openssl_decrypt($encrypted, $cipher, $rawKey, OPENSSL_RAW_DATA, $iv);
-        if ($decrypted === false) return null;
-        
-        return json_decode($decrypted, true);
-    } catch (\Exception $e) {
-        return null;
-    }
-}
-
 switch ($action) {
 
     // ========================================
     // ACTION: send — สร้าง OTP + ส่งอีเมล + คืนค่า token
     // ========================================
     case 'send':
-        $email = strtolower(trim($body['email'] ?? ''));
-        $type  = trim($body['type'] ?? '');
+        $email   = strtolower(trim($body['email'] ?? ''));
+        $type    = trim($body['type'] ?? 'user');
+        $purpose = trim($body['purpose'] ?? 'reset'); // 'reset' or 'register'
 
         if (empty($email)) {
             jsonError('กรุณาระบุอีเมล');
@@ -98,14 +55,23 @@ switch ($action) {
             break;
         }
 
-        // ตรวจสอบว่าอีเมลมีอยู่ในตารางที่ระบุหรือไม่
-        $table   = ($type === 'user') ? 'users' : 'admin_user';
-        $pkField = ($type === 'user') ? 'user_id' : 'admin_id';
-        $check   = dbSelectSingle($table, $pkField, ['email' => 'eq.' . rawurlencode($email)]);
+        if ($purpose === 'register') {
+            // ตรวจสอบว่าอีเมลนี้ถูกใช้งานแล้วหรือไม่ (ถ้ามีอยู่แล้วจะไม่อนุญาตให้ลงทะเบียนซ้ำ)
+            $check = dbSelect('users', 'user_id', ['email' => 'eq.' . rawurlencode($email)]);
+            if (!empty($check['data'])) {
+                jsonError('อีเมลนี้ถูกใช้งานในระบบแล้ว กรุณาเข้าสู่ระบบหรือใช้อีเมลอื่น');
+                break;
+            }
+        } else {
+            // สำหรับรีเซ็ตรหัสผ่าน: ตรวจสอบว่าอีเมลมีอยู่ในตารางที่ระบุหรือไม่
+            $table   = ($type === 'user') ? 'users' : 'admin_user';
+            $pkField = ($type === 'user') ? 'user_id' : 'admin_id';
+            $check   = dbSelectSingle($table, $pkField, ['email' => 'eq.' . rawurlencode($email)]);
 
-        if ($check['error'] || empty($check['data'])) {
-            jsonError('ไม่พบบัญชีผู้ใช้ที่ลงทะเบียนด้วยอีเมลนี้');
-            break;
+            if ($check['error'] || empty($check['data'])) {
+                jsonError('ไม่พบบัญชีผู้ใช้ที่ลงทะเบียนด้วยอีเมลนี้');
+                break;
+            }
         }
 
         // สร้าง OTP 6 หลัก
@@ -117,12 +83,13 @@ switch ($action) {
             'email'      => $email,
             'type'       => $type,
             'otp_code'   => $otpCode,
-            'expires_at' => $expiresAt
+            'expires_at' => $expiresAt,
+            'purpose'    => $purpose
         ];
         $token = encryptToken($payload, $encryptionKey);
 
         // ส่งอีเมล OTP
-        $mailSent = sendOtpEmail($email, $otpCode);
+        $mailSent = sendOtpEmail($email, $otpCode, $purpose);
 
         if (!$mailSent['success']) {
             jsonError('ไม่สามารถส่งอีเมลได้: ' . $mailSent['error']);
@@ -130,22 +97,24 @@ switch ($action) {
         }
 
         jsonOk([
-            'message' => 'ส่งรหัส OTP ไปยังอีเมลของคุณเรียบร้อยแล้ว',
+            'message' => ($purpose === 'register') 
+                ? 'ส่งรหัส OTP สำหรับยืนยันการสมัครสมาชิกไปยังอีเมลของคุณเรียบร้อยแล้ว' 
+                : 'ส่งรหัส OTP ไปยังอีเมลของคุณเรียบร้อยแล้ว',
             'token'   => $token
         ]);
         break;
 
     // ========================================
-    // ACTION: verify — ตรวจสอบ OTP + ออก resetToken
+    // ACTION: verify — ตรวจสอบ OTP + ออก resetToken หรือ registerToken
     // ========================================
     case 'verify':
         $email = strtolower(trim($body['email'] ?? ''));
         $otp   = trim($body['otp'] ?? '');
-        $type  = trim($body['type'] ?? '');
+        $type  = trim($body['type'] ?? 'user');
         $token = trim($body['token'] ?? '');
 
-        if (empty($email) || empty($otp) || empty($type) || empty($token)) {
-            jsonError('ข้อมูลไม่ครบถ้วน (กรุณาส่ง email, otp, type, token)');
+        if (empty($email) || empty($otp) || empty($token)) {
+            jsonError('ข้อมูลไม่ครบถ้วน (กรุณาส่ง email, otp, token)');
             break;
         }
 
@@ -159,7 +128,6 @@ switch ($action) {
         // ตรวจสอบค่าภายใน Token
         if (
             strtolower(trim($payload['email'])) !== $email ||
-            $payload['type'] !== $type ||
             $payload['otp_code'] !== $otp
         ) {
             jsonError('รหัส OTP ไม่ถูกต้อง');
@@ -172,11 +140,32 @@ switch ($action) {
             break;
         }
 
-        // หากยืนยันผ่าน ให้ออก resetToken (มีอายุ 5 นาที) เพื่อใช้สำหรับขั้นตอนตั้งรหัสผ่านใหม่
+        $purpose = $payload['purpose'] ?? 'reset';
+
+        if ($purpose === 'register') {
+            // ออก registerToken (มีอายุ 10 นาที) เพื่อใช้ยืนยันการสร้างบัญชี
+            $registerPayload = [
+                'email'    => $email,
+                'type'     => $type,
+                'verified' => true,
+                'purpose'  => 'register',
+                'expires'  => time() + 600 // 10 นาที
+            ];
+            $registerToken = encryptToken($registerPayload, $encryptionKey);
+
+            jsonOk([
+                'message'       => 'ยืนยันรหัส OTP สำเร็จ',
+                'registerToken' => $registerToken
+            ]);
+            break;
+        }
+
+        // หากยืนยันผ่าน (สำหรับ Reset Password) ให้ออก resetToken (มีอายุ 5 นาที)
         $resetPayload = [
             'email'    => $email,
             'type'     => $type,
             'verified' => true,
+            'purpose'  => 'reset',
             'expires'  => time() + 300 // 5 นาที
         ];
         $resetToken = encryptToken($resetPayload, $encryptionKey);
@@ -260,15 +249,22 @@ switch ($action) {
         jsonError('Unknown action: กรุณาระบุ action เป็น send, verify หรือ resetPassword');
 }
 
-function sendOtpEmail(string $toEmail, string $otpCode): array {
-    // 1. ส่งผ่าน Google Apps Script Webhook (ส่งจากบัญชี Google ของคุณโดยตรงผ่าน HTTPS ไม่โดนบล็อกพอร์ต)
+function sendOtpEmail(string $toEmail, string $otpCode, string $purpose = 'reset'): array {
+    $isRegister = ($purpose === 'register');
+    $subject = $isRegister 
+        ? '🔑 รหัส OTP สำหรับยืนยันการสมัครสมาชิก - แปลภาษาล้านนา' 
+        : '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา';
+    $htmlContent = buildOtpEmailHtml($otpCode, $purpose);
+    $altBody = "รหัส OTP ของคุณคือ: $otpCode (หมดอายุใน 3 นาที)";
+
+    // 1. ส่งผ่าน Google Apps Script Webhook
     $googleWebhook = $_ENV['GOOGLE_MAIL_WEBHOOK'] ?? getenv('GOOGLE_MAIL_WEBHOOK') ?? '';
     if (!empty($googleWebhook)) {
         $ch = curl_init($googleWebhook);
         $payload = json_encode([
             'to' => $toEmail,
-            'subject' => '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา',
-            'html' => buildOtpEmailHtml($otpCode),
+            'subject' => $subject,
+            'html' => $htmlContent,
         ]);
         curl_setopt_array($ch, [
             CURLOPT_POST => true,
@@ -286,7 +282,7 @@ function sendOtpEmail(string $toEmail, string $otpCode): array {
         }
     }
 
-    // 2. ส่งผ่าน Brevo API (HTTPS Port 443)
+    // 2. ส่งผ่าน Brevo API
     $brevoKey = $_ENV['BREVO_API_KEY'] ?? getenv('BREVO_API_KEY') ?? '';
     if (!empty($brevoKey)) {
         $ch = curl_init('https://api.brevo.com/v3/smtp/email');
@@ -298,8 +294,8 @@ function sendOtpEmail(string $toEmail, string $otpCode): array {
             'to' => [
                 ['email' => $toEmail]
             ],
-            'subject' => '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา',
-            'htmlContent' => buildOtpEmailHtml($otpCode),
+            'subject' => $subject,
+            'htmlContent' => $htmlContent,
         ]);
         curl_setopt_array($ch, [
             CURLOPT_POST => true,
@@ -320,7 +316,7 @@ function sendOtpEmail(string $toEmail, string $otpCode): array {
         }
     }
 
-    // 3. ส่งผ่าน Google SMTP (PHPMailer)
+    // 3. ส่งผ่าน Google / DirectAdmin SMTP (PHPMailer)
     $mail = new PHPMailer(true);
 
     try {
@@ -353,25 +349,25 @@ function sendOtpEmail(string $toEmail, string $otpCode): array {
                 ]
             ];
             
-        $mail->CharSet = 'UTF-8';
-        $mail->Encoding = 'base64';
-        
-        // ผู้ส่ง
-        $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? 'siripaporn@siripaporn.lnw.mn';
-        $fromName    = $_ENV['MAIL_FROM_NAME'] ?? 'แปลภาษาล้านนา';
-        $mail->setFrom($fromAddress, $fromName);
-        
-        // ผู้รับ
-        $mail->addAddress($toEmail);
-        
-        // เนื้อหา
-        $mail->isHTML(true);
-        $mail->Subject = '🔑 รหัส OTP สำหรับรีเซ็ตรหัสผ่าน - แปลภาษาล้านนา';
-        $mail->Body    = buildOtpEmailHtml($otpCode);
-        $mail->AltBody = "รหัส OTP ของคุณคือ: $otpCode (หมดอายุใน 3 นาที)";
-        
-        $mail->send();
-        return ['success' => true, 'error' => null];
+            $mail->CharSet = 'UTF-8';
+            $mail->Encoding = 'base64';
+            
+            // ผู้ส่ง
+            $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? 'siripaporn@siripaporn.lnw.mn';
+            $fromName    = $_ENV['MAIL_FROM_NAME'] ?? 'แปลภาษาล้านนา';
+            $mail->setFrom($fromAddress, $fromName);
+            
+            // ผู้รับ
+            $mail->addAddress($toEmail);
+            
+            // เนื้อหา
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = $htmlContent;
+            $mail->AltBody = $altBody;
+            
+            $mail->send();
+            return ['success' => true, 'error' => null];
         }
         
         return ['success' => false, 'error' => 'Mailer configuration not supported'];
@@ -383,14 +379,24 @@ function sendOtpEmail(string $toEmail, string $otpCode): array {
 // =============================================
 // สร้าง HTML Template สำหรับอีเมล OTP ดีไซน์สวยงามตามรูปแบบ
 // =============================================
-function buildOtpEmailHtml(string $otpCode): string {
+function buildOtpEmailHtml(string $otpCode, string $purpose = 'reset'): string {
+    $isRegister = ($purpose === 'register');
+    $title = $isRegister ? '🔑 ยืนยันการสมัครสมาชิก' : '🔑 รีเซ็ตรหัสผ่าน';
+    $subtitle = 'แปลภาษาล้านนา — Lanna Translation';
+    $greeting = $isRegister
+        ? "สวัสดีค่ะ คุณได้ทำการลงทะเบียนสมัครสมาชิกในระบบแปลภาษาล้านนา<br>กรุณาใช้รหัส OTP ด้านล่างนี้เพื่อยืนยันอีเมลของคุณ:"
+        : "สวัสดีค่ะ คุณได้ร้องขอรีเซ็ตรหัสผ่าน<br>กรุณาใช้รหัส OTP ด้านล่างเพื่อดำเนินการ:";
+    $disclaimer = $isRegister
+        ? "หากคุณไม่ได้เป็นผู้ลงทะเบียนสมัครสมาชิก กรุณาเพิกเฉยอีเมลนี้"
+        : "หากคุณไม่ได้ร้องขอรีเซ็ตรหัสผ่าน กรุณาเพิกเฉยอีเมลนี้";
+
     return <<<HTML
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>รหัสยืนยัน OTP - แปลภาษาล้านนา</title>
+  <title>{$title} - แปลภาษาล้านนา</title>
 </head>
 <body style="margin:0; padding:0; background-color:#f4f5f7; font-family:'Segoe UI','Noto Sans Thai',Tahoma,sans-serif; -webkit-font-smoothing:antialiased;">
   <table align="center" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px; margin:40px auto; background:#ffffff; border-radius:18px; box-shadow:0 6px 24px rgba(0,0,0,0.07); overflow:hidden; border:1px solid #e5e7eb;">
@@ -399,10 +405,10 @@ function buildOtpEmailHtml(string $otpCode): string {
     <tr>
       <td style="background:linear-gradient(135deg, #F59E0B 0%, #EA580C 50%, #C2410C 100%); padding:34px 24px; text-align:center;">
         <h1 style="color:#ffffff; margin:0; font-size:24px; font-weight:700; letter-spacing:0.5px; text-shadow:0 1px 2px rgba(0,0,0,0.12);">
-          🔑 รีเซ็ตรหัสผ่าน
+          {$title}
         </h1>
         <p style="color:rgba(255,255,255,0.95); margin:8px 0 0; font-size:14px; font-weight:400;">
-          แปลภาษาล้านนา — Lanna Translation
+          {$subtitle}
         </p>
       </td>
     </tr>
@@ -411,8 +417,7 @@ function buildOtpEmailHtml(string $otpCode): string {
     <tr>
       <td style="padding:34px 24px; text-align:center;">
         <p style="color:#374151; font-size:16px; line-height:1.6; margin:0 0 26px;">
-          สวัสดีค่ะ คุณได้ร้องขอรีเซ็ตรหัสผ่าน<br>
-          กรุณาใช้รหัส OTP ด้านล่างเพื่อดำเนินการ:
+          {$greeting}
         </p>
 
         <!-- OTP Code Box -->
@@ -424,7 +429,7 @@ function buildOtpEmailHtml(string $otpCode): string {
 
         <p style="color:#6B7280; font-size:14px; line-height:1.6; margin:0;">
           ⏱️ รหัสนี้จะหมดอายุใน <strong style="color:#DC2626;">3 นาที</strong><br>
-          หากคุณไม่ได้ร้องขอรีเซ็ตรหัสผ่าน กรุณาเพิกเฉยอีเมลนี้
+          {$disclaimer}
         </p>
       </td>
     </tr>

@@ -56,12 +56,12 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Register as User
-  Future<void> register(String username, String email, String password) async {
+  Future<void> register(String username, String email, String password, {String? registerToken}) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final userProfile = await _authService.register(username, email, password);
+      final userProfile = await _authService.register(username, email, password, registerToken: registerToken);
       // Automatically log in after registration
       await ApiService.saveUserSession(userProfile);
       _user = userProfile;

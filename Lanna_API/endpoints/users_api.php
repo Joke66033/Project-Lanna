@@ -202,6 +202,21 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
 
+            // ตรวจสอบ registerToken (ถ้ามีการส่งมาจากการยืนยัน OTP)
+            $encryptionKey = $_ENV['ENCRYPTION_KEY'] ?? 'default_key_lanna_translation_12345';
+            if (!empty($body['registerToken']) || !empty($body['register_token'])) {
+                $rToken = trim($body['registerToken'] ?? $body['register_token']);
+                $rPayload = decryptToken($rToken, $encryptionKey);
+                if (!$rPayload || !($rPayload['verified'] ?? false) || ($rPayload['purpose'] ?? '') !== 'register' || ($rPayload['expires'] ?? 0) < time()) {
+                    jsonError('โทเค็นการยืนยันอีเมลไม่ถูกต้องหรือหมดอายุแล้ว กรุณายืนยัน OTP ใหม่อีกครั้ง');
+                    break;
+                }
+                if (strtolower(trim($rPayload['email'])) !== $email) {
+                    jsonError('อีเมลไม่ตรงกับที่ได้รับการยืนยัน OTP');
+                    break;
+                }
+            }
+
             // ดึง ID ล่าสุดเพื่อนำมาบวก 1 และสร้างรหัสผู้ใช้รูปฟอร์แมต US####
             $listRes = dbSelect('users', 'user_id', [], 'user_id.desc', 1);
             $nextNumber = 1;

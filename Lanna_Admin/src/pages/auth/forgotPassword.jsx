@@ -17,12 +17,40 @@ export default function ForgotPassword() {
   const [apiError, setApiError] = useState("")
   const [apiSuccess, setApiSuccess] = useState("")
   const [errors, setErrors] = useState({})
+  const [cooldown, setCooldown] = useState(0)
 
-  // เคลียร์ error และรีเซ็ตค่าเริ่มต้นเมื่อเปิดหน้าครั้งแรก (Component Mount)
+  // เคลียร์ error และตรวจนับเวลาถอยหลัง 2 นาที (120 วินาที)
   useEffect(() => {
     setApiError("");
     setErrors({});
+    const lastSent = localStorage.getItem("admin_otp_sent_at");
+    if (lastSent) {
+      const diff = Math.floor((Date.now() - parseInt(lastSent, 10)) / 1000);
+      if (diff < 120) {
+        setCooldown(120 - diff);
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // แปลงข้อความ error เป็นภาษาไทย
   const translateError = (message) => {
@@ -103,6 +131,9 @@ export default function ForgotPassword() {
 
       setApiSuccess("ส่งรหัส OTP ไปยังอีเมลของท่านเรียบร้อยแล้ว")
       const sentTime = Date.now();
+      localStorage.setItem("admin_otp_sent_at", sentTime.toString());
+      setCooldown(120);
+
       setTimeout(() => {
         setApiSuccess("")
         navigate("/otp", { 
@@ -181,12 +212,18 @@ export default function ForgotPassword() {
           </div>
 
           <button
-            disabled={loading}
+            disabled={loading || cooldown > 0}
             className={`w-full rounded-2xl py-3 font-semibold text-white shadow-sm transition ${
-              loading ? "bg-orange-300 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600"
+              loading || cooldown > 0
+                ? "bg-orange-300 cursor-not-allowed"
+                : "bg-orange-500 hover:bg-orange-600"
             }`}
           >
-            {loading ? "กำลังส่ง OTP..." : "ส่ง OTP"}
+            {loading
+              ? "กำลังส่ง OTP..."
+              : cooldown > 0
+              ? `ขอรหัสใหม่ได้ใน ${formatTime(cooldown)} นาที`
+              : "ส่ง OTP"}
           </button>
         </form>
 

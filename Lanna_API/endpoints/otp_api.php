@@ -381,7 +381,7 @@ function sendOtpEmail(string $toEmail, string $otpCode): array {
 }
 
 // =============================================
-// สร้าง HTML Template สำหรับอีเมล OTP
+// สร้าง HTML Template สำหรับอีเมล OTP ดีไซน์สวยงาม ทันสมัย
 // =============================================
 function buildOtpEmailHtml(string $otpCode): string {
     return <<<HTML
@@ -390,49 +390,75 @@ function buildOtpEmailHtml(string $otpCode): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รหัสยืนยัน OTP - แปลภาษาล้านนา</title>
 </head>
-<body style="margin:0; padding:0; background-color:#f4f4f7; font-family:'Segoe UI','Noto Sans Thai',Tahoma,sans-serif;">
-  <table align="center" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px; margin:40px auto; background:#ffffff; border-radius:16px; box-shadow:0 4px 24px rgba(0,0,0,0.08); overflow:hidden;">
+<body style="margin:0; padding:0; background-color:#f1f5f9; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing:antialiased;">
+  <table align="center" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px; margin:36px auto; background:#ffffff; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.06); overflow:hidden; border:1px solid #e2e8f0;">
+    
     <!-- Header -->
     <tr>
-      <td style="background:linear-gradient(135deg,#D4A574 0%,#8B6914 100%); padding:32px 24px; text-align:center;">
-        <h1 style="color:#ffffff; margin:0; font-size:22px; font-weight:700; letter-spacing:0.5px;">
-          🔑 รีเซ็ตรหัสผ่าน
+      <td style="background:linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%); padding:36px 24px 30px; text-align:center;">
+        <div style="display:inline-block; width:54px; height:54px; background:rgba(255,255,255,0.22); border-radius:16px; line-height:54px; font-size:26px; margin-bottom:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+          🔑
+        </div>
+        <h1 style="color:#ffffff; margin:0; font-size:22px; font-weight:800; letter-spacing:0.5px; text-shadow:0 1px 2px rgba(0,0,0,0.1);">
+          รีเซ็ตรหัสผ่าน
         </h1>
-        <p style="color:rgba(255,255,255,0.9); margin:8px 0 0; font-size:14px;">
-          แปลภาษาล้านนา — Lanna Translation
+        <p style="color:rgba(255,255,255,0.92); margin:6px 0 0; font-size:14px; font-weight:500;">
+          ระบบแปลภาษาล้านนา • Lanna Translation
         </p>
       </td>
     </tr>
+
     <!-- Body -->
     <tr>
-      <td style="padding:32px 24px; text-align:center;">
-        <p style="color:#374151; font-size:16px; line-height:1.6; margin:0 0 24px;">
-          สวัสดีค่ะ คุณได้ร้องขอรีเซ็ตรหัสผ่าน<br>
-          กรุณาใช้รหัส OTP ด้านล่างเพื่อดำเนินการ:
+      <td style="padding:32px 28px 24px; text-align:center;">
+        <p style="color:#1e293b; font-size:16px; font-weight:600; margin:0 0 6px;">
+          สวัสดีค่ะ
+        </p>
+        <p style="color:#475569; font-size:14px; line-height:1.6; margin:0 0 24px;">
+          คุณได้ทำการร้องขอรีเซ็ตรหัสผ่านสำหรับบัญชีของคุณ<br>
+          กรุณาใช้รหัสยืนยันตัวตน (OTP) ด้านล่างนี้เพื่อดำเนินการต่อ:
         </p>
 
         <!-- OTP Code Box -->
-        <div style="display:inline-block; background:linear-gradient(135deg,#FEF3C7,#FDE68A); border:2px solid #D4A574; border-radius:12px; padding:16px 40px; margin:8px 0 24px;">
-          <span style="font-size:36px; font-weight:800; color:#8B6914; letter-spacing:12px; font-family:'Courier New',monospace;">
+        <div style="background:#fff7ed; border:2px dashed #f97316; border-radius:16px; padding:20px 16px; margin:0 auto 24px; max-width:340px; box-shadow:0 2px 8px rgba(249,115,22,0.08);">
+          <div style="font-size:11px; font-weight:700; color:#ea580c; text-transform:uppercase; letter-spacing:2px; margin-bottom:6px;">
+            รหัสยืนยัน OTP (6 หลัก)
+          </div>
+          <div style="font-size:38px; font-weight:900; color:#9a3412; letter-spacing:12px; padding-left:12px; font-family:'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; line-height:1.2;">
             {$otpCode}
-          </span>
+          </div>
         </div>
 
-        <p style="color:#6B7280; font-size:14px; line-height:1.5; margin:0;">
-          ⏱️ รหัสนี้จะหมดอายุใน <strong style="color:#DC2626;">2 นาที</strong><br>
-          หากคุณไม่ได้ร้องขอรีเซ็ตรหัสผ่าน กรุณาเพิกเฉยอีเมลนี้
+        <!-- Expiration Alert Box -->
+        <div style="background:#fef2f2; border:1px solid #fee2e2; border-left:4px solid #ef4444; border-radius:10px; padding:12px 16px; text-align:left; margin-bottom:20px;">
+          <div style="color:#991b1b; font-size:13.5px; font-weight:700; margin-bottom:3px;">
+            ⏱️ รหัสนี้มีอายุการใช้งาน <span style="color:#dc2626; text-decoration:underline;">2 นาที</span> เท่านั้น
+          </div>
+          <div style="color:#64748b; font-size:12px; line-height:1.4;">
+            หากเกินเวลาดังกล่าว รหัสจะหมดอายุและท่านจะต้องกดขอรหัสใหม่
+          </div>
+        </div>
+
+        <p style="color:#64748b; font-size:12.5px; line-height:1.5; margin:0;">
+          🔒 หากคุณไม่ได้เป็นผู้ทำรายการนี้ สามารถเพิกเฉยอีเมลฉบับนี้ได้ บัญชีของคุณจะยังคงปลอดภัย
         </p>
       </td>
     </tr>
+
     <!-- Footer -->
     <tr>
-      <td style="background:#f9fafb; padding:20px 24px; text-align:center; border-top:1px solid #e5e7eb;">
-        <p style="color:#9CA3AF; font-size:12px; margin:0;">
-          © 2026 แปลภาษาล้านนา — ส่งอัตโนมัติจากระบบ กรุณาอย่าตอบกลับอีเมลนี้
+      <td style="background:#f8fafc; padding:18px 24px; text-align:center; border-top:1px solid #e2e8f0;">
+        <p style="color:#64748b; font-size:12px; font-weight:600; margin:0 0 3px;">
+          ระบบแปลภาษาล้านนา (Lanna Translation)
+        </p>
+        <p style="color:#94a3b8; font-size:11px; margin:0;">
+          © 2026 สงวนลิขสิทธิ์ • ส่งอัตโนมัติจากระบบ กรุณาอย่าตอบกลับอีเมลนี้
         </p>
       </td>
     </tr>
+
   </table>
 </body>
 </html>

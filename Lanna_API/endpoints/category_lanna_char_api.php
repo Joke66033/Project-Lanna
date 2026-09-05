@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $filters['learning_category_code'] = 'eq.' . $learning_category_code;
             }
             
-            $res = dbSelect('category_lanna_char', '*', $filters, 'category_char_id.desc');
+            $res = dbSelect('category_lanna_char', '*', $filters, 'category_char_id.asc');
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;

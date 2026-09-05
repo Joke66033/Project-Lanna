@@ -24,6 +24,12 @@ class LannaCharService {
       c.lannaChar != '\u0E3A'
     ).toList();
 
+    int extractIdNum(String id) {
+      final match = RegExp(r'\d+').firstMatch(id);
+      return match != null ? int.tryParse(match.group(0)!) ?? 0 : 0;
+    }
+    list.sort((a, b) => extractIdNum(a.charId).compareTo(extractIdNum(b.charId)));
+
     if (categoryCharId != null && categoryCharId.trim().isNotEmpty) {
       final targetIds = categoryCharId.split(',').map((s) => s.trim().toUpperCase()).toSet();
       return list.where((c) => targetIds.contains(c.categoryCharId.trim().toUpperCase())).toList();

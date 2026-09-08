@@ -387,7 +387,6 @@ export default function Articles() {
             title: form.title,
             content: form.content,
             category_char_id: form.category_char_id || null,
-            image_path: form.image_path || null,
           }),
         }
       );
@@ -429,7 +428,6 @@ export default function Articles() {
       title: a.title || "",
       content: a.content || "",
       category_char_id: a.category_char_id ? String(a.category_char_id) : "",
-      image_path: a.image_path || null,
       learning_category_code: a.learning_category_code || "",
     });
     setShowEdit(true);
@@ -451,7 +449,6 @@ export default function Articles() {
             title: form.title,
             content: form.content,
             category_char_id: form.category_char_id || null,
-            image_path: form.image_path || null,
           }),
         }
       );

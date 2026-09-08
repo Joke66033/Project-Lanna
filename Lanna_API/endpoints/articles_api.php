@@ -92,7 +92,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'article_id'       => $nextId,
                 'title'            => $body['title'] ?? '',
                 'content'          => $body['content'] ?? '',
-                'image_path'       => $body['image_path'] ?? $body['cover_image_url'] ?? '',
                 'category_char_id' => !empty($body['category_char_id']) ? $body['category_char_id'] : null
             ];
 
@@ -100,7 +99,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($res['error']) { jsonError($res['error']['message']); break; }
             
             $insertedId = $res['data']['article_id'] ?? $nextId;
-            $resRow = dbSelectSingle('articles', '*', ['article_id' => 'eq.' . $insertedId]);
+            $resRow = dbSelectSingle('articles', '*,category_lanna_char(*,learning_category(*))', ['article_id' => 'eq.' . $insertedId]);
             if ($resRow['data']) {
                 jsonOk($resRow['data']);
             } else {
@@ -115,9 +114,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $updateData = [];
             if (array_key_exists('title', $body))            $updateData['title'] = $body['title'];
             if (array_key_exists('content', $body))          $updateData['content'] = $body['content'];
-            if (array_key_exists('image_path', $body) || array_key_exists('cover_image_url', $body)) {
-                $updateData['image_path'] = $body['image_path'] ?? ($body['cover_image_url'] ?? '');
-            }
             if (array_key_exists('category_char_id', $body)) $updateData['category_char_id'] = !empty($body['category_char_id']) ? $body['category_char_id'] : null;
 
             $res = dbUpdate('articles', ['article_id' => 'eq.' . rawurlencode($id)], $updateData);

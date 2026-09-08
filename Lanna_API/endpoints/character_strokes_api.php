@@ -302,7 +302,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (array_key_exists('stroke_data', $body))      $updateData['stroke_data'] = is_array($body['stroke_data']) ? json_encode($body['stroke_data'], JSON_UNESCAPED_UNICODE) : $body['stroke_data'];
             
             if (!empty($updateData)) {
-                $resUpdate = dbUpdate('character_strokes', $updateData, ['stroke_id' => 'eq.' . rawurlencode($id)]);
+                $resUpdate = dbUpdate('character_strokes', ['stroke_id' => 'eq.' . rawurlencode($id)], $updateData);
                 if ($resUpdate['error']) { jsonError($resUpdate['error']['message']); break; }
             }
 

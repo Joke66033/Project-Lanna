@@ -47,6 +47,26 @@ export function getItemId(item, type = "", idField = "") {
   return ids.length > 0 ? ids[0] : "";
 }
 
+export function isIdMatch(idA, idB) {
+  if (idA === undefined || idA === null || idB === undefined || idB === null) return false;
+  const sA = String(idA).trim();
+  const sB = String(idB).trim();
+  if (sA === "" || sB === "") return false;
+  if (sA.toLowerCase() === sB.toLowerCase()) return true;
+
+  // Only consider numeric match if at least one side is a pure number (no alphabetic prefix)
+  const isPureNumA = /^\d+$/.test(sA);
+  const isPureNumB = /^\d+$/.test(sB);
+  if (isPureNumA || isPureNumB) {
+    const numA = parseInt(sA.replace(/\D/g, ""), 10);
+    const numB = parseInt(sB.replace(/\D/g, ""), 10);
+    if (!isNaN(numA) && !isNaN(numB) && numA === numB) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function trackRecentActivity(type, id) {
   try {
     if (id === undefined || id === null || String(id).trim() === "") return;
@@ -54,14 +74,7 @@ export function trackRecentActivity(type, id) {
     const key = `recent_${type}`;
     const existing = JSON.parse(localStorage.getItem(key) || "[]").map((x) => String(x).trim());
 
-    const strNum = strId.match(/\d+/) ? parseInt(strId.match(/\d+/)[0], 10) : null;
-    const filtered = existing.filter((item) => {
-      if (item.toLowerCase() === strId.toLowerCase()) return false;
-      const itemNum = item.match(/\d+/) ? parseInt(item.match(/\d+/)[0], 10) : null;
-      if (strNum !== null && itemNum !== null && strNum === itemNum) return false;
-      return true;
-    });
-
+    const filtered = existing.filter((item) => !isIdMatch(item, strId));
     const updated = [strId, ...filtered].slice(0, 50);
     localStorage.setItem(key, JSON.stringify(updated));
   } catch (e) {
@@ -74,26 +87,12 @@ export function getRecentRank(item, type, idField, recentIds) {
   const ids = getItemPrimaryIds(item, type, idField);
   if (ids.length === 0) return -1;
 
-  const idsLower = ids.map((x) => x.toLowerCase());
-  const idsNums = ids
-    .map((x) => {
-      const m = x.match(/\d+/);
-      return m ? parseInt(m[0], 10) : null;
-    })
-    .filter((n) => n !== null);
-
   for (let i = 0; i < recentIds.length; i++) {
     const r = recentIds[i];
     if (!r) continue;
-    const rLower = r.toLowerCase();
-    const rMatch = r.match(/\d+/);
-    const rNum = rMatch ? parseInt(rMatch[0], 10) : null;
-
-    // 1. Direct or case-insensitive string match
-    if (ids.includes(r) || idsLower.includes(rLower)) return i;
-
-    // 2. Numeric match (e.g. "V00018" and 18 or "18")
-    if (rNum !== null && idsNums.includes(rNum)) return i;
+    if (ids.some((id) => isIdMatch(id, r))) {
+      return i;
+    }
   }
 
   return -1;
@@ -105,31 +104,22 @@ export function sortRecentData(dataList, type, idField = "id") {
     const key = `recent_${type}`;
     const recentIds = JSON.parse(localStorage.getItem(key) || "[]").map((x) => String(x).trim());
 
-    const parseNumId = (item, field) => {
-      const ids = getItemPrimaryIds(item, type, field);
-      for (const idStr of ids) {
-        const match = String(idStr).match(/\d+/);
-        if (match) return parseInt(match[0], 10);
-      }
-      return 0;
-    };
-
     return [...dataList].sort((a, b) => {
       const rankA = getRecentRank(a, type, idField, recentIds);
       const rankB = getRecentRank(b, type, idField, recentIds);
 
-      // 1. อันดับแรก: รายการที่เพิ่งกดเพิ่มหรือแก้ไขในหน้าผู้ดูแล (Recent Action) -> ลำดับที่ 1 ล่าสุดเสมอ
+      // 1. Recent action items go to Rank 1 (top of table)
       if (rankA !== -1 && rankB !== -1) {
         return rankA - rankB;
       }
       if (rankA !== -1) return -1;
       if (rankB !== -1) return 1;
 
-      // 2. ข้อมูลปกติในฐานข้อมูล: เรียงจากน้อยไปมากตาม ID (ASC) เช่น V00001 -> V00002 -> V00003
-      const numA = parseNumId(a, idField);
-      const numB = parseNumId(b, idField);
-      if (numA !== numB) {
-        return numA - numB;
+      // 2. Default items: natural ascending (ASC) order (e.g. CS0001, CS0002... S00001, S00002... V00001, V00002...)
+      const idA = getItemId(a, type, idField);
+      const idB = getItemId(b, type, idField);
+      if (idA && idB) {
+        return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: "base" });
       }
 
       return 0;
@@ -145,13 +135,7 @@ export function removeRecentActivity(type, id) {
     const strId = String(id).trim();
     const key = `recent_${type}`;
     const existing = JSON.parse(localStorage.getItem(key) || "[]").map((x) => String(x).trim());
-    const strNum = strId.match(/\d+/) ? parseInt(strId.match(/\d+/)[0], 10) : null;
-    const updated = existing.filter((item) => {
-      if (item.toLowerCase() === strId.toLowerCase()) return false;
-      const itemNum = item.match(/\d+/) ? parseInt(item.match(/\d+/)[0], 10) : null;
-      if (strNum !== null && itemNum !== null && strNum === itemNum) return false;
-      return true;
-    });
+    const updated = existing.filter((item) => !isIdMatch(item, strId));
     localStorage.setItem(key, JSON.stringify(updated));
   } catch (e) {
     // Ignore storage errors

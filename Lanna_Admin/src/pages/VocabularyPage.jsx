@@ -381,9 +381,8 @@ export default function VocabularyPage() {
       if (vocabId) {
         trackRecentActivity("vocabulary", vocabId);
       }
-      setData((prev) => [newVocab, ...prev.filter((i) => (i.vocab_id || i.id) !== vocabId)]);
       setCurrentPage(1);
-      fetchData(1);
+      await fetchData(1, selectedCategory, search);
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มคำศัพท์");
       setShowWarning(true);
@@ -452,13 +451,12 @@ export default function VocabularyPage() {
       setSuccessText("แก้ไขคำศัพท์สำเร็จ");
       setShowSuccess(true);
 
-      // Update state locally (prepend updated item)
+      // Track recent activity and reload page 1
       const updatedObj = updatedItem || { ...originalForm, ...payload, vocab_id: targetId, id: targetId };
       const editId = updatedObj?.vocab_id || targetId;
       trackRecentActivity("vocabulary", editId);
-      setData((prev) => [updatedObj, ...prev.filter((i) => (i.vocab_id || i.id) !== editId)]);
       setCurrentPage(1);
-      fetchData(1);
+      await fetchData(1, selectedCategory, search);
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขคำศัพท์");
       setShowWarning(true);

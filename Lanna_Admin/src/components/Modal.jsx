@@ -42,7 +42,7 @@ export default function Modal({ isOpen = true, title, onClose, children, maxWidt
       >
         {title && (
           <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 flex-shrink-0 bg-white">
-            <h2 className="font-bold text-xl text-gray-800">{title}</h2>
+            <h2 className="font-bold text-xl" style={{ color: '#000000' }}>{title}</h2>
             <button
               type="button"
               onClick={onClose}

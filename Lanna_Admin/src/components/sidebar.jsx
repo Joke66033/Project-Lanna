@@ -96,7 +96,7 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <aside className="w-64 bg-gray-50 border-r border-gray-200 text-gray-700 min-h-screen flex flex-col shrink-0 select-none">
+    <aside className="w-64 bg-gray-50 border-r border-gray-200 text-black min-h-screen flex flex-col shrink-0 select-none">
 
       {/* ===== HEADER (Gradient Orange Accented) ===== */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-orange-100 bg-gradient-to-r from-orange-50/70 to-orange-100/30">

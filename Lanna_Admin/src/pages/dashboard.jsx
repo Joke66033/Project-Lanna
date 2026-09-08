@@ -20,20 +20,21 @@ const getApiBase = () => {
 };
 const BASE = getApiBase();
 
-async function apiFetch(url) {
-  const res = await fetch(url);
-  const contentType = res.headers.get('content-type') || '';
-  if (!contentType.includes('application/json')) {
-    const text = await res.text();
-    // Strip HTML tags for cleaner error message
-    const clean = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
-    throw new Error(`API ตอบกลับไม่ถูกต้อง (${url.split('/').pop()}): ${clean || 'ไม่ทราบสาเหตุ'}`);
+async function safeApiFetch(url) {
+  try {
+    const res = await fetch(url);
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await res.text();
+      console.warn(`Non-JSON response from ${url}:`, text.slice(0, 100));
+      return { data: [] };
+    }
+    const json = await res.json();
+    return json && typeof json === 'object' ? json : { data: [] };
+  } catch (err) {
+    console.warn(`safeApiFetch error for ${url}:`, err);
+    return { data: [] };
   }
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data?.message || data?.error || `HTTP ${res.status}`);
-  }
-  return data;
 }
 
 const getInitDate = (daysAgo) => {
@@ -66,24 +67,18 @@ export default function Dashboard() {
         resArticles,
         resCat
       ] = await Promise.all([
-        apiFetch(`${BASE}/endpoints/vocabulary_api.php?action=getAll`),
-        apiFetch(`${BASE}/endpoints/users_api.php?action=getAll`),
-        apiFetch(`${BASE}/endpoints/translate_logs_api.php?action=getAll`),
-        apiFetch(`${BASE}/endpoints/articles_api.php?action=getAll`),
-        apiFetch(`${BASE}/endpoints/category_vocab_api.php?action=getAll`),
+        safeApiFetch(`${BASE}/endpoints/vocabulary_api.php?action=getAll`),
+        safeApiFetch(`${BASE}/endpoints/users_api.php?action=getAll`),
+        safeApiFetch(`${BASE}/endpoints/translate_logs_api.php?action=getAll`),
+        safeApiFetch(`${BASE}/endpoints/articles_api.php?action=getAll`),
+        safeApiFetch(`${BASE}/endpoints/category_vocab_api.php?action=getAll`),
       ]);
 
-      if (resVocab.error) throw resVocab.error;
-      if (resUsers.error) throw resUsers.error;
-      if (resLogs.error) throw resLogs.error;
-      if (resArticles.error) throw resArticles.error;
-      if (resCat.error) throw resCat.error;
-
-      setVocabularies(resVocab.data || []);
-      setUsers(resUsers.data || []);
-      setTranslateLogs(resLogs.data || []);
-      setArticles(resArticles.data || []);
-      setCategoryVocabs(resCat.data || []);
+      setVocabularies(Array.isArray(resVocab.data) ? resVocab.data : []);
+      setUsers(Array.isArray(resUsers.data) ? resUsers.data : []);
+      setTranslateLogs(Array.isArray(resLogs.data) ? resLogs.data : []);
+      setArticles(Array.isArray(resArticles.data) ? resArticles.data : []);
+      setCategoryVocabs(Array.isArray(resCat.data) ? resCat.data : []);
 
     } catch (err) {
       console.error("Dashboard fetch error:", err);

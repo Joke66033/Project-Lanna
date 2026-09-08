@@ -1,7 +1,7 @@
 export const categoryColors = {
   dashboard: {
     sidebarActive: "bg-orange-50 text-orange-700 font-bold border-l-4 border-orange-600 shadow-sm",
-    sidebarNormal: "text-gray-600 hover:bg-orange-50/70 hover:text-orange-700",
+    sidebarNormal: "text-black hover:bg-orange-50/70 hover:text-orange-700",
     seqBg: "bg-orange-100",
     seqText: "text-orange-700",
     seqBgHover: "hover:bg-orange-200",
@@ -16,7 +16,7 @@ export const categoryColors = {
   },
   vocabulary: {
     sidebarActive: "bg-amber-50 text-amber-900 font-bold border-l-4 border-amber-800 shadow-sm",
-    sidebarNormal: "text-gray-600 hover:bg-amber-50/70 hover:text-amber-900",
+    sidebarNormal: "text-black hover:bg-amber-50/70 hover:text-amber-900",
     seqBg: "bg-amber-100",
     seqText: "text-amber-800",
     seqBgHover: "hover:bg-amber-200",
@@ -31,7 +31,7 @@ export const categoryColors = {
   },
   alphabet: {
     sidebarActive: "bg-emerald-50 text-emerald-700 font-bold border-l-4 border-emerald-600 shadow-sm",
-    sidebarNormal: "text-gray-600 hover:bg-emerald-50/70 hover:text-emerald-700",
+    sidebarNormal: "text-black hover:bg-emerald-50/70 hover:text-emerald-700",
     seqBg: "bg-emerald-100",
     seqText: "text-emerald-700",
     seqBgHover: "hover:bg-emerald-200",
@@ -46,7 +46,7 @@ export const categoryColors = {
   },
   characterStrokes: {
     sidebarActive: "bg-indigo-50 text-indigo-700 font-bold border-l-4 border-indigo-600 shadow-sm",
-    sidebarNormal: "text-gray-600 hover:bg-indigo-50/70 hover:text-indigo-700",
+    sidebarNormal: "text-black hover:bg-indigo-50/70 hover:text-indigo-700",
     seqBg: "bg-indigo-100",
     seqText: "text-indigo-700",
     seqBgHover: "hover:bg-indigo-200",
@@ -61,7 +61,7 @@ export const categoryColors = {
   },
   categoryVocab: {
     sidebarActive: "bg-teal-50 text-teal-700 font-bold border-l-4 border-teal-600 shadow-sm",
-    sidebarNormal: "text-gray-600 hover:bg-teal-50/70 hover:text-teal-700",
+    sidebarNormal: "text-black hover:bg-teal-50/70 hover:text-teal-700",
     seqBg: "bg-teal-100",
     seqText: "text-teal-700",
     seqBgHover: "hover:bg-teal-200",
@@ -76,7 +76,7 @@ export const categoryColors = {
   },
   categoryAlphabet: {
     sidebarActive: "bg-cyan-50 text-cyan-700 font-bold border-l-4 border-cyan-600 shadow-sm",
-    sidebarNormal: "text-gray-600 hover:bg-cyan-50/70 hover:text-cyan-700",
+    sidebarNormal: "text-black hover:bg-cyan-50/70 hover:text-cyan-700",
     seqBg: "bg-cyan-100",
     seqText: "text-cyan-700",
     seqBgHover: "hover:bg-cyan-200",
@@ -91,7 +91,7 @@ export const categoryColors = {
   },
   categoryLearning: {
     sidebarActive: "bg-sky-50 text-sky-700 font-bold border-l-4 border-sky-600 shadow-sm",
-    sidebarNormal: "text-gray-600 hover:bg-sky-50/70 hover:text-sky-700",
+    sidebarNormal: "text-black hover:bg-sky-50/70 hover:text-sky-700",
     seqBg: "bg-sky-100",
     seqText: "text-sky-700",
     seqBgHover: "hover:bg-sky-200",
@@ -106,7 +106,7 @@ export const categoryColors = {
   },
   articles: {
     sidebarActive: "bg-violet-50 text-violet-700 font-bold border-l-4 border-violet-600 shadow-sm",
-    sidebarNormal: "text-gray-600 hover:bg-violet-50/70 hover:text-violet-700",
+    sidebarNormal: "text-black hover:bg-violet-50/70 hover:text-violet-700",
     seqBg: "bg-violet-100",
     seqText: "text-violet-700",
     seqBgHover: "hover:bg-violet-200",
@@ -121,7 +121,7 @@ export const categoryColors = {
   },
   users: {
     sidebarActive: "bg-rose-50 text-rose-700 font-bold border-l-4 border-rose-600 shadow-sm",
-    sidebarNormal: "text-gray-600 hover:bg-rose-50/70 hover:text-rose-700",
+    sidebarNormal: "text-black hover:bg-rose-50/70 hover:text-rose-700",
     seqBg: "bg-rose-100",
     seqText: "text-rose-700",
     seqBgHover: "hover:bg-rose-200",

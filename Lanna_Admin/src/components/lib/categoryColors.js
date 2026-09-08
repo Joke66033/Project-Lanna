@@ -6,7 +6,7 @@ const colorsData = {
     theadBorder: 'border-orange-200',
     button: 'bg-orange-600 hover:bg-orange-700', 
     sidebarActive: 'bg-orange-50 text-orange-700 border-l-4 border-orange-600',
-    sidebarNormal: 'text-gray-800 hover:bg-orange-50 hover:text-orange-700',
+    sidebarNormal: 'text-black hover:bg-orange-50 hover:text-orange-700',
     
     // Compatibility aliases
     primaryBg: 'bg-orange-600',

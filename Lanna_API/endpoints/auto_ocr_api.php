@@ -57,7 +57,7 @@ $base64Image = base64_encode($imageBytes);
 
 // 1. Primary: Gemini Vision AI (3.6 Flash / 3.8 Flash)
 $geminiKey = base64_decode('QVEuQWI4Uk42SVctZUVRdVdWMXdnZ0lZRFhWUUdWMHFneXFRd2MweHJoQ0llOFpwbElmaXc=');
-$geminiModels = ['gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-flash-latest'];
+$geminiModels = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-flash-latest'];
 
 $prompt = <<<PROMPT
 คุณคือผู้เชี่ยวชาญระดับศาสตราจารย์ด้าน "อักขรวิธีอักษรธรรมล้านนา (ตั๋วเมือง / Tai Tham Script)" และวัฒนธรรม-อาหาร-ภาษาถิ่นภาคเหนือ

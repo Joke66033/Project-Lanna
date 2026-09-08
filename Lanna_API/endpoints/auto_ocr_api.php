@@ -57,7 +57,7 @@ $base64Image = base64_encode($imageBytes);
 
 // 1. Primary: Gemini Vision AI (3.6 Flash / 3.8 Flash)
 $geminiKey = base64_decode('QVEuQWI4Uk42SVctZUVRdVdWMXdnZ0lZRFhWUUdWMHFneXFRd2MweHJoQ0llOFpwbElmaXc=');
-$geminiModels = ['gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.6-flash', 'gemini-3.7-flash'];
+$geminiModels = ['gemini-3.5-flash', 'gemini-flash-latest'];
 
 $prompt = <<<PROMPT
 คุณคือผู้เชี่ยวชาญระดับศาสตราจารย์ด้าน "อักขรวิธีอักษรธรรมล้านนา (ตั๋วเมือง / Tai Tham Script)" และวัฒนธรรม-อาหาร-ภาษาถิ่นภาคเหนือ
@@ -75,24 +75,23 @@ $prompt = <<<PROMPT
    - วรรณยุกต์: ไม้ขอช้าง (ไม้โท ᩶), ไม้เหยาะ (ไม้เอก ᩵), ไม้ซัด (᩺/᩹)
 
 คลังคำสำคัญและอาหารพื้นเมืองล้านนา (High-Frequency Lanna Reference):
+* สถานที่สำคัญและประวัติศาสตร์:
+  - "เวียงกุมกาม" (ᩅ᩠ᨿᨦᨠᩩᨾᨠᩣᨾ): วะ ᩅ + ย ห้อย ᩠ᨿ + งะ ᨦ (เวียง) + กะ ᨠ + สระอุ ᩩ + มะ ᨾ (กุม) + กะ ᨠ + สระอา ᩣ + มะ ᨾ (กาม)
+  - "เชียงใหม่" (ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵), "เชียงราย" (ᨩ᩠ᨿᨦᩁᩣ᩠ᨿ), "ลำปาง" (ᩃᩣᩴᨻᩣ᩠ᨦ), "ลำพูน" (ᩃᩣᩴᨻᩪ᩠ᨶ), "แพร่" (ᨻᩯᩕ᩵), "น่าน" (ᨶ᩵ᩣ᩠ᨶ), "พะเยา" (ᨻ᩠ᨿᩣᩅ), "แม่ฮ่องสอน" (ᨾᩯ᩵ᩁᩬ᩶ᨦᩈᩬᩁ)
+  - "ข่วงเมือง" (ᨡ᩠ᩅᩴᨦᩮᨾᩥ᩠ᨦ), "มหาวิทยาลัยเชียงใหม่" (ᨾᩉᩣᩅᩥᨴ᩠ᨿᩣᩃᩢ᩠ᨿᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵), "วัดพระสิงห์วรมหาวิหาร", "วัดป่าอ้อเมืองอินทร์"
 * อาหารล้านนา:
   - "ส้าดิบ" (ᩈ᩶ᩣᨯᩥ᩠ᨷ): พยางค์แรก สะ ᩈ + ไม้ขอช้าง ᩶ + สระอา ᩣ = "ส้า", พยางค์สอง ดะ ᨯ + สระอิ ᩥ + บ ห้อย ᩠ᨷ = "ดิบ" (ห้ามอ่านว่า สาธุ เด็ดขาด!)
   - "ส้าสุก" (ᩈ᩶ᩣᩈᩩ᩠ᨠ): ส้า + สะ ᩈ + สระอุ ᩩ + ก ห้อย ᩠ᨠ = "ส้าสุก"
   - "ลาบ" (ᩃᩣ᩠ᨷ): ละ ᩃ + สระอา ᩣ + บ ห้อย ᩠ᨷ
-  - "ลาบควาย" (ᩃᩣ᩠ᨷᨤ᩠ᩅᩣ᩠ᨿ): ลาบ + คะ ᨤ + ว ห้อย ᩠ᩅ + สระอา ᩣ + ย ห้อย ᩠ᨿ
-  - "ลาบหมู" (ᩃᩣ᩠ᨷᩉ᩠ᨾᩪ): ลาบ + หะ ᩉ + ม ห้อย ᩠ᨾ + สระอู ᩪ
-  - "ลำไย" (ᩃᩣᩴᩱᨿ): ละ ᩃ + นิคหิต สระอำ ᩣᩴ + ไม้ใค ᩱ + ยะ ᨿ
-* ชื่อเมืองและสถานที่สำคัญ:
-  - "เชียงใหม่" (ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵), "เชียงราย" (ᨩ᩠ᨿᨦᩁᩣ᩠ᨿ), "ลำปาง" (ᩃᩣᩴᨻᩣ᩠ᨦ), "ลำพูน" (ᩃᩣᩴᨻᩪ᩠ᨶ), "แพร่" (ᨻᩯᩕ᩵), "น่าน" (ᨶ᩵ᩣ᩠ᨶ), "พะเยา" (ᨻ᩠ᨿᩣᩅ), "แม่ฮ่องสอน" (ᨾᩯ᩵ᩁᩬ᩶ᨦᩈᩬᩁ)
-  - "มหาวิทยาลัยเชียงใหม่" (ᨾᩉᩣᩅᩥᨴ᩠ᨿᩣᩃᩢ᩠ᨿᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵), "วัดพระสิงห์วรมหาวิหาร", "วัดป่าอ้อเมืองอินทร์"
+  - "ลาบควาย" (ᩃᩣ᩠ᨷᨤ᩠ᩅᩣ᩠ᨿ), "ลาบหมู" (ᩃᩣ᩠ᨷᩉ᩠ᨾᩪ), "ลำไย" (ᩃᩣᩴᩱᨿ)
 * คำทั่วไป:
   - "กำเมือง" (ᨠᩣᩴᨾᩮᩬᩥᨦ), "ฉลาด" (ᨧᩕᩣ᩠ᨯ), "ชีวิตธรรมดา" (ᨩᩦᩅᩥ᩠ᨲᨵ᩠ᨾᨯᩣ), "วันนี้เป็นวันดีขอให้มีโชค", "สวัสดีปีใหม่", "อี้" (ᩋᩦ᩶), "กึ๊บโจ๊ะโล๊ะ"
 
 ตอบกลับเป็น JSON บริสุทธิ์ (Pure JSON) เท่านั้น:
 {
-  "detected_text": "คำแปลหรือชื่ออักษร (เช่น ส้าดิบ, ลาบ, เชียงใหม่)",
-  "lanna_text": "ตัวอักษรหรือข้อความล้านนา (เช่น ᩈ᩶ᩣᨯᩥ᩠ᨷ, ᩃᩣ᩠ᨷ)",
-  "reading": "[คำอ่านสำเนียงคำเมืองแท้ เช่น ส้า-ดิบ, ลาบ]",
+  "detected_text": "คำแปลหรือชื่ออักษร (เช่น ส้าดิบ, ลาบ, เชียงใหม่, เวียงกุมกาม)",
+  "lanna_text": "ตัวอักษรหรือข้อความล้านนา (เช่น ᩈ᩶ᩣᨯᩥ᩠ᨷ, ᩃᩣ᩠ᨷ, ᩅ᩠ᨿᨦᨠᩩᨾᨠᩣᨾ)",
+  "reading": "[คำอ่านสำเนียงคำเมืองแท้ เช่น ส้า-ดิบ, เวียง-กุม-กาม]",
   "meaning": "คำอธิบายความหมาย บริบท และที่มา",
   "direction": "ภาษาล้านนา → ภาษาไทย"
 }
@@ -113,7 +112,18 @@ foreach ($geminiModels as $model) {
                     ]
                 ]
             ]
-        ]
+        ],
+        'generationConfig' => [
+            'temperature' => 0.1,
+            'responseMimeType' => 'application/json',
+        ],
+        'safetySettings' => [
+            ['category' => 'HARM_CATEGORY_HARASSMENT', 'threshold' => 'BLOCK_NONE'],
+            ['category' => 'HARM_CATEGORY_HATE_SPEECH', 'threshold' => 'BLOCK_NONE'],
+            ['category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold' => 'BLOCK_NONE'],
+            ['category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold' => 'BLOCK_NONE'],
+            ['category' => 'HARM_CATEGORY_CIVIC_INTEGRITY', 'threshold' => 'BLOCK_NONE'],
+        ],
     ], JSON_UNESCAPED_UNICODE);
 
     $ch = curl_init($url);
@@ -122,7 +132,10 @@ foreach ($geminiModels as $model) {
         CURLOPT_POSTFIELDS => $postData,
         CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 25,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_TIMEOUT => 18,
     ]);
 
     $response = curl_exec($ch);

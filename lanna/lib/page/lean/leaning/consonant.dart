@@ -95,8 +95,26 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
       _errorMsg = null;
     });
     try {
-      // 1. ดึงบทความอธิบายพยัญชนะทั้งหมด (CL0001, CL0002, CL0003)
-      final apiArticles = await _articleService.getAllArticles(categoryCharId: 'CL0001,CL0002,CL0003');
+      // 1. ดึงหมวดหมู่ย่อยทั้งหมดที่สังกัด LC001
+      var subCategories = await _charService.getCategoriesByLearningCode('LC001');
+      if (subCategories.isEmpty) {
+        final allCats = await _charService.getAllCategories();
+        subCategories = allCats.where((c) => 
+          (c.learningCategoryCode != null && c.learningCategoryCode!.trim().toUpperCase() == 'LC001') ||
+          c.categoryCharId.toUpperCase() == 'CL0001' ||
+          c.categoryCharId.toUpperCase() == 'CL0002' ||
+          c.categoryCharId.toUpperCase() == 'CL0008' ||
+          c.categoryCharId.toUpperCase() == 'CL0009' ||
+          c.categoryCharId.toUpperCase() == 'CL0003'
+        ).toList();
+      }
+
+      final List<String> catIds = subCategories.map((c) => c.categoryCharId).toList();
+      const String fallbackConsonantCatIds = 'CL0001,CL0002,CL0008,CL0009,CL0003';
+      final String effectiveCatIds = catIds.isNotEmpty ? catIds.join(',') : fallbackConsonantCatIds;
+
+      // 2. ดึงบทความอธิบายพยัญชนะทั้งหมด
+      final apiArticles = await _articleService.getAllArticles(categoryCharId: effectiveCatIds);
       _articlesMap.clear();
       for (var art in apiArticles) {
         if (art.categoryCharId != null && art.content.trim().isNotEmpty) {
@@ -112,8 +130,20 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
       _articlesMap.putIfAbsent('CL0002', () => const ArticleModel(
         articleId: 'AR0002',
         title: 'พยัญชนะนอกวรรค คืออะไร?',
-        content: 'พยัญชนะนอกวรรค หรือที่เรียกว่า "เศษวรรค" คือกลุ่มพยัญชนะที่อยู่นอกระบบวรรค 5 วรรคตามหลักบาลีสันสกฤต มีทั้งสิ้น 8 ตัว ได้แก่ ย ร ล ว ส ห ฬ อ',
+        content: 'พยัญชนะนอกวรรค หรือที่เรียกว่า "เศษวรรค" คือกลุ่มพยัญชนะที่อยู่นอกระบบวรรค 5 วรรคตามหลักบาลีสันสกฤต ได้แก่ ย ร ล ว ส ห ฬ อ และพยัญชนะเสียงดั้งเดิมของล้านนา',
         categoryCharId: 'CL0002',
+      ));
+      _articlesMap.putIfAbsent('CL0008', () => const ArticleModel(
+        articleId: 'AR0008',
+        title: 'อักษร ห นำ คืออะไร?',
+        content: 'อักษร ห นำ ในภาษาล้านนาเป็นการนำตัว ห มาประกอบไว้ข้างหน้าหรือเหนือพยัญชนะตัวอื่น เช่น หง (หงะ), หน (หนะ), หม (หมะ), หย (หยะ), หล (หละ), หว (หวะ) เพื่อเปลี่ยนระดับเสียงวรรณยุกต์ให้เป็นเสียงสูง',
+        categoryCharId: 'CL0008',
+      ));
+      _articlesMap.putIfAbsent('CL0009', () => const ArticleModel(
+        articleId: 'AR0009',
+        title: 'พยัญชนะควบกล้ำ (ระวง) คืออะไร?',
+        content: 'พยัญชนะควบกล้ำในภาษาล้านนา หรือที่เรียกว่า "ระวง" (ร ควบ) ใช้เครื่องหมายห้อยใต้พยัญชนะต้น เช่น กร (กฺระ), ขร (ขฺระ), คร (คฺระ), ตร (ตฺระ), ทร (ทฺระ), บร (บฺระ), หร (หฺระ), พร (พฺระ), สร (สฺระ)',
+        categoryCharId: 'CL0009',
       ));
       _articlesMap.putIfAbsent('CL0003', () => const ArticleModel(
         articleId: 'AR0003',
@@ -122,8 +152,8 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
         categoryCharId: 'CL0003',
       ));
 
-      // 2. ดึงอักขระพยัญชนะทั้งหมดตามกลุ่ม
-      final apiConsonants = await _charService.getAllCharacters(categoryCharId: 'CL0001,CL0002,CL0003');
+      // 3. ดึงอักขระพยัญชนะทั้งหมดตามกลุ่ม
+      final apiConsonants = await _charService.getAllCharacters(categoryCharId: effectiveCatIds);
       final allCategories = await _charService.getAllCategories();
       final Map<String, String> catNames = {
         for (var c in allCategories) c.categoryCharId: c.name
@@ -151,11 +181,19 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
         dynamicGroups[catId]!.add(consonant);
       }
 
-      // Sort categories to maintain some order (CL0001, CL0002, CL0003)
-      final sortedKeys = dynamicGroups.keys.toList()..sort();
+      // Sort categories in canonical sequence: CL0001, CL0002, CL0008, CL0009, CL0003
+      const canonicalOrder = ['CL0001', 'CL0002', 'CL0008', 'CL0009', 'CL0003'];
+      final sortedKeys = dynamicGroups.keys.toList()
+        ..sort((a, b) {
+          int indexA = canonicalOrder.indexOf(a);
+          int indexB = canonicalOrder.indexOf(b);
+          if (indexA == -1) indexA = 999;
+          if (indexB == -1) indexB = 999;
+          return indexA.compareTo(indexB);
+        });
 
       setState(() {
-        _groups = sortedKeys.map((key) {
+        _groups = sortedKeys.where((k) => dynamicGroups[k]!.isNotEmpty).map((key) {
           return ConsonantGroup(
             name: catNames[key] ?? key,
             categoryCharId: key,
@@ -163,6 +201,8 @@ class _ConsonantPageState extends State<ConsonantPage> with SingleTickerProvider
           );
         }).toList();
 
+        _tabController?.removeListener(_handleTabChange);
+        _tabController?.dispose();
         _tabController = TabController(length: _groups.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
         

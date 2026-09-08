@@ -106,20 +106,14 @@ class _SpellingPageState extends State<SpellingPage>
         final allCats = await _charService.getAllCategories();
         subCategories = allCats.where((c) => 
           (c.learningCategoryCode != null && c.learningCategoryCode!.trim().toUpperCase() == 'LC005') ||
-          c.categoryCharId.toUpperCase() == 'CL0008' ||
-          c.categoryCharId.toUpperCase() == 'CL0009' ||
-          c.categoryCharId.toUpperCase() == 'CL0010' ||
-          c.categoryCharId.toUpperCase() == 'CL0011' ||
-          c.categoryCharId.toUpperCase() == 'CL0012' ||
-          c.categoryCharId.toUpperCase() == 'CL0013' ||
-          c.name.contains('สะกด') || c.name.contains('ห นำ') || c.name.contains('ระวง')
+          c.categoryCharId.toUpperCase() == 'CL0010'
         ).toList();
       }
       final List<String> catIds = subCategories.map((c) => c.categoryCharId).toList();
       final String catIdQuery = catIds.join(',');
 
       // 2. ดึงบทความอธิบายตามรหัสหมวดหมู่ย่อย
-      const String fallbackSpellingCatIds = 'CL0008,CL0009,CL0010,CL0011,CL0012,CL0013';
+      const String fallbackSpellingCatIds = 'CL0010';
       final String effectiveCatIds = catIdQuery.isNotEmpty ? catIdQuery : fallbackSpellingCatIds;
       final apiArticles = await _articleService.getAllArticles(
         categoryCharId: effectiveCatIds,
@@ -130,6 +124,14 @@ class _SpellingPageState extends State<SpellingPage>
           _articlesMap[art.categoryCharId!] = art;
         }
       }
+
+      // Default article if missing
+      _articlesMap.putIfAbsent('CL0010', () => const ArticleModel(
+        articleId: 'AR0010',
+        title: 'ตัวสะกดล้านนา (ตัวห้อย) คืออะไร?',
+        content: 'ตัวสะกดล้านนา (ตัวห้อย) คือ พยัญชนะที่ทำหน้าที่เป็นตัวสะกดท้ายพยางค์ โดยตามอักขรวิธีล้านนาจะนำพยัญชนะตัวสะกดมาเขียนซ้อนไว้ด้านล่างของพยัญชนะต้น (ทำเป็นตัวห้อย) เช่น แม่กง (ง สะกด), แม่กน (น สะกด), แม่กม (ม สะกด), แม่เกย (ย สะกด), แม่เกอว (ว สะกด), แม่กก (ก สะกด), แม่กด (ด สะกด), แม่กบ (บ สะกด) เป็นต้น',
+        categoryCharId: 'CL0010',
+      ));
 
       // 3. ดึงอักขระตัวสะกดทั้งหมดจาก API เฉพาะหมวดตัวสะกด
       final apiSpellings = await _charService.getAllCharacters(
@@ -183,7 +185,9 @@ class _SpellingPageState extends State<SpellingPage>
 
       setState(() {
         _groups = groups;
-        _tabController = TabController(length: _groups.length, vsync: this);
+        _tabController?.removeListener(_handleTabChange);
+        _tabController?.dispose();
+        _tabController = TabController(length: _groups.isNotEmpty ? _groups.length : 1, vsync: this);
         _tabController!.addListener(_handleTabChange);
 
         if (_groups.isNotEmpty) {
@@ -294,73 +298,89 @@ class _SpellingPageState extends State<SpellingPage>
                 child: _IntroCard(article: _articlesMap[_currentCategoryId]),
               ),
             ),
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _SliverTabBarDelegate(
-                TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  tabAlignment: TabAlignment.start,
-                  indicatorColor: const Color(0xFFE16905),
-                  indicatorWeight: 3.5,
-                  indicatorSize: TabBarIndicatorSize.label,
-                  labelColor: const Color(0xFFE16905),
-                  labelStyle: const TextStyle(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w400,
+            if (_groups.length > 1)
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _SliverTabBarDelegate(
+                  TabBar(
+                    controller: _tabController,
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    indicatorColor: const Color(0xFFE16905),
+                    indicatorWeight: 3.5,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    labelColor: const Color(0xFFE16905),
+                    labelStyle: const TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    unselectedLabelColor: const Color(0xFF7A5C3A),
+                    unselectedLabelStyle: const TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    tabs: _groups.map((g) => Tab(text: g.name)).toList(),
                   ),
-                  unselectedLabelColor: const Color(0xFF7A5C3A),
-                  unselectedLabelStyle: const TextStyle(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  tabs: _groups.map((g) => Tab(text: g.name)).toList(),
                 ),
               ),
-            ),
           ];
         },
-        body: TabBarView(
-          controller: _tabController,
-          children: _groups.map((group) {
-            return PaginatedLannaGrid<LannaSpelling>(
-              items: group.spellings,
-              pageSize: 16,
-              itemBuilder: (context, spelling, globalIndex) {
-                final initialIndex = allSpellingsForTrain.indexWhere(
-                  (s) => s.char == spelling.char,
-                );
-                return GestureDetector(
-                  onTap: () => pushLearningPage(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => CharDetailPage(
-                        char: spelling.char,
-                        reading: spelling.reading,
-                        thai: spelling.thai,
-                        description: spelling.description,
-                        isGuest: widget.isGuest,
-                        writingType: WritingType.consonant,
-                        allChars: allSpellingsForTrain
-                            .map((s) => {'char': s.char, 'label': s.reading})
-                            .toList(),
-                        initialWritingIndex: initialIndex >= 0
-                            ? initialIndex
-                            : 0,
-                        categoryName: group.name,
-                      ),
+        body: _groups.length > 1
+            ? TabBarView(
+                controller: _tabController,
+                children: _groups.map((group) {
+                  return _buildSpellingGrid(group.spellings, group.name, allSpellingsForTrain);
+                }).toList(),
+              )
+            : (_groups.isNotEmpty
+                ? _buildSpellingGrid(_groups.first.spellings, _groups.first.name, allSpellingsForTrain)
+                : const Center(
+                    child: Text(
+                      'ไม่มีข้อมูลตัวสะกด',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF7A5C3A)),
                     ),
-                  ),
-                  child: LannaGlyphCard(
-                    glyph: spelling.char,
-                    thaiEquivalent: spelling.thai,
-                  ),
-                );
-              },
-            );
-          }).toList(),
-        ),
+                  )),
       ),
+    );
+  }
+
+  Widget _buildSpellingGrid(
+    List<LannaSpelling> spellings,
+    String groupName,
+    List<LannaSpelling> allSpellingsForTrain,
+  ) {
+    return PaginatedLannaGrid<LannaSpelling>(
+      items: spellings,
+      pageSize: 16,
+      itemBuilder: (context, spelling, globalIndex) {
+        final initialIndex = allSpellingsForTrain.indexWhere(
+          (s) => s.char == spelling.char,
+        );
+        return GestureDetector(
+          onTap: () => pushLearningPage(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CharDetailPage(
+                char: spelling.char,
+                reading: spelling.reading,
+                thai: spelling.thai,
+                description: spelling.description,
+                isGuest: widget.isGuest,
+                writingType: WritingType.consonant,
+                allChars: allSpellingsForTrain
+                    .map((s) => {'char': s.char, 'label': s.reading})
+                    .toList(),
+                initialWritingIndex: initialIndex >= 0 ? initialIndex : 0,
+                categoryName: groupName,
+              ),
+            ),
+          ),
+          child: LannaGlyphCard(
+            glyph: spelling.char,
+            thaiEquivalent: spelling.thai,
+          ),
+        );
+      },
     );
   }
 

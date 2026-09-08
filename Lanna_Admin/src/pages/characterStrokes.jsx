@@ -262,13 +262,12 @@ export default function CharacterStrokesPage() {
       const strokeId = newStroke.stroke_id || result.data?.stroke_id;
       if (strokeId) {
         trackRecentActivity("character_strokes", strokeId);
-        setData((prev) => [newStroke, ...prev.filter((i) => (i.stroke_id || i.id) !== strokeId)]);
       }
       setShowAdd(false);
       setSuccessText("เพิ่มข้อมูลสำเร็จ");
       setShowSuccess(true);
       setCurrentPage(1);
-      fetchData(categoryFilter, search);
+      await fetchData(categoryFilter, search);
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
       setShowWarning(true);
@@ -312,13 +311,12 @@ export default function CharacterStrokesPage() {
       const strokeId = updatedStroke.stroke_id || targetId;
       if (strokeId) {
         trackRecentActivity("character_strokes", strokeId);
-        setData((prev) => [updatedStroke, ...prev.filter((i) => (i.stroke_id || i.id) !== strokeId)]);
       }
       setShowEdit(false);
       setSuccessText("แก้ไขข้อมูลสำเร็จ");
       setShowSuccess(true);
       setCurrentPage(1);
-      fetchData(categoryFilter, search);
+      await fetchData(categoryFilter, search);
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการอัปเดตข้อมูล");
       setShowWarning(true);

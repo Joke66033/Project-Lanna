@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $filters['category_lanna_char.learning_category_code'] = 'eq.' . $learning_category_code;
             }
             
-            $res = dbSelect('articles', $selectStr, $filters, 'article_id.desc');
+            $res = dbSelect('articles', $selectStr, $filters, 'article_id.asc');
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk($res['data']);
             break;

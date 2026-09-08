@@ -17,6 +17,7 @@ const Color kPrimaryOrange = Color(0xFF924E19);
 
 class _CameraOcrResult {
   final String text;
+  final String? lannaText;
   final String? reading;
   final String? meaning;
   final bool isLannaOutput;
@@ -24,6 +25,7 @@ class _CameraOcrResult {
 
   const _CameraOcrResult({
     required this.text,
+    this.lannaText,
     this.reading,
     this.meaning,
     required this.isLannaOutput,
@@ -281,12 +283,10 @@ class _CameraPageState extends State<CameraPage>
           isLannaOut = false;
         }
 
-        // ค้นหาในฐานข้อมูลคำศัพท์เพื่อดึงความหมายและคำอ่านที่แท้จริง
+        // ค้นหาในฐานข้อมูลคำศัพท์เพื่อดึงความหมายและคำอ่านที่แท้จริง (เฉพาะที่ตรงกันทั้งคำแบบ 100%)
         for (var v in _dbVocabs) {
-          if (v.lannaWord.trim() == raw ||
-              v.thaiWord.trim() == thaiOutput.trim() ||
-              raw.contains(v.lannaWord.trim()) ||
-              thaiOutput.contains(v.thaiWord.trim())) {
+          if ((v.lannaWord.trim().isNotEmpty && v.lannaWord.trim() == raw) ||
+              (v.thaiWord.trim().isNotEmpty && v.thaiWord.trim() == thaiOutput.trim())) {
             thaiOutput = v.thaiWord;
             readingOutput = v.reading;
             meaningOutput = v.meaning;
@@ -362,7 +362,7 @@ class _CameraPageState extends State<CameraPage>
         http.MultipartFile.fromBytes('file', imageBytes, filename: filename),
       );
       final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 6),
+        const Duration(seconds: 12),
       );
       final response = await http.Response.fromStream(streamedResponse);
       if (response.statusCode == 200) {
@@ -373,6 +373,7 @@ class _CameraPageState extends State<CameraPage>
           if (translated.isNotEmpty) {
             return _CameraOcrResult(
               text: translated,
+              lannaText: resData['lanna_text']?.toString(),
               reading: resData['reading']?.toString(),
               meaning: resData['meaning']?.toString() ?? 'แปลจากอักษรล้านนาด้วย AI',
               isLannaOutput: false,
@@ -389,47 +390,139 @@ class _CameraPageState extends State<CameraPage>
     throw Exception('ไม่สามารถอ่านอักษรจากภาพได้ กรุณาจัดตำแหน่งกล้องให้ชัดเจนและลองใหม่อีกครั้ง');
   }
 
-  /// อ่านและแปลอักษรล้านนาจากภาพถ่ายด้วย Google Gemini Vision AI
+  // ─────────────────────────────────────────────────────────────────────────────
+  // STAGE 2: Database & Master Dictionary Matcher (วิธีที่ 3 Two-Stage Pipeline)
+  // ─────────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────────
+  // STAGE 2: Dynamic Database & Grammatical Matcher (ดึงจากฐานข้อมูลจริง 6,000+ คำ)
+  // ─────────────────────────────────────────────────────────────────────────────
+  _CameraOcrResult _matchStage2({
+    required String detectedText,
+    String? lannaText,
+    String? reading,
+    String? meaning,
+    String directionLabel = 'ภาษาล้านนา → ภาษาไทย',
+  }) {
+    final cleanLanna = (lannaText ?? '').replaceAll(RegExp(r'\s+'), '').trim();
+    final cleanDetected = detectedText.replaceAll(RegExp(r'\s+'), '').trim();
+
+    // 1. ตรวจสอบกับฐานข้อมูลคำศัพท์จริงในระบบ (_dbVocabs)
+    for (final v in _dbVocabs) {
+      final vLanna = v.lannaWord.replaceAll(RegExp(r'\s+'), '').trim();
+      final vThai = v.thaiWord.replaceAll(RegExp(r'\s+'), '').trim();
+
+      if (cleanLanna.isNotEmpty && vLanna.isNotEmpty && vLanna == cleanLanna) {
+        return _CameraOcrResult(
+          text: v.thaiWord,
+          lannaText: lannaText,
+          reading: v.reading.isNotEmpty ? v.reading : reading,
+          meaning: v.meaning.isNotEmpty ? v.meaning : (meaning ?? 'พจนานุกรมภาษาล้านนา'),
+          isLannaOutput: false,
+          directionLabel: 'ภาษาล้านนา → ภาษาไทย (พจนานุกรม)',
+        );
+      } else if (cleanDetected.isNotEmpty && vThai.isNotEmpty && vThai == cleanDetected) {
+        return _CameraOcrResult(
+          text: v.thaiWord,
+          lannaText: lannaText,
+          reading: v.reading.isNotEmpty ? v.reading : reading,
+          meaning: v.meaning.isNotEmpty ? v.meaning : (meaning ?? 'พจนานุกรมภาษาล้านนา'),
+          isLannaOutput: false,
+          directionLabel: 'ภาษาล้านนา → ภาษาไทย (พจนานุกรม)',
+        );
+      }
+    }
+
+    // 2. ถอดเสียงตรงตัวด้วย LannaTransliterator (Dynamic Transliteration)
+    final transliteratedFromLanna = cleanLanna.isNotEmpty ? _conv.lannaToThai(cleanLanna) : '';
+    if (transliteratedFromLanna.isNotEmpty) {
+      for (final v in _dbVocabs) {
+        final vThai = v.thaiWord.replaceAll(RegExp(r'\s+'), '').trim();
+        if (vThai.isNotEmpty && vThai == transliteratedFromLanna) {
+          return _CameraOcrResult(
+            text: v.thaiWord,
+            lannaText: lannaText,
+            reading: v.reading.isNotEmpty ? v.reading : reading,
+            meaning: v.meaning.isNotEmpty ? v.meaning : (meaning ?? 'พจนานุกรมภาษาล้านนา'),
+            isLannaOutput: false,
+            directionLabel: 'ภาษาล้านนา → ภาษาไทย (ถอดเสียงตรงตัว)',
+          );
+        }
+      }
+    }
+
+    // 3. สำหรับข้อความยาว / ประโยค / คำใหม่นอกพจนานุกรม: ใช้ผลลัพธ์จากการวิเคราะห์ของ AI
+    if (detectedText.trim().isNotEmpty) {
+      return _CameraOcrResult(
+        text: detectedText.trim(),
+        lannaText: lannaText,
+        reading: reading ?? (cleanLanna.isNotEmpty ? _conv.lannaToThai(cleanLanna) : null),
+        meaning: meaning ?? 'แปลความหมายตามหลักภาษาศาสตร์ล้านนา',
+        isLannaOutput: false,
+        directionLabel: 'ภาษาล้านนา → ภาษาไทย (AI Vision)',
+      );
+    }
+
+    // 4. Fallback: ถอดอักขรวิธีด้วย LannaTransliterator ในเครื่อง
+    String finalThai = detectedText;
+    if (finalThai.isEmpty && transliteratedFromLanna.isNotEmpty) {
+      finalThai = transliteratedFromLanna;
+    }
+
+    return _CameraOcrResult(
+      text: finalThai.isNotEmpty ? finalThai : 'ไม่สามารถระบุคำแปลได้',
+      lannaText: lannaText,
+      reading: reading,
+      meaning: meaning ?? 'ถอดความหมายตามหลักอักขรวิธีล้านนา',
+      isLannaOutput: false,
+      directionLabel: directionLabel,
+    );
+  }
+
+  /// อ่านและแปลอักษรล้านนาจากภาพถ่ายด้วย Stage 1 (Vision AI) + Stage 2 (Database Matcher)
   Future<_CameraOcrResult?> _requestGeminiVisionOcr(Uint8List imageBytes) async {
     final apiKey = await ApiConfig.getActiveGeminiApiKey();
     final base64Img = base64Encode(imageBytes);
     const models = [
-      'gemini-3.5-flash',
       'gemini-3.5-flash-lite',
       'gemini-flash-lite-latest',
+      'gemini-3.6-flash',
+      'gemini-3.5-flash',
+      'gemini-3.7-flash',
       'gemini-flash-latest',
     ];
 
     const prompt = '''
-คุณคือผู้เชี่ยวชาญระดับศาสตราจารย์ด้านอักษรธรรมล้านนา (ตั๋วเมือง), ภาษาไทยวน/คำเมือง, และศิลาจารึก-ป้ายอักษรล้านนาภาคเหนือ
+คุณคือผู้เชี่ยวชาญด้าน "ภาษาศาสตร์และอักขรวิธีอักษรธรรมล้านนา (ตั๋วเมือง / Tai Tham Script)"
+หน้าที่ของคุณคืออ่านอักขระล้านนาหรือภาษาไทยจากรูปภาพอย่างละเอียดทีละตัวอักษร และแปลความหมายออกมาให้ถูกต้องตรงตัว 100%:
 
-หน้าที่ของคุณ:
-1. ตรวจสอบภาพถ่ายเพื่อค้นหา "ตัวอักษรล้านนา (ตั๋วเมือง / Tai Tham Script)" หรือป้ายข้อความภาษาเหนือ
-2. ถอดรหัสอักษรล้านนาในภาพแล้ว "แปลออกมาเป็นภาษาไทยกลางที่ถูกต้อง 100%"
-3. ระบุคำอ่านออกเสียงสำเนียงภาษาเหนือแท้ ใส่ในเครื่องหมายวงเล็บเหลี่ยม [คำอ่าน]
-4. อธิบายความหมายและบริบทของคำหรือป้ายนั้น 1 ประโยค
+หลักการวิเคราะห์เชิงอักขรวิธี (Tai Tham Orthography Analysis):
+1. ตรวจสอบพยัญชนะต้น (Consonants): กะ ขะ คะ งะ จะ ฉะ ชะ ญะ ตะ ถะ ทะ นะ ปะ ผะ พะ มะ ยะ ระ ละ วะ สะ หะ อะ
+2. ตรวจสอบรูปสระ (Vowel Diacritics):
+   - สระเดี่ยว: สระอะ (ไม้กั๋ง ᩢ), สระอา (ᩣ/ᩤ), สระอิ (ᩥ), สระอี (ᩦ), สระอุ (ᩩ), สระอู (ᩪ), สระเอ (ᩮ), สระโอ (ᩰ), สระออ (ᩬ)
+   - สระประสม: สระเอีย (ไม้เกี๋ยง ᩠ᨿ), สระเอือ (สระเอ + ไม้กั่งล่าง + สระอิ ᩮ_ᩬᩥ_), สระอัว (ว ห้อย ᩠ᩅ / ไม้กั่งลาย ᩫ)
+   - สระอำ (นิคหิต ᩴ + สระอา ᩤ)
+3. ตรวจสอบตัวสะกด / ตัวห้อย (Subjoined Sakot ᩠):
+   - ตัวสะกดจะอยู่ใต้พยัญชนะต้นเสมอ เช่น ง ห้อย (᩠ᨦ), น ห้อย (᩠ᨶ), ด ห้อย (᩠ᨯ), ม ห้อย (᩠ᨾ)
+4. ตรวจสอบวรรณยุกต์และเครื่องหมาย: ไม้ขอช้าง (วรรณยุกต์โท/ตรี ᩶), ไม้ซัด (᩺/᩹)
+5. ถอดรหัสเป็นข้อความภาษาไทยมาตรฐาน คำอ่านสำเนียงคำเมือง และความหมาย
 
-ตัวอย่างการถอดรหัสอักษรล้านนา -> ภาษาไทย:
-* ᩈ᩠ᩅᩢᩔᨯᩦ -> แปลว่า: "สวัสดี" (คำอ่าน: [สะ-หวัด-ดี], ความหมาย: "คำกล่าวทักทายหรือแสดงความเคารพอย่างสุภาพ")
-* ᨿᩥ᩠ᨶᨯᩦᨲᩬ᩶ᩁᩁᩢ᩠ᨷ -> แปลว่า: "ยินดีต้อนรับ" (คำอ่าน: [ยิน-ดี-ต้อน-ฮับ], ความหมาย: "คำกล่าวแสดงความยินดีในการมาเยือน")
-* ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵ -> แปลว่า: "เชียงใหม่" (คำอ่าน: [เจียง-ใหม่], ความหมาย: "จังหวัดเชียงใหม่ เมืองหลวงแห่งอาณาจักรล้านนา")
-* ᨩ᩠ᨿᨦᩁᩣᨿ -> แปลว่า: "เชียงราย" (คำอ่าน: [เจียง-ฮาย], ความหมาย: "จังหวัดเชียงราย เมืองเหนือสุดแดนสยาม")
-* ᩅᩢ᩠ᨯᨻᩕᩈᩥ᩠ᨦᩉ᩼ -> แปลว่า: "วัดพระสิงห์" (คำอ่าน: [วัด-พระ-สิง], ความหมาย: "พระอารามหลวงสำคัญคู่บ้านคู่เมืองเชียงใหม่")
-* ᩅᩢ᩠ᨯᨾᩉᩣᩅᩢ᩠ᨶ -> แปลว่า: "วัดมหาวัน" (คำอ่าน: [วัด-มะ-หา-วัน], ความหมาย: "วัดโบราณสำคัญแห่งนครหริภุญชัยลำพูน")
-* ᨯᩬ᩠ᨿᩈᩩᩮᨴᨻ -> แปลว่า: "ดอยสุเทพ" (คำอ่าน: [ดอย-สุ-เตพ], ความหมาย: "ยอดดอยศักดิ์สิทธิ์และสถานที่ประดิษฐานพระธาตุดอยสุเทพ")
-* ᩃᩣ᩠ᨷᩉ᩠ᨾᩪ -> แปลว่า: "ลาบหมู" (คำอ่าน: [ลาบ-หมู], ความหมาย: "อาหารพื้นเมืองเหนือประเภทยำเนื้อหมูปรุงด้วยพริกลาบ")
-* ᨡ᩶ᩣᩅᨪᩬ᩠ᨿ -> แปลว่า: "ข้าวซอย" (คำอ่าน: [ข้าว-ซอย], ความหมาย: "อาหารเส้นกะทิยอดนิยมเอกลักษณ์ของภาคเหนือ")
-* ᨠᩥ᩠᩵ᨶᨡ᩶ᩣᩅ -> แปลว่า: "กินข้าว" (คำอ่าน: [กิ๋น-ข้าว], ความหมาย: "การรับประทานอาหารประจำมื้อ")
-* ᨩᩦᩅᩥ᩠ᨲᨵᨾ᩠ᨾᨯᩣ / ᨩᩦᩅᩥ᩠ᨲ ᨵᨾ᩠ᨾᨯᩣ -> แปลว่า: "ชีวิตธรรมดา" (คำอ่าน: [ชี-วิด-ทำ-มะ-ดา], ความหมาย: "การดำเนินชีวิตอย่างเรียบง่าย")
-* ᨠᩣ᩠ᨯ -> แปลว่า: "ตลาด" (คำอ่าน: [กาด], ความหมาย: "ตลาดหรือแหล่งซื้อขายสินค้าพื้นเมือง")
-
-ตอบกลับเป็น JSON บริสุทธิ์เท่านั้น (Pure JSON) รูปแบบ:
+ส่งคืนผลลัพธ์เป็น JSON บริสุทธิ์ (Pure JSON เท่านั้น ห้ามใส่ markdown นอกเหนือจาก JSON):
 {
-  "detected_text": "คำแปลภาษาไทยที่ถูกต้อง (เช่น สวัสดี หรือ เชียงใหม่ หรือ ชีวิตธรรมดา)",
-  "reading": "[คำอ่านสำเนียง เช่น สะ-หวัด-ดี]",
-  "meaning": "คำอธิบายความหมายและบริบทสั้นๆ 1 ประโยค"
+  "detected_text": "ข้อความหรือคำแปลภาษาไทยมาตรฐานที่ถูกต้องตรงตัวที่สุด",
+  "lanna_text": "อักขระล้านนา Tai Tham Unicode ที่สมบูรณ์",
+  "reading": "[คำอ่านสำเนียงล้านนา]",
+  "meaning": "คำอธิบายความหมายตามหลักภาษาศาสตร์",
+  "direction": "ภาษาล้านนา → ภาษาไทย"
 }
 ''';
+
+    final mimeType = (imageBytes.length > 4 &&
+            imageBytes[0] == 0x89 &&
+            imageBytes[1] == 0x50 &&
+            imageBytes[2] == 0x4E &&
+            imageBytes[3] == 0x47)
+        ? 'image/png'
+        : 'image/jpeg';
 
     for (final model in models) {
       try {
@@ -446,7 +539,7 @@ class _CameraPageState extends State<CameraPage>
                   {'text': prompt},
                   {
                     'inline_data': {
-                      'mime_type': 'image/jpeg',
+                      'mime_type': mimeType,
                       'data': base64Img,
                     }
                   }
@@ -454,48 +547,35 @@ class _CameraPageState extends State<CameraPage>
               }
             ]
           }),
-        ).timeout(const Duration(seconds: 25));
+        ).timeout(const Duration(seconds: 12));
 
         if (res.statusCode == 200) {
           final data = jsonDecode(res.body);
           final raw = data['candidates'][0]['content']['parts'][0]['text'] as String;
-          final cleanJson = raw.replaceAll('```json', '').replaceAll('```', '').trim();
+          String cleanJson = raw.replaceAll('```json', '').replaceAll('```', '').trim();
+          final jsonMatch = RegExp(r'\{[\s\S]*\}').firstMatch(cleanJson);
+          if (jsonMatch != null) {
+            cleanJson = jsonMatch.group(0)!;
+          }
           final jsonMap = jsonDecode(cleanJson) as Map<String, dynamic>;
 
-          String detectedText = jsonMap['detected_text']?.toString().trim() ??
+          final detectedText = jsonMap['detected_text']?.toString().trim() ??
               jsonMap['translated_text']?.toString().trim() ??
               '';
-          String? reading = jsonMap['reading']?.toString().trim();
-          String? meaning = jsonMap['meaning']?.toString().trim();
+          final lannaText = jsonMap['lanna_text']?.toString().trim() ??
+              jsonMap['lanna_char']?.toString().trim();
+          final reading = jsonMap['reading']?.toString().trim();
+          final meaning = jsonMap['meaning']?.toString().trim();
 
-          // ตรวจสอบเทียบกับฐานข้อมูลคำศัพท์ใน MySQL เพื่อเพิ่มความแม่นยำ 100%
-          for (var v in _dbVocabs) {
-            if (v.thaiWord.trim() == detectedText.trim() ||
-                v.lannaWord.trim() == detectedText.trim() ||
-                (reading != null && reading.contains(v.reading.replaceAll(RegExp(r'[\[\]]'), '')))) {
-              detectedText = v.thaiWord;
-              reading = v.reading;
-              meaning = v.meaning;
-              break;
-            }
-          }
-
-          if (detectedText.isNotEmpty) {
-            return _CameraOcrResult(
-              text: detectedText,
-              reading: reading,
-              meaning: meaning ?? 'แปลจากอักษรล้านนาด้วย AI Vision',
-              isLannaOutput: false,
-              directionLabel: 'ภาษาล้านนา → ภาษาไทย (AI Vision)',
-            );
-          }
+          // STAGE 2: ส่งผ่าน Database & Master Lexicon Matcher ทันที
+          return _matchStage2(
+            detectedText: detectedText,
+            lannaText: lannaText,
+            reading: reading,
+            meaning: meaning,
+          );
         } else if (res.statusCode == 403 || (res.statusCode == 400 && res.body.contains('API_KEY'))) {
           debugPrint('Gemini API Key Error (HTTP ${res.statusCode}): ${res.body}');
-          if (mounted) {
-            _showApiKeyDialog(
-              errorMessage: 'Google Gemini API Key ถูกระงับหรือยังไม่ถูกต้อง (403 Forbidden)\nกรุณากรอก API Key ใหม่ (ฟรี) จาก Google AI Studio เพื่อใช้งาน',
-            );
-          }
           return null;
         }
       } catch (e) {
@@ -505,193 +585,6 @@ class _CameraPageState extends State<CameraPage>
     return null;
   }
 
-  Future<_CameraOcrResult> _requestLegacyAutoOcr(
-    Uint8List imageBytes,
-    String filename,
-  ) async {
-    // Prefer Lanna -> Thai only when the experimental classifier is confident.
-    // A low-confidence Lanna result must never override readable Thai OCR.
-    try {
-      final lannaResult = await _requestLannaOcr(imageBytes, filename);
-      if (lannaResult != null) return lannaResult;
-    } catch (error) {
-      debugPrint('Experimental Lanna OCR unavailable: $error');
-    }
-
-    final thaiText = await _requestTyphoonOcr(imageBytes, filename);
-    final lannaText = _conv.thaiToLanna(thaiText);
-    if (lannaText.trim().isEmpty) {
-      throw Exception('ไม่พบข้อความภาษาไทยในภาพ');
-    }
-    return _CameraOcrResult(
-      text: lannaText,
-      isLannaOutput: true,
-      directionLabel: 'ภาษาไทย → ภาษาล้านนา',
-    );
-  }
-
-  Future<_CameraOcrResult?> _requestLannaOcr(
-    Uint8List imageBytes,
-    String filename,
-  ) async {
-    final request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ApiConfig.lannaOcr),
-    );
-    request.files.add(
-      http.MultipartFile.fromBytes('file', imageBytes, filename: filename),
-    );
-    final streamedResponse = await request.send().timeout(
-      const Duration(seconds: 120),
-    );
-    final response = await http.Response.fromStream(streamedResponse);
-    if (response.statusCode < 200 || response.statusCode >= 300) return null;
-
-    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-    final data = decoded['data'] as Map<String, dynamic>?;
-    final isLowConfidence = data?['is_low_confidence'] as bool? ?? true;
-    final confidence = (data?['confidence'] as num?)?.toDouble() ?? 0;
-    final text = (data?['text'] as String? ?? '').trim();
-    if (isLowConfidence || confidence < 0.65 || text.isEmpty) return null;
-
-    return _CameraOcrResult(
-      text: text,
-      isLannaOutput: false,
-      directionLabel: 'ภาษาล้านนา → ภาษาไทย (ทดลอง)',
-    );
-  }
-
-  Future<String> _requestTyphoonOcr(
-    Uint8List imageBytes,
-    String filename,
-  ) async {
-    final request = http.MultipartRequest(
-      'POST',
-      Uri.parse(ApiConfig.typhoonOcr),
-    );
-    request.files.add(
-      http.MultipartFile.fromBytes('file', imageBytes, filename: filename),
-    );
-
-    final streamedResponse = await request.send().timeout(
-      const Duration(seconds: 120),
-    );
-    final response = await http.Response.fromStream(streamedResponse);
-    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      final error = decoded['error'] as Map<String, dynamic>?;
-      throw Exception(error?['message'] ?? 'ไม่สามารถอ่านภาพได้');
-    }
-
-    final data = decoded['data'] as Map<String, dynamic>?;
-    final text = (data?['text'] as String? ?? '').trim();
-    if (text.isEmpty) {
-      throw Exception('ไม่พบอักษรในภาพ');
-    }
-    return text;
-  }
-
-  void _showApiKeyDialog({String? errorMessage}) async {
-    final currentKey = await ApiConfig.getActiveGeminiApiKey();
-    final controller = TextEditingController(
-      text: currentKey == ApiConfig.geminiApiKey ? '' : currentKey,
-    );
-    if (!mounted) return;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: const [
-            Icon(Icons.vpn_key, color: kPrimaryOrange),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'ตั้งค่า Gemini API Key',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (errorMessage != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red.shade200),
-                  ),
-                  child: Text(
-                    errorMessage,
-                    style: TextStyle(color: Colors.red.shade800, fontSize: 13),
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-              const Text(
-                'ระบบกล้องใช้ Google Gemini Vision AI ในการอ่านและแปลอักษรล้านนาจากภาพถ่าย\n\nสามารถรับ API Key ฟรีได้ที่:\nhttps://aistudio.google.com/app/apikey',
-                style: TextStyle(fontSize: 13, color: Colors.black87),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                  labelText: 'Gemini API Key (AIza...)',
-                  hintText: 'วาง API Key ที่นี่',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  prefixIcon: const Icon(Icons.key, color: kPrimaryOrange),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('ยกเลิก', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimaryOrange,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: () async {
-              final newKey = controller.text.trim();
-              if (newKey.isNotEmpty) {
-                await ApiConfig.saveCustomGeminiApiKey(newKey);
-                if (ctx.mounted) Navigator.pop(ctx);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('บันทึก Gemini API Key เรียบร้อยแล้ว'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                  // ถ้ามีรูปที่ค้างอยู่ ให้ลองส่งไปประมวลผลใหม่ทันที
-                  if (_webImage != null) {
-                    _processImageWeb(_webImage!, 'camera_retry.jpg');
-                  }
-                }
-              }
-            },
-            child: const Text('บันทึกและใช้งาน', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _clearImage() {
     setState(() {
       _image = null;
@@ -699,6 +592,7 @@ class _CameraPageState extends State<CameraPage>
       _resultText = '';
       _resultReading = null;
       _resultMeaning = null;
+      _resultIsLanna = false;
     });
   }
 
@@ -730,16 +624,6 @@ class _CameraPageState extends State<CameraPage>
                     child: _iconBtn(
                       _flashOn ? Icons.flash_on : Icons.flash_off_outlined,
                       onTap: () => setState(() => _flashOn = !_flashOn),
-                    ),
-                  ),
-
-                  // Floating Settings / Key Button (Top Right)
-                  Positioned(
-                    top: 16,
-                    right: hasImage ? 64 : 16,
-                    child: _iconBtn(
-                      Icons.vpn_key_outlined,
-                      onTap: () => _showApiKeyDialog(),
                     ),
                   ),
 
@@ -933,15 +817,16 @@ class _CameraPageState extends State<CameraPage>
   // ─── Result card ───
   Widget _buildResultCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xE61E1E1E),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kPrimaryOrange.withValues(alpha: 0.6)),
+        color: const Color(0xF2151515),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFFFB300), width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
-            blurRadius: 16,
+            color: Colors.black.withValues(alpha: 0.6),
+            blurRadius: 14,
             offset: const Offset(0, 4),
           ),
         ],
@@ -950,26 +835,37 @@ class _CameraPageState extends State<CameraPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Top bar: Direction & Close
           Row(
             children: [
-              const Icon(Icons.auto_awesome, color: kPrimaryOrange, size: 18),
+              const Icon(Icons.auto_awesome, color: Color(0xFFFFB300), size: 16),
               const SizedBox(width: 6),
-              Text(
-                _resultDirection,
-                style: const TextStyle(
-                  color: kPrimaryOrange,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  _resultDirection,
+                  style: const TextStyle(
+                    color: Color(0xFFFFB300),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              const Spacer(),
               GestureDetector(
                 onTap: _clearImage,
-                child: const Icon(Icons.close, color: Colors.white54, size: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 16),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
+
+          // Main text display (Thai translated text)
           Text(
             _resultText,
             style: TextStyle(
@@ -977,21 +873,23 @@ class _CameraPageState extends State<CameraPage>
               fontSize: 20,
               fontWeight: FontWeight.bold,
               fontFamily: _resultIsLanna ? 'LNTilok' : null,
-              height: 1.4,
+              height: 1.2,
             ),
           ),
+
+          // Reading
           if (_resultReading != null && _resultReading!.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 5),
             Row(
               children: [
-                const Icon(Icons.record_voice_over, color: Color(0xFFFFB74D), size: 16),
-                const SizedBox(width: 6),
+                const Icon(Icons.record_voice_over, color: Color(0xFFFFD54F), size: 14),
+                const SizedBox(width: 5),
                 Expanded(
                   child: Text(
                     'คำอ่าน: $_resultReading',
                     style: const TextStyle(
-                      color: Color(0xFFFFB74D),
-                      fontSize: 14,
+                      color: Color(0xFFFFD54F),
+                      fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -999,23 +897,28 @@ class _CameraPageState extends State<CameraPage>
               ],
             ),
           ],
+
+          // Meaning
           if (_resultMeaning != null && _resultMeaning!.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
                   padding: EdgeInsets.only(top: 2),
-                  child: Icon(Icons.menu_book_rounded, color: Colors.white60, size: 15),
+                  child: Icon(Icons.info_outline, color: Colors.white70, size: 13),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 5),
                 Expanded(
                   child: Text(
                     _resultMeaning!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                      height: 1.4,
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.normal,
+                      height: 1.3,
                     ),
                   ),
                 ),

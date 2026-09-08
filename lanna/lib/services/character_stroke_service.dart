@@ -34,9 +34,9 @@ class CharacterStrokeService {
   }
 
   /// Get stroke data by specific character symbol (e.g. 'ᨠ', 'ᨡ')
-  Future<CharacterStrokeModel?> getStrokeByChar(String charSymbol) async {
+  Future<CharacterStrokeModel?> getStrokeByChar(String charSymbol, {bool forceRefresh = false}) async {
     final cleanChar = charSymbol.trim().replaceAll(RegExp(r'[\u200B-\u200F\uFEFF]'), '');
-    if (_cache.containsKey(cleanChar)) {
+    if (!forceRefresh && _cache.containsKey(cleanChar)) {
       return _cache[cleanChar];
     }
     try {
@@ -50,7 +50,7 @@ class CharacterStrokeService {
     } catch (e) {
       debugPrint('CharacterStrokeService: getByChar unavailable, fallback to local: $e');
     }
-    return null;
+    return _cache[cleanChar];
   }
 
   /// Create new character stroke data
@@ -75,15 +75,13 @@ class CharacterStrokeService {
   }
 }
 
-/// Global helper function to get stroke paths for drawing from local stroke_data or database cache fallback
+/// Global helper function to get stroke paths for drawing from database cache first, with local stroke_data as fallback
 List<List<Offset>> getStrokeData(String charSymbol) {
-  final local = sd.getStrokeData(charSymbol);
-  if (local.isNotEmpty && local.first.isNotEmpty) {
-    return local;
-  }
-  final cached = CharacterStrokeService.getCachedStroke(charSymbol);
-  if (cached != null && cached.strokePaths.isNotEmpty) {
+  final cleanChar = charSymbol.trim().replaceAll(RegExp(r'[\u200B-\u200F\uFEFF]'), '');
+  final cached = CharacterStrokeService.getCachedStroke(cleanChar);
+  if (cached != null && cached.strokePaths.isNotEmpty && cached.strokePaths.first.isNotEmpty) {
     return cached.strokePaths;
   }
+  final local = sd.getStrokeData(cleanChar);
   return local;
 }

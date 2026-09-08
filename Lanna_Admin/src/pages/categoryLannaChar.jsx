@@ -209,9 +209,8 @@ export default function CategoryLannaChar() {
       if (catId) {
         trackRecentActivity("category_lanna_char", catId);
       }
-      setData((prev) => [newObj, ...prev.filter((i) => (i.category_char_id || i.id) !== catId)]);
       setCurrentPage(1);
-      fetchData(1);
+      await fetchData(1, search, selectedLearningCategory);
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่");
       setShowWarning(true);

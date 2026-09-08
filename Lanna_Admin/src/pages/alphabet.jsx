@@ -292,9 +292,8 @@ export default function AlphabetPage() {
       if (charId) {
         trackRecentActivity("lanna_char", charId);
       }
-      setData((prev) => [newChar, ...prev.filter((i) => (i.char_id || i.id) !== charId)]);
       setCurrentPage(1);
-      fetchData(1);
+      await fetchData(1, selectedCategory, search);
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มอักขระ");
       setShowWarning(true);
@@ -345,13 +344,12 @@ export default function AlphabetPage() {
       setSuccessText("แก้ไขข้อมูลสำเร็จ");
       setShowSuccess(true);
 
-      // Update state locally (prepend)
+      // Track recent activity and reload page 1
       const updatedObj = updatedChar || { char_id: targetId, id: targetId, lanna_char: form.ln, thai_equivalent: form.th, category_char_id: form.category_char_id };
       const editCharId = updatedObj?.char_id || targetId;
       trackRecentActivity("lanna_char", editCharId);
-      setData((prev) => [updatedObj, ...prev.filter((i) => (i.char_id || i.id) !== editCharId)]);
       setCurrentPage(1);
-      fetchData(1);
+      await fetchData(1, selectedCategory, search);
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขอักขระ");
       setShowWarning(true);

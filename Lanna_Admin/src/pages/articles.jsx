@@ -406,12 +406,11 @@ export default function Articles() {
       if (articleId) {
         trackRecentActivity("articles", articleId);
       }
-      setData((prev) => [newArticle, ...prev.filter((i) => (i.article_id || i.id) !== articleId)]);
       setSearch("");
       setSelectedLearningCategory("all");
       setSelectedCharCategory("all");
       setCurrentPage(1);
-      fetchData(1, "", "all", "all");
+      await fetchData(1, "", "all", "all");
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มเนื้อหา");
       setShowWarning(true);
@@ -465,16 +464,15 @@ export default function Articles() {
       setSuccessText("แก้ไขข้อมูลสำเร็จ");
       setShowSuccess(true);
 
-      // Update state locally (prepend updated item)
+      // Track recent activity and reload page 1
       const updatedArticle = updatedItem || { ...form, article_id: targetId, id: targetId };
       const editId = updatedArticle?.article_id || targetId;
       trackRecentActivity("articles", editId);
-      setData((prev) => [updatedArticle, ...prev.filter((i) => (i.article_id || i.id) !== editId)]);
       setSearch("");
       setSelectedLearningCategory("all");
       setSelectedCharCategory("all");
       setCurrentPage(1);
-      fetchData(1, "", "all", "all");
+      await fetchData(1, "", "all", "all");
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขเนื้อหา");
       setShowWarning(true);

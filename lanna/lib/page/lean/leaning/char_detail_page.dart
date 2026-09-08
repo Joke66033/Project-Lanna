@@ -103,7 +103,7 @@ class _CharDetailPageState extends State<CharDetailPage>
   }
 
   Future<void> _fetchStrokesFromDatabase() async {
-    final strokeModel = await _strokeService.getStrokeByChar(widget.char);
+    final strokeModel = await _strokeService.getStrokeByChar(widget.char, forceRefresh: true);
     if (!mounted || strokeModel == null) return;
     setState(() {
       _loadStrokesFromCache();

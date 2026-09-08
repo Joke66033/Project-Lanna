@@ -183,7 +183,7 @@ export default function CategoryLearning() {
       setSearch("");
       setSelectedStatus("all");
       setCurrentPage(1);
-      fetchData(1, "", "all");
+      await fetchData(1, "", "all");
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่");
       setShowWarning(true);
@@ -234,14 +234,14 @@ export default function CategoryLearning() {
       setSuccessText("แก้ไขหมวดหมู่สำเร็จ");
       setShowSuccess(true);
 
+      // Track recent activity and reload page 1
       const updatedObj = updatedItem || { ...originalForm, ...submitData, category_code: targetCode, id: targetCode };
       const editCode = updatedObj?.category_code || targetCode;
       trackRecentActivity("learning_category", editCode);
-      setData((prev) => [updatedObj, ...prev.filter((i) => (i.category_code || i.id) !== editCode)]);
       setSearch("");
       setSelectedStatus("all");
       setCurrentPage(1);
-      fetchData(1, "", "all");
+      await fetchData(1, "", "all");
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่");
       setShowWarning(true);

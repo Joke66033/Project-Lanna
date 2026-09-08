@@ -6,6 +6,8 @@ class CharacterStrokeModel {
   final String charSymbol;
   final String? charName;
   final String category;
+  final String categoryCharId;
+  final String? categoryName;
   final int strokeCount;
   final List<List<Offset>> strokePaths;
   final String? createdAt;
@@ -16,6 +18,8 @@ class CharacterStrokeModel {
     required this.charSymbol,
     this.charName,
     required this.category,
+    required this.categoryCharId,
+    this.categoryName,
     required this.strokeCount,
     required this.strokePaths,
     this.createdAt,
@@ -36,16 +40,28 @@ class CharacterStrokeModel {
 
     if (rawStrokes is List) {
       for (var stroke in rawStrokes) {
-        if (stroke is List) {
+        dynamic pointsList = stroke;
+        if (stroke is Map && stroke.containsKey('points')) {
+          pointsList = stroke['points'];
+        }
+        if (pointsList is List) {
           List<Offset> points = [];
-          for (var pt in stroke) {
+          for (var pt in pointsList) {
             if (pt is Map) {
-              final double dx = (pt['x'] as num?)?.toDouble() ?? 0.0;
-              final double dy = (pt['y'] as num?)?.toDouble() ?? 0.0;
+              double dx = (pt['x'] as num?)?.toDouble() ?? 0.0;
+              double dy = (pt['y'] as num?)?.toDouble() ?? 0.0;
+              if (dx <= 1.0 && dy <= 1.0 && (dx > 0 || dy > 0)) {
+                dx *= 100.0;
+                dy *= 100.0;
+              }
               points.add(Offset(dx, dy));
             } else if (pt is List && pt.length >= 2) {
-              final double dx = (pt[0] as num?)?.toDouble() ?? 0.0;
-              final double dy = (pt[1] as num?)?.toDouble() ?? 0.0;
+              double dx = (pt[0] as num?)?.toDouble() ?? 0.0;
+              double dy = (pt[1] as num?)?.toDouble() ?? 0.0;
+              if (dx <= 1.0 && dy <= 1.0 && (dx > 0 || dy > 0)) {
+                dx *= 100.0;
+                dy *= 100.0;
+              }
               points.add(Offset(dx, dy));
             }
           }
@@ -56,11 +72,15 @@ class CharacterStrokeModel {
       }
     }
 
+    final catId = (json['category_char_id'] ?? json['category'])?.toString() ?? 'CL0001';
+
     return CharacterStrokeModel(
       strokeId: json['stroke_id'] is int ? json['stroke_id'] : int.tryParse(json['stroke_id']?.toString() ?? ''),
       charSymbol: json['char_symbol']?.toString() ?? '',
       charName: json['char_name']?.toString(),
-      category: json['category']?.toString() ?? 'consonant',
+      category: catId,
+      categoryCharId: catId,
+      categoryName: json['category_name']?.toString(),
       strokeCount: (json['stroke_count'] is int) ? json['stroke_count'] : int.tryParse(json['stroke_count']?.toString() ?? '') ?? parsedPaths.length,
       strokePaths: parsedPaths,
       createdAt: json['created_at']?.toString(),
@@ -77,7 +97,9 @@ class CharacterStrokeModel {
       if (strokeId != null) 'stroke_id': strokeId,
       'char_symbol': charSymbol,
       'char_name': charName,
-      'category': category,
+      'category': categoryCharId,
+      'category_char_id': categoryCharId,
+      if (categoryName != null) 'category_name': categoryName,
       'stroke_count': strokeCount,
       'stroke_data': rawStrokes,
     };

@@ -2,6 +2,7 @@
  * recentActivity.js
  * Tracks recently added / edited records in localStorage
  * and places them at Rank 1 (ลำดับที่ 1) at the top of the table.
+ * Default database items remain sorted in natural ascending (ASC) order (จากน้อยไปมาก).
  */
 
 export function getItemId(item, type = "", idField = "") {
@@ -117,35 +118,11 @@ export function sortRecentData(dataList, type, idField = "id") {
       if (rankA !== -1) return -1;
       if (rankB !== -1) return 1;
 
-      // 2. สำหรับ character_strokes: เรียงลำดับตัวเลข ID ตามลำดับอักขระธรรมชาติ (S00001, S00002... ก, ข, ค, ฆ, ง)
-      if (type === "character_strokes") {
-        const numA = parseNumId(a, idField);
-        const numB = parseNumId(b, idField);
-        if (numA !== numB) {
-          return numA - numB;
-        }
-        return 0;
-      }
-
-      // 3. เรียงตามเวลาที่มีการอัปเดตหรือสร้างล่าสุด (updated_at / created_at / timestamp)
-      const parseTime = (item) => {
-        const val = item?.updated_at || item?.created_at || item?.timestamp;
-        if (!val) return 0;
-        const t = new Date(val).getTime();
-        return isNaN(t) ? 0 : t;
-      };
-
-      const timeA = parseTime(a);
-      const timeB = parseTime(b);
-      if (timeA > 0 && timeB > 0 && timeA !== timeB) {
-        return timeB - timeA;
-      }
-
-      // 4. ลำดับ fallback: ID ล่าสุดลงมา (descending)
+      // 2. ข้อมูลปกติในฐานข้อมูล: เรียงจากน้อยไปมากตาม ID (ASC) เช่น V00001 -> V00002 -> V00003
       const numA = parseNumId(a, idField);
       const numB = parseNumId(b, idField);
       if (numA !== numB) {
-        return numB - numA;
+        return numA - numB;
       }
 
       return 0;

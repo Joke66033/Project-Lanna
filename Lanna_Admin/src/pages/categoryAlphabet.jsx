@@ -169,9 +169,8 @@ export default function CategoryAlphabet() {
       if (catId) {
         trackRecentActivity("category_vocab", catId);
       }
-      setData((prev) => [newObj, ...prev.filter((i) => (i.category_vocab_id || i.id) !== catId)]);
       setCurrentPage(1);
-      fetchData(1);
+      await fetchData(1, search);
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่");
       setShowWarning(true);
@@ -211,13 +210,12 @@ export default function CategoryAlphabet() {
       setSuccessText("แก้ไขหมวดหมู่สำเร็จ");
       setShowSuccess(true);
 
-      // Prepend to state
+      // Track recent activity and reload page 1
       const updatedObj = updatedItem || { category_vocab_id: targetId, id: targetId, name: form.name };
       const editCatId = updatedObj?.category_vocab_id || targetId;
       trackRecentActivity("category_vocab", editCatId);
-      setData((prev) => [updatedObj, ...prev.filter((i) => (i.category_vocab_id || i.id) !== editCatId)]);
       setCurrentPage(1);
-      fetchData(1);
+      await fetchData(1, search);
     } catch (err) {
       setWarningText(err.message || "เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่");
       setShowWarning(true);

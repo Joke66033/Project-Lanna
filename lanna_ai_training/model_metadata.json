@@ -1,0 +1,391 @@
+{
+  "num_classes": 76,
+  "classes": [
+    "ᨠ",
+    "ᨡ",
+    "ᨡᩬ᩠ᨷᨣᩩᨱ",
+    "ᨡ᩶ᩣᩅ",
+    "ᨡ᩶ᩣᩅᨪᩬ᩠ᨿ",
+    "ᨢ",
+    "ᨣ",
+    "ᨣᩤᩴᨾᩮᩬᩥᨦ",
+    "ᨤ",
+    "ᨥ",
+    "ᨦ",
+    "ᨧ",
+    "ᨧ᩠ᨿᨦᩁᩣ᩠ᨿ",
+    "ᨧ᩠ᨿᨦᩲᩉ᩠ᨾ᩵",
+    "ᨧᩣᩁᩅᩦ",
+    "ᨨ",
+    "ᨨ᩠ᩃᩣᨯ",
+    "ᨩ",
+    "ᨩ᩠ᨿᨦᩁᩣ᩠ᨿ",
+    "ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵",
+    "ᨩᩦᩅᩥ᩠ᨲᨵᩢ᩠ᨾᩕᨯᩣ",
+    "ᨪ",
+    "ᨫ",
+    "ᨬ",
+    "ᨭ",
+    "ᨮ",
+    "ᨯ",
+    "ᨰ",
+    "ᨱ",
+    "ᨲ",
+    "ᨲ᩠ᩅᩫᨾᩮᩬᩥᨦ",
+    "ᨳ",
+    "ᨴ",
+    "ᨵ",
+    "ᨶ",
+    "ᨶᩣ᩠ᨶ",
+    "ᨶᩣᩴ᩶",
+    "ᨶ᩵ᩣ᩠ᨶ",
+    "ᨷ",
+    "ᨷ᩶ᩣᩁ",
+    "ᨸ",
+    "ᨸᩯ᩵",
+    "ᨹ",
+    "ᨹ᩠ᩃᩣᨯ",
+    "ᨺ",
+    "ᨻ",
+    "ᨻᨿᩣ᩠ᩅ",
+    "ᨻᩯ᩵",
+    "ᨼ",
+    "ᨽ",
+    "ᨾ",
+    "ᨾ᩠ᩅ᩵ᩁ",
+    "ᨾᩯ᩵ᩁᩬ᩠ᨦᩈᩬᩁ",
+    "ᨾᩯ᩵ᩌᩬ᩠ᨦᩈᩬᩁ",
+    "ᨿ",
+    "ᩀ",
+    "ᩁ",
+    "ᩁᩢ᩠ᨠ",
+    "ᩃ",
+    "ᩃᩣᩴᨸᩣ᩠ᨦ",
+    "ᩃᩣᩴᨻᩪᩁ",
+    "ᩅ",
+    "ᩅᩢ᩠ᨯ",
+    "ᩆ",
+    "ᩇ",
+    "ᩈ",
+    "ᩈ᩠ᩅᩢᩔᨯᩦ",
+    "ᩈᩩᨡ",
+    "ᩉ",
+    "ᩉ᩠ᩃᩣᩉᩣ᩠ญ",
+    "ᩊ",
+    "ᩋ",
+    "ᩋᩬᩁ",
+    "ᩌ",
+    "ᩯᨲ᩠᩵ᩃ",
+    "ᩯᨻᩕ᩵"
+  ],
+  "class_info": {
+    "ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵": {
+      "thai_translation": "เชียงใหม่",
+      "reading": "เจียง-ใหม่"
+    },
+    "ᨧ᩠ᨿᨦᩲᩉ᩠ᨾ᩵": {
+      "thai_translation": "เชียงใหม่",
+      "reading": "เจียง-ใหม่"
+    },
+    "ᨩ᩠ᨿᨦᩁᩣ᩠ᨿ": {
+      "thai_translation": "เชียงราย",
+      "reading": "เจียง-ฮาย"
+    },
+    "ᨧ᩠ᨿᨦᩁᩣ᩠ᨿ": {
+      "thai_translation": "เชียงราย",
+      "reading": "เจียง-ฮาย"
+    },
+    "ᨻᩯ᩵": {
+      "thai_translation": "แพร่",
+      "reading": "แป้"
+    },
+    "ᨸᩯ᩵": {
+      "thai_translation": "แพร่",
+      "reading": "แป้"
+    },
+    "ᩯᨻᩕ᩵": {
+      "thai_translation": "แพร่",
+      "reading": "แพร่"
+    },
+    "ᩯᨲ᩠᩵ᩃ": {
+      "thai_translation": "แพร่",
+      "reading": "แป้"
+    },
+    "ᨶ᩵ᩣ᩠ᨶ": {
+      "thai_translation": "น่าน",
+      "reading": "น่าน"
+    },
+    "ᨶᩣ᩠ᨶ": {
+      "thai_translation": "น่าน",
+      "reading": "น่าน"
+    },
+    "ᨾᩯ᩵ᩁᩬ᩠ᨦᩈᩬᩁ": {
+      "thai_translation": "แม่ฮ่องสอน",
+      "reading": "แม่-ฮ่อง-สอน"
+    },
+    "ᨾᩯ᩵ᩌᩬ᩠ᨦᩈᩬᩁ": {
+      "thai_translation": "แม่ฮ่องสอน",
+      "reading": "แม่-ฮ่อง-สอน"
+    },
+    "ᩃᩣᩴᨻᩪᩁ": {
+      "thai_translation": "ลำพูน",
+      "reading": "หละ-ปูน"
+    },
+    "ᩃᩣᩴᨸᩣ᩠ᨦ": {
+      "thai_translation": "ลำปาง",
+      "reading": "ลำ-ปาง"
+    },
+    "ᨻᨿᩣ᩠ᩅ": {
+      "thai_translation": "พะเยา",
+      "reading": "พะ-เยา"
+    },
+    "ᨹ᩠ᩃᩣᨯ": {
+      "thai_translation": "ฉลาด",
+      "reading": "ผลาด"
+    },
+    "ᨨ᩠ᩃᩣᨯ": {
+      "thai_translation": "ฉลาด",
+      "reading": "ฉลาด"
+    },
+    "ᩉ᩠ᩃᩣᩉᩣ᩠ญ": {
+      "thai_translation": "กล้าหาญ",
+      "reading": "หล้า-หาญ"
+    },
+    "ᨩᩦᩅᩥ᩠ᨲᨵᩢ᩠ᨾᩕᨯᩣ": {
+      "thai_translation": "ชีวิตธรรมดา",
+      "reading": "ชี-วิด-ทำ-มะ-ดา"
+    },
+    "ᨡ᩶ᩣᩅᨪᩬ᩠ᨿ": {
+      "thai_translation": "ข้าวซอย",
+      "reading": "ข้าว-ซอย"
+    },
+    "ᨧᩣᩁᩅᩦ": {
+      "thai_translation": "จารวี",
+      "reading": "จา-ระ-วี"
+    },
+    "ᩈ᩠ᩅᩢᩔᨯᩦ": {
+      "thai_translation": "สวัสดี",
+      "reading": "สะ-หวัด-ดี"
+    },
+    "ᨡᩬ᩠ᨷᨣᩩᨱ": {
+      "thai_translation": "ขอบคุณ",
+      "reading": "ขอบ-คุน"
+    },
+    "ᨣᩤᩴᨾᩮᩬᩥᨦ": {
+      "thai_translation": "คำเมือง",
+      "reading": "กำ-เมือง"
+    },
+    "ᨲ᩠ᩅᩫᨾᩮᩬᩥᨦ": {
+      "thai_translation": "ตั๋วเมือง",
+      "reading": "ตั๋ว-เมือง"
+    },
+    "ᨡ᩶ᩣᩅ": {
+      "thai_translation": "ข้าว",
+      "reading": "ข้าว"
+    },
+    "ᨶᩣᩴ᩶": {
+      "thai_translation": "น้ำ",
+      "reading": "น้ำ"
+    },
+    "ᨷ᩶ᩣᩁ": {
+      "thai_translation": "บ้าน",
+      "reading": "บ้าน"
+    },
+    "ᩅᩢ᩠ᨯ": {
+      "thai_translation": "วัด",
+      "reading": "วัด"
+    },
+    "ᩋᩬᩁ": {
+      "thai_translation": "งาม",
+      "reading": "งาม"
+    },
+    "ᩁᩢ᩠ᨠ": {
+      "thai_translation": "รัก",
+      "reading": "ฮัก"
+    },
+    "ᨾ᩠ᩅ᩵ᩁ": {
+      "thai_translation": "สนุก",
+      "reading": "ม่วน"
+    },
+    "ᩈᩩᨡ": {
+      "thai_translation": "สุข",
+      "reading": "สุข"
+    },
+    "ᨠ": {
+      "thai_translation": "กะ (ก)",
+      "reading": "กะ"
+    },
+    "ᨡ": {
+      "thai_translation": "ขะ (ข)",
+      "reading": "ขะ"
+    },
+    "ᨢ": {
+      "thai_translation": "ข้ะ (ฃ)",
+      "reading": "ข้ะ"
+    },
+    "ᨣ": {
+      "thai_translation": "ก๊ะ (ค)",
+      "reading": "ก๊ะ"
+    },
+    "ᨤ": {
+      "thai_translation": "ก๊ำ (ฅ)",
+      "reading": "ก๊ำ"
+    },
+    "ᨥ": {
+      "thai_translation": "ฆะ (ฆ)",
+      "reading": "ฆะ"
+    },
+    "ᨦ": {
+      "thai_translation": "งะ (ง)",
+      "reading": "งะ"
+    },
+    "ᨧ": {
+      "thai_translation": "จะ (จ)",
+      "reading": "จะ"
+    },
+    "ᨨ": {
+      "thai_translation": "ฉะ (ฉ)",
+      "reading": "ฉะ"
+    },
+    "ᨩ": {
+      "thai_translation": "จ๊ะ (ช)",
+      "reading": "จ๊ะ"
+    },
+    "ᨪ": {
+      "thai_translation": "ซะ (ซ)",
+      "reading": "ซะ"
+    },
+    "ᨫ": {
+      "thai_translation": "ฌะ (ฌ)",
+      "reading": "ฌะ"
+    },
+    "ᨬ": {
+      "thai_translation": "ญะ (ญ)",
+      "reading": "ญะ"
+    },
+    "ᨭ": {
+      "thai_translation": "ฏะ (ฏ)",
+      "reading": "ฏะ"
+    },
+    "ᨮ": {
+      "thai_translation": "ฐะ (ฐ)",
+      "reading": "ฐะ"
+    },
+    "ᨯ": {
+      "thai_translation": "ดะ (ฑ/ด)",
+      "reading": "ดะ"
+    },
+    "ᨰ": {
+      "thai_translation": "ฒะ (ฒ)",
+      "reading": "ฒะ"
+    },
+    "ᨱ": {
+      "thai_translation": "ณะ (ณ)",
+      "reading": "ณะ"
+    },
+    "ᨲ": {
+      "thai_translation": "ตะ (ต)",
+      "reading": "ตะ"
+    },
+    "ᨳ": {
+      "thai_translation": "ถะ (ถ)",
+      "reading": "ถะ"
+    },
+    "ᨴ": {
+      "thai_translation": "ทะ (ท)",
+      "reading": "ทะ"
+    },
+    "ᨵ": {
+      "thai_translation": "ธะ (ธ)",
+      "reading": "ธะ"
+    },
+    "ᨶ": {
+      "thai_translation": "นะ (น)",
+      "reading": "นะ"
+    },
+    "ᨷ": {
+      "thai_translation": "บะ (บ)",
+      "reading": "บะ"
+    },
+    "ᨸ": {
+      "thai_translation": "ปะ (ป)",
+      "reading": "ปะ"
+    },
+    "ᨹ": {
+      "thai_translation": "ผะ (ผ)",
+      "reading": "ผะ"
+    },
+    "ᨺ": {
+      "thai_translation": "ฝะ (ฝ)",
+      "reading": "ฝะ"
+    },
+    "ᨻ": {
+      "thai_translation": "พะ (พ)",
+      "reading": "พะ"
+    },
+    "ᨼ": {
+      "thai_translation": "ฟะ (ฟ)",
+      "reading": "ฟะ"
+    },
+    "ᨽ": {
+      "thai_translation": "ภะ (ภ)",
+      "reading": "ภะ"
+    },
+    "ᨾ": {
+      "thai_translation": "มะ (ม)",
+      "reading": "มะ"
+    },
+    "ᨿ": {
+      "thai_translation": "ยะ (ย)",
+      "reading": "ยะ"
+    },
+    "ᩀ": {
+      "thai_translation": "ยย้อย (อย)",
+      "reading": "ยย้อย"
+    },
+    "ᩁ": {
+      "thai_translation": "ระ (ร/ฮ)",
+      "reading": "ฮะ"
+    },
+    "ᩃ": {
+      "thai_translation": "ละ (ล)",
+      "reading": "ละ"
+    },
+    "ᩅ": {
+      "thai_translation": "วะ (ว)",
+      "reading": "วะ"
+    },
+    "ᩆ": {
+      "thai_translation": "ศะ (ศ)",
+      "reading": "ศะ"
+    },
+    "ᩇ": {
+      "thai_translation": "ษะ (ษ)",
+      "reading": "ษะ"
+    },
+    "ᩈ": {
+      "thai_translation": "สะ (ส)",
+      "reading": "สะ"
+    },
+    "ᩉ": {
+      "thai_translation": "หะ (ห)",
+      "reading": "หะ"
+    },
+    "ᩊ": {
+      "thai_translation": "ฬะ (ฬ)",
+      "reading": "ฬะ"
+    },
+    "ᩋ": {
+      "thai_translation": "อะ (อ)",
+      "reading": "อะ"
+    },
+    "ᩌ": {
+      "thai_translation": "ฮะ (ฮ)",
+      "reading": "ฮะ"
+    }
+  },
+  "img_size": [
+    128,
+    256
+  ]
+}

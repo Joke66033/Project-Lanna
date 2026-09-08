@@ -358,9 +358,7 @@ class LearnPageState extends State<LearnPage> {
                     icon = Icons.help_outline;
                   }
 
-                  final count = category.totalItems > 0
-                      ? category.totalItems
-                      : _getDefaultCount(category.categoryCode);
+                  final count = category.totalItems;
 
                   return _gridItem(
                     index: index,

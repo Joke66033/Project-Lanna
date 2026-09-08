@@ -39,7 +39,14 @@ class LannaRulesData {
   };
 
   /// คำอ่านและข้อยกเว้น
-  static const Map<String, String> irregularSpellingMap = {};
+  static const Map<String, String> irregularSpellingMap = {
+    'ตัวธัมม์': 'ᨲ᩠ᩅᩫᨵᨾ᩠ᨾ᩺',
+    'ตั๋วธัมม์': 'ᨲ᩠ᩅᩫᨵᨾ᩠ᨾ᩺',
+    'ตัวธรรม': 'ᨲ᩠ᩅᩫᨵᨾ᩠ᨾ᩺',
+    'ตั๋วธรรม': 'ᨲ᩠ᩅᩫᨵᨾ᩠ᨾ᩺',
+    'ธัมม์': 'ᨵᨾ᩠ᨾ᩺',
+    'ธรรม': 'ᨵᨾ᩠ᨾ᩺',
+  };
 
   /// ฟังก์ชันโหลดและซิงค์ข้อมูลพยัญชนะ สระ และอักขระจากตาราง `lanna_char` ในฐานข้อมูลจริง
   static Future<void> loadFromDatabase([List<LannaCharModel>? preloaded]) async {

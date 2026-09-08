@@ -82,11 +82,43 @@ List<List<Offset>>? getConsonantStrokePaths(String char) {
       ];
     case 'ᨥ':
       return [
-        [const Offset(26.0, 32.0), const Offset(30.0, 28.0), const Offset(34.0, 31.0), const Offset(33.0, 36.0), const Offset(28.0, 36.0), const Offset(20.0, 46.0), const Offset(20.0, 60.0), const Offset(26.0, 68.0), const Offset(36.0, 68.0), const Offset(44.0, 58.0), const Offset(46.0, 44.0), const Offset(48.0, 56.0), const Offset(54.0, 68.0), const Offset(64.0, 68.0), const Offset(70.0, 56.0), const Offset(70.0, 36.0), const Offset(76.0, 28.0), const Offset(84.0, 32.0), const Offset(86.0, 48.0), const Offset(80.0, 62.0), const Offset(86.0, 66.0), const Offset(92.0, 62.0)],
+        [
+          const Offset(15.9, 38.7), const Offset(18.4, 35.8), const Offset(18.4, 42.2), const Offset(13.8, 42.8), const Offset(11.3, 37.8),
+          const Offset(12.2, 31.4), const Offset(15.9, 27.0), const Offset(21.0, 29.9), const Offset(27.6, 29.3), const Offset(33.3, 27.0), const Offset(35.9, 31.4),
+          const Offset(31.3, 42.7), const Offset(23.0, 52.5), const Offset(11.8, 61.3), const Offset(11.0, 70.1), const Offset(19.0, 73.0), const Offset(30.7, 72.4),
+          const Offset(38.9, 64.6), const Offset(43.6, 51.5), const Offset(48.2, 38.3), const Offset(53.2, 27.0), const Offset(58.3, 28.5), const Offset(60.9, 38.3),
+          const Offset(59.8, 52.9), const Offset(58.6, 66.1), const Offset(62.4, 73.0), const Offset(68.1, 72.4),
+          const Offset(71.2, 55.9), const Offset(75.2, 38.3), const Offset(80.4, 27.0), const Offset(85.5, 28.5), const Offset(88.1, 38.3),
+          const Offset(89.0, 52.9), const Offset(87.0, 66.1), const Offset(82.9, 72.7), const Offset(76.3, 71.2), const Offset(72.1, 61.7),
+        ],
       ];
     case 'ᨦ': // งะ (ง)
       return [
-        [const Offset(48.0, 56.0), const Offset(54.0, 50.0), const Offset(60.0, 56.0), const Offset(54.0, 62.0), const Offset(46.0, 60.0), const Offset(34.0, 60.0), const Offset(24.0, 50.0), const Offset(24.0, 38.0), const Offset(32.0, 32.0), const Offset(46.0, 26.0), const Offset(64.0, 26.0), const Offset(76.0, 36.0), const Offset(80.0, 52.0), const Offset(76.0, 68.0), const Offset(68.0, 80.0)],
+        [
+          const Offset(52.0, 64.3),
+          const Offset(57.1, 63.3),
+          const Offset(58.2, 58.7),
+          const Offset(53.1, 53.6),
+          const Offset(44.9, 55.1),
+          const Offset(34.7, 63.3),
+          const Offset(22.4, 68.9),
+          const Offset(9.2, 65.3),
+          const Offset(3.1, 53.1),
+          const Offset(4.1, 40.8),
+          const Offset(12.2, 31.6),
+          const Offset(19.4, 25.5),
+          const Offset(21.4, 18.4),
+          const Offset(16.3, 13.8),
+          const Offset(12.2, 13.3),
+          const Offset(23.5, 8.7),
+          const Offset(46.9, 4.1),
+          const Offset(71.4, 7.7),
+          const Offset(87.8, 19.4),
+          const Offset(95.9, 37.8),
+          const Offset(92.9, 63.3),
+          const Offset(86.7, 80.6),
+          const Offset(81.6, 95.9),
+        ],
       ];
     case 'ᨧ': // จะ (จ)
       return [
@@ -194,7 +226,47 @@ List<List<Offset>>? getConsonantStrokePaths(String char) {
       ];
     case 'ᨾ':
       return [
-        [const Offset(28.0, 28.0), const Offset(34.0, 22.0), const Offset(42.0, 26.0), const Offset(38.0, 34.0), const Offset(30.0, 34.0), const Offset(22.0, 26.0), const Offset(18.0, 38.0), const Offset(22.0, 54.0), const Offset(32.0, 66.0), const Offset(48.0, 68.0), const Offset(64.0, 64.0), const Offset(74.0, 52.0), const Offset(76.0, 36.0), const Offset(70.0, 24.0), const Offset(58.0, 20.0), const Offset(48.0, 28.0), const Offset(44.0, 42.0), const Offset(48.0, 56.0), const Offset(60.0, 62.0), const Offset(72.0, 60.0), const Offset(82.0, 50.0), const Offset(88.0, 34.0)],
+        [
+          const Offset(16.8, 14.7),
+          const Offset(14.7, 6.3),
+          const Offset(7.9, 6.3),
+          const Offset(4.7, 13.7),
+          const Offset(6.8, 20.0),
+          const Offset(14.7, 24.2),
+          const Offset(20.5, 20.0),
+          const Offset(20.0, 14.7),
+          const Offset(17.9, 21.1),
+          const Offset(12.6, 29.5),
+          const Offset(6.8, 41.1),
+          const Offset(6.3, 55.8),
+          const Offset(15.8, 65.3),
+          const Offset(30.5, 72.1),
+          const Offset(48.4, 73.2),
+          const Offset(65.3, 68.9),
+          const Offset(80.0, 61.1),
+          const Offset(87.4, 52.6),
+          const Offset(81.1, 45.3),
+          const Offset(66.3, 42.1),
+          const Offset(51.6, 43.7),
+          const Offset(44.7, 50.5),
+          const Offset(48.4, 55.8),
+          const Offset(55.8, 55.3),
+          const Offset(61.6, 50.5),
+          const Offset(72.6, 44.2),
+          const Offset(83.2, 43.2),
+          const Offset(87.4, 36.8),
+          const Offset(83.2, 25.3),
+          const Offset(75.8, 15.8),
+          const Offset(65.3, 7.4),
+          const Offset(73.2, 3.7),
+          const Offset(82.1, 4.2),
+          const Offset(89.5, 12.6),
+          const Offset(95.3, 26.3),
+          const Offset(96.8, 41.1),
+          const Offset(96.8, 56.8),
+          const Offset(95.8, 73.7),
+          const Offset(94.7, 90.5),
+        ],
       ];
     case 'ᨿ':
       return [

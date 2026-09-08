@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
             $res = dbRequest('GET', 'vocabulary', [
                 'select' => '*,category_vocab(name)',
-                'order'  => 'vocab_id.desc',
+                'order'  => 'vocab_id.asc',
             ]);
             if ($res['error']) { jsonError($res['error']['message']); break; }
             jsonOk(mapVocabCategory($res['data'] ?? []));

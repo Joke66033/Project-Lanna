@@ -13,6 +13,8 @@ class LannaCharModel {
     this.categoryName,
   });
 
+  String? get charId => lannaCharId;
+
   factory LannaCharModel.fromJson(Map<String, dynamic> json) {
     String? catName;
     if (json['category_lanna_char'] is Map) {

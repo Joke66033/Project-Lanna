@@ -26,47 +26,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     switch ($action) {
 
         case 'getAll':
-            $withChildren = ($_GET['with_children'] ?? '') === 'true';
-            $selectStr = $withChildren ? '*,category_lanna_char(*)' : '*';
-            
+            $pdo = getPdo();
             $onlyActive = ($_GET['only_active'] ?? '') === 'true';
-            $filters = [];
-            if ($onlyActive) {
-                $filters['is_active'] = 'eq.true';
-            }
-            
-            $res = dbSelect('learning_category', $selectStr, $filters, 'category_code.desc');
-            if ($res['error']) {
-                jsonError($res['error']['message']);
-                break;
-            }
+            $whereActive = $onlyActive ? "WHERE (lc.`is_active` = 1 OR lc.`is_active` = 'true' OR lc.`is_active` = '1')" : "";
 
-            $categories = $res['data'] ?? [];
-            for ($i = 0; $i < count($categories); $i++) {
-                $catCode = $categories[$i]['category_code'] ?? '';
-                if ($catCode !== '') {
-                    $subCatsRes = dbSelect('category_lanna_char', 'category_char_id', ['learning_category_code' => 'eq.' . rawurlencode($catCode)]);
-                    $subIds = [];
-                    if (!$subCatsRes['error'] && !empty($subCatsRes['data'])) {
-                        $subIds = array_column($subCatsRes['data'], 'category_char_id');
-                    }
-                    
-                    if (empty($subIds)) {
-                        if ($catCode === 'LC001') $subIds = ['CL0001', 'CL0002', 'CL0003'];
-                        else if ($catCode === 'LC002') $subIds = ['CL0004', 'CL0005'];
-                        else if ($catCode === 'LC003') $subIds = ['CL0006'];
-                        else if ($catCode === 'LC004') $subIds = ['CL0007'];
-                        else if ($catCode === 'LC005') $subIds = ['CL0008', 'CL0009', 'CL0010'];
-                    }
+            // Dynamic count from lanna_char joining category_lanna_char
+            $sql = "SELECT 
+                        lc.`category_code`,
+                        lc.`title`,
+                        lc.`description`,
+                        (CASE WHEN lc.`is_active` = 1 OR lc.`is_active` = 'true' OR lc.`is_active` = '1' THEN 1 ELSE 0 END) AS `is_active`,
+                        COUNT(DISTINCT c.`char_id`) AS `total_items`
+                    FROM `learning_category` lc
+                    LEFT JOIN `category_lanna_char` clc ON lc.`category_code` = clc.`learning_category_code`
+                    LEFT JOIN `lanna_char` c ON clc.`category_char_id` = c.`category_char_id`
+                    $whereActive
+                    GROUP BY lc.`category_code`, lc.`title`, lc.`description`, lc.`is_active`
+                    ORDER BY CAST(SUBSTRING(lc.`category_code`, 3) AS UNSIGNED) ASC, lc.`category_code` ASC";
 
-                    if (!empty($subIds)) {
-                        $subIdStrs = array_map(function($id) { return rawurlencode($id); }, $subIds);
-                        $inFilter = 'in.(' . implode(',', $subIdStrs) . ')';
-                        $charCountRes = dbSelect('lanna_char', 'char_id', ['category_char_id' => $inFilter]);
-                        if (!$charCountRes['error'] && is_array($charCountRes['data'])) {
-                            $categories[$i]['total_items'] = count($charCountRes['data']);
-                        }
+            $stmt = $pdo->query($sql);
+            $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // If with_children
+            $withChildren = ($_GET['with_children'] ?? '') === 'true';
+            if ($withChildren) {
+                $subStmt = $pdo->query("SELECT * FROM `category_lanna_char` ORDER BY `category_char_id` ASC");
+                $allSubs = $subStmt->fetchAll(PDO::FETCH_ASSOC);
+                $subsByParent = [];
+                foreach ($allSubs as $sub) {
+                    $pCode = $sub['learning_category_code'] ?? '';
+                    if ($pCode) {
+                        $subsByParent[$pCode][] = $sub;
                     }
+                }
+                foreach ($categories as &$row) {
+                    $row['category_lanna_char'] = $subsByParent[$row['category_code']] ?? [];
                 }
             }
 

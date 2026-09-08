@@ -158,6 +158,8 @@ class _VowelPageState extends State<VowelPage> with SingleTickerProviderStateMix
           VowelGroup(name: catNames['CL0004'] ?? 'สระลอย (หลวง)', categoryCharId: 'CL0004', vowels: listLoy),
         ].where((g) => g.vowels.isNotEmpty).toList();
 
+        _tabController?.removeListener(_handleTabChange);
+        _tabController?.dispose();
         _tabController = TabController(length: _groups.length, vsync: this);
         _tabController!.addListener(_handleTabChange);
         

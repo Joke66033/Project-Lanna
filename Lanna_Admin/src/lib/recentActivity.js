@@ -5,51 +5,46 @@
  * Default database items remain sorted in natural ascending (ASC) order (จากน้อยไปมาก).
  */
 
-export function getItemId(item, type = "", idField = "") {
-  if (!item) return "";
+export function getItemPrimaryIds(item, type = "", idField = "") {
+  if (!item) return [];
+  const set = new Set();
 
-  // 1. If an explicit idField is provided and exists directly in item
-  if (idField && item[idField] !== undefined && item[idField] !== null && String(item[idField]).trim() !== "") {
-    return String(item[idField]).trim();
+  if (idField && item[idField] !== undefined && item[idField] !== null) {
+    const val = String(item[idField]).trim();
+    if (val) set.add(val);
   }
 
-  // 2. Resolve primary key strictly by table type (Avoid mixing foreign keys!)
   const normType = String(type || "").toLowerCase().trim();
 
   if (normType === "vocabulary" || normType === "vocab") {
-    if (item.vocab_id !== undefined && item.vocab_id !== null) return String(item.vocab_id).trim();
+    if (item.vocab_id) set.add(String(item.vocab_id).trim());
   } else if (normType === "lanna_char" || normType === "alphabet" || normType === "char") {
-    if (item.char_id !== undefined && item.char_id !== null) return String(item.char_id).trim();
+    if (item.char_id) set.add(String(item.char_id).trim());
   } else if (normType === "character_strokes" || normType === "strokes") {
-    if (item.stroke_id !== undefined && item.stroke_id !== null) return String(item.stroke_id).trim();
+    if (item.stroke_id) set.add(String(item.stroke_id).trim());
   } else if (normType === "articles" || normType === "article") {
-    if (item.article_id !== undefined && item.article_id !== null) return String(item.article_id).trim();
+    if (item.article_id) set.add(String(item.article_id).trim());
   } else if (normType === "category_vocab") {
-    if (item.category_vocab_id !== undefined && item.category_vocab_id !== null) return String(item.category_vocab_id).trim();
+    if (item.category_vocab_id) set.add(String(item.category_vocab_id).trim());
   } else if (normType === "category_lanna_char") {
-    if (item.category_char_id !== undefined && item.category_char_id !== null) return String(item.category_char_id).trim();
+    if (item.category_char_id) set.add(String(item.category_char_id).trim());
   } else if (normType === "learning_category") {
-    if (item.category_code !== undefined && item.category_code !== null) return String(item.category_code).trim();
+    if (item.category_code) set.add(String(item.category_code).trim());
   } else if (normType === "users" || normType === "user") {
-    if (item.user_id !== undefined && item.user_id !== null) return String(item.user_id).trim();
+    if (item.user_id) set.add(String(item.user_id).trim());
   }
 
-  // 3. Fallback: item.id
-  if (item.id !== undefined && item.id !== null && String(item.id).trim() !== "") {
-    return String(item.id).trim();
+  if (item.id !== undefined && item.id !== null) {
+    const val = String(item.id).trim();
+    if (val) set.add(val);
   }
 
-  // 4. Default priority if type was not specified
-  if (item.vocab_id) return String(item.vocab_id).trim();
-  if (item.char_id) return String(item.char_id).trim();
-  if (item.stroke_id) return String(item.stroke_id).trim();
-  if (item.article_id) return String(item.article_id).trim();
-  if (item.user_id) return String(item.user_id).trim();
-  if (item.category_vocab_id) return String(item.category_vocab_id).trim();
-  if (item.category_char_id) return String(item.category_char_id).trim();
-  if (item.category_code) return String(item.category_code).trim();
+  return Array.from(set);
+}
 
-  return "";
+export function getItemId(item, type = "", idField = "") {
+  const ids = getItemPrimaryIds(item, type, idField);
+  return ids.length > 0 ? ids[0] : "";
 }
 
 export function trackRecentActivity(type, id) {
@@ -58,7 +53,16 @@ export function trackRecentActivity(type, id) {
     const strId = String(id).trim();
     const key = `recent_${type}`;
     const existing = JSON.parse(localStorage.getItem(key) || "[]").map((x) => String(x).trim());
-    const updated = [strId, ...existing.filter((item) => item.toLowerCase() !== strId.toLowerCase())].slice(0, 50);
+
+    const strNum = strId.match(/\d+/) ? parseInt(strId.match(/\d+/)[0], 10) : null;
+    const filtered = existing.filter((item) => {
+      if (item.toLowerCase() === strId.toLowerCase()) return false;
+      const itemNum = item.match(/\d+/) ? parseInt(item.match(/\d+/)[0], 10) : null;
+      if (strNum !== null && itemNum !== null && strNum === itemNum) return false;
+      return true;
+    });
+
+    const updated = [strId, ...filtered].slice(0, 50);
     localStorage.setItem(key, JSON.stringify(updated));
   } catch (e) {
     // Ignore storage errors
@@ -67,29 +71,29 @@ export function trackRecentActivity(type, id) {
 
 export function getRecentRank(item, type, idField, recentIds) {
   if (!item || !recentIds || recentIds.length === 0) return -1;
-  const targetId = getItemId(item, type, idField);
-  if (!targetId) return -1;
+  const ids = getItemPrimaryIds(item, type, idField);
+  if (ids.length === 0) return -1;
 
-  const targetLower = targetId.toLowerCase();
+  const idsLower = ids.map((x) => x.toLowerCase());
+  const idsNums = ids
+    .map((x) => {
+      const m = x.match(/\d+/);
+      return m ? parseInt(m[0], 10) : null;
+    })
+    .filter((n) => n !== null);
 
   for (let i = 0; i < recentIds.length; i++) {
     const r = recentIds[i];
     if (!r) continue;
     const rLower = r.toLowerCase();
+    const rMatch = r.match(/\d+/);
+    const rNum = rMatch ? parseInt(rMatch[0], 10) : null;
 
-    // 1. Direct match or case-insensitive match (e.g. "V00025" === "v00025")
-    if (targetLower === rLower) return i;
+    // 1. Direct or case-insensitive string match
+    if (ids.includes(r) || idsLower.includes(rLower)) return i;
 
-    // 2. Strict prefix + numeric match (e.g. "V00025" and "V25")
-    const prefixTarget = targetLower.replace(/\d+.*$/, "");
-    const prefixR = rLower.replace(/\d+.*$/, "");
-    if (prefixTarget === prefixR) {
-      const matchTarget = targetLower.match(/\d+/);
-      const matchR = rLower.match(/\d+/);
-      if (matchTarget && matchR && parseInt(matchTarget[0], 10) === parseInt(matchR[0], 10)) {
-        return i;
-      }
-    }
+    // 2. Numeric match (e.g. "V00018" and 18 or "18")
+    if (rNum !== null && idsNums.includes(rNum)) return i;
   }
 
   return -1;
@@ -102,9 +106,12 @@ export function sortRecentData(dataList, type, idField = "id") {
     const recentIds = JSON.parse(localStorage.getItem(key) || "[]").map((x) => String(x).trim());
 
     const parseNumId = (item, field) => {
-      const idStr = getItemId(item, type, field);
-      const match = String(idStr).match(/\d+/);
-      return match ? parseInt(match[0], 10) : 0;
+      const ids = getItemPrimaryIds(item, type, field);
+      for (const idStr of ids) {
+        const match = String(idStr).match(/\d+/);
+        if (match) return parseInt(match[0], 10);
+      }
+      return 0;
     };
 
     return [...dataList].sort((a, b) => {
@@ -138,7 +145,13 @@ export function removeRecentActivity(type, id) {
     const strId = String(id).trim();
     const key = `recent_${type}`;
     const existing = JSON.parse(localStorage.getItem(key) || "[]").map((x) => String(x).trim());
-    const updated = existing.filter((item) => item.toLowerCase() !== strId.toLowerCase());
+    const strNum = strId.match(/\d+/) ? parseInt(strId.match(/\d+/)[0], 10) : null;
+    const updated = existing.filter((item) => {
+      if (item.toLowerCase() === strId.toLowerCase()) return false;
+      const itemNum = item.match(/\d+/) ? parseInt(item.match(/\d+/)[0], 10) : null;
+      if (strNum !== null && itemNum !== null && strNum === itemNum) return false;
+      return true;
+    });
     localStorage.setItem(key, JSON.stringify(updated));
   } catch (e) {
     // Ignore storage errors

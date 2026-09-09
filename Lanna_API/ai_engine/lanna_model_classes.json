@@ -337,6 +337,6 @@
       "meaning": "ชื่อเฉพาะ (Night)"
     }
   },
-  "best_val_accuracy": 98.83040935672514,
-  "trained_at": "2026-09-09 15:23:49"
+  "best_val_accuracy": 100.0,
+  "trained_at": "2026-09-09 16:22:00"
 }

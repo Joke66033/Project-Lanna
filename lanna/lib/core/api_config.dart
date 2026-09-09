@@ -40,11 +40,29 @@ class ApiConfig {
     return _defaultKey;
   }
 
-  static Future<void> saveCustomGeminiApiKey(String key) async {
-    _customGeminiApiKey = key.trim();
+  // OpenAI API Key for GPT-4o / GPT-4o-mini Vision OCR
+  static String? _customOpenAiApiKey;
+
+  static Future<String?> getActiveOpenAiApiKey() async {
+    if (_customOpenAiApiKey != null && _customOpenAiApiKey!.isNotEmpty) {
+      return _customOpenAiApiKey!;
+    }
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('custom_gemini_api_key', key.trim());
+      final saved = prefs.getString('custom_openai_api_key');
+      if (saved != null && saved.trim().isNotEmpty) {
+        _customOpenAiApiKey = saved.trim();
+        return _customOpenAiApiKey!;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  static Future<void> saveCustomOpenAiApiKey(String key) async {
+    _customOpenAiApiKey = key.trim();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('custom_openai_api_key', key.trim());
     } catch (_) {}
   }
 

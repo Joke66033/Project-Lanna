@@ -342,7 +342,17 @@ class _CameraPageState extends State<CameraPage>
     Uint8List imageBytes,
     String filename,
   ) async {
-    // 1. ใช้ Gemini Vision AI ถอดรหัสอักษรล้านนา -> ภาษาไทย เป็นตัวเลือกหลักอันดับ 1
+    // 1. ตรวจสอบและเรียกใช้ OpenAI GPT-4o Vision เป็นอันดับแรก (หากมี OpenAI Key)
+    try {
+      final gptResult = await _requestGptVisionOcr(imageBytes);
+      if (gptResult != null && gptResult.text.trim().isNotEmpty) {
+        return gptResult;
+      }
+    } catch (error) {
+      debugPrint('GPT Vision OCR unavailable: $error');
+    }
+
+    // 2. ใช้ Gemini Vision AI ถอดรหัสอักษรล้านนา -> ภาษาไทย
     try {
       final geminiResult = await _requestGeminiVisionOcr(imageBytes);
       if (geminiResult != null && geminiResult.text.trim().isNotEmpty) {
@@ -352,7 +362,7 @@ class _CameraPageState extends State<CameraPage>
       debugPrint('Gemini Vision OCR unavailable: $error');
     }
 
-    // 2. Fallback ไปยัง Unified Backend OCR
+    // 3. Fallback ไปยัง Unified Backend OCR
     try {
       final request = http.MultipartRequest(
         'POST',
@@ -386,7 +396,7 @@ class _CameraPageState extends State<CameraPage>
       debugPrint('Unified OCR endpoint unavailable: $error');
     }
 
-    // 3. Fallback: ดึงคำอ่านและคำแปลจากพจนานุกรมในเครื่อง
+    // 4. Fallback
     throw Exception('ไม่สามารถอ่านอักษรจากภาพได้ กรุณาจัดตำแหน่งกล้องให้ชัดเจนและลองใหม่อีกครั้ง');
   }
 
@@ -533,6 +543,128 @@ class _CameraPageState extends State<CameraPage>
     );
   }
 
+  /// อ่านและแปลอักษรล้านนาจากภาพถ่ายด้วย OpenAI GPT-4o / GPT-4o-mini Vision
+  Future<_CameraOcrResult?> _requestGptVisionOcr(Uint8List imageBytes) async {
+    final apiKey = await ApiConfig.getActiveOpenAiApiKey();
+    if (apiKey == null || apiKey.isEmpty) {
+      return null;
+    }
+    final base64Img = base64Encode(imageBytes);
+    final mimeType = (imageBytes.length > 4 &&
+            imageBytes[0] == 0x89 &&
+            imageBytes[1] == 0x50 &&
+            imageBytes[2] == 0x4E &&
+            imageBytes[3] == 0x47)
+        ? 'image/png'
+        : 'image/jpeg';
+
+    const prompt = '''
+คุณคือผู้เชี่ยวชาญระดับศาสตราจารย์ด้าน "อักขรวิธีอักษรธรรมล้านนา (ตั๋วเมือง / Tai Tham Script)" และสัทศาสตร์ภาษาไทยถิ่นเหนือ
+หน้าที่ของคุณคืออ่าน วิเคราะห์ และถอดรหัสข้อความอักษรล้านนาจากภาพถ่ายอย่างแม่นยำ:
+
+หลักการอ่านและถอดรหัสโครงสร้างอักขระ 4 มิติ (Tai Tham Spatial & Orthographic Chart):
+1. กฎการจำแนกคำศัพท์สำคัญ (Orthographic Disambiguation Rules):
+   - ᨩ᩠ᨿᨦᩲᩉ᩠ᨾ᩵ (ชะ ᨩ + ยห้อย ᩠ᨿ + งะ ᨦ + ไม้ไก๋ ᩲ + หะ ᩉ + มห้อย ᩠ᨾ + ไม้เหยาะ ᩵) = "เชียงใหม่" (เจียงใหม่) **ข้อควรระวังอย่างยิ่ง: ห้ามอ่านเป็น 'ลูกไก่' หรือ 'ไก่'**
+   - ᨩ᩠ᨿᨦᩁᩣ᩠ᨿ (ชะ+ยห้อย+งะ + ระ+สระอา+ยห้อย) = "เชียงราย" (เจียงฮาย)
+   - ᩯᨻᩖ᩵ (สระแอ ᩯ + พะ ᨻ + ลหาง ᩖ + ไม้เหยาะ ᩵) = "แพร่" (แป้)
+   - ᩃᩣᩴᨻᩣ᩠ᨦ (ละ+สระอำ + พะ+สระอา+งห้อย) = "ลำปาง", ᩃᩣᩴᨻᩪ᩠ᨶ = "ลำพูน", ᩃᩣᩴᩱᨿ = "ลำไย"
+   - ᩃᩣ᩠ᨷ = "ลาบ", ᩃᩣ᩠ᨷᨤ᩠ᩅᩣ᩠ᨿ = "ลาบควาย", ᩃᩣ᩠ᨷᩉ᩠ᨾᩪ = "ลาบหมู", ᩈ᩶ᩣᨯᩥ᩠ᨷ = "ส้าดิบ", ᩈ᩶ᩣᩈᩩ᩠ᨠ = "ส้าสุก"
+   - ᨧᩕᩣ᩠ᨯ = "ฉลาด", ᨠᩣᩴᨾᩮᩬᩥᨦ = "กำเมือง", ᩮᨾᩥ᩠ᨦᩋᩥ᩠ᨶ᩠ᨴᩕ᩼ = "เมืองอินทร์", ᨾᩯ᩵ᩁᩬ᩶ᨦᩈᩬᩁ = "แม่ฮ่องสอน"
+
+2. สระหน้า (Leading Vowels):
+   - สระแอ (ᩯ) 2 ขาซ้ายสุด, ไม้ไก๋/สระไอ (ᩱ) หรือ ไม้ใค/สระใอ (ᩲ) ทรงสูง, สระเอ (ᩮ), สระโอ (ᩰ)
+
+3. พยัญชนะหลัก (Base Consonants):
+   - กะ ᨠ, ขะ ᨡ, คะ ᨣ, ฅะ ᨤ, งะ ᨦ, จะ ᨧ, ฉะ ᨨ, ชะ ᨩ, ซะ ᨪ, ญะ ᨬ
+   - ตะ ᨲ, ถะ ᨳ, ทะ ᨴ, ธะ ᨵ, นะ ᨶ
+   - บะ/ปะ ᨷ, ปะหางยาว ᨸ, ผะ ᨹ, ฝะ ᨺ, พะ ᨻ, ฟะ ᨼ, ภะ ᨽ, มะ ᨾ, ยะ ᨿ
+   - ระ ᩁ, ละ ᩃ, วะ ᩅ, สะ ᩈ, หะ ᩉ, อะ ᩋ, ฮฮก ᩌ
+
+4. ตัวสะกดห้อยและตัวควบใต้ล่าง (Subjoined Sakot & Medials):
+   - ย ห้อย (᩠ᨿ), ว ห้อย (᩠ᩅ), ม ห้อย (᩠ᨾ), ง ห้อย (᩠ᨦ), น ห้อย (᩠ᨶ), ด ห้อย (᩠ᨯ), บ ห้อย (᩠ᨷ), ก ห้อย (᩠ᨠ), ล หาง (ᩖ), ร หางกวาด (ᩕ)
+
+5. สระบนและเครื่องหมายวรรณยุกต์ (Upper Vowels & Tone Marks):
+   - สระอิ (ᩥ), สระอี (ᩦ), สระอึ (ᩧ), สระอือ (ᩨ), ไม้กั๋ง (ᩢ), สระอัว (ᩫ), นิคหิต/สระอำ (ᩴ), ไม้เหยาะ (᩵), ไม้ขอช้าง (᩶)
+
+ขั้นตอนการวิเคราะห์รูปภาพ:
+1. พิจารณาอักขระทีละกลุ่มจากซ้ายไปขวา โดยสังเกตสระหน้า พยัญชนะต้น ตัวสะกดห้อยล่าง และสระบน/วรรณยุกต์
+2. สังเคราะห์เป็นรหัส Tai Tham Unicode ที่สมบูรณ์
+3. แปลเป็นภาษาไทยมาตรฐาน และระบุคำอ่านสัทอักษรภาษาเหนือ/คำเมือง
+
+ส่งคืนผลลัพธ์เป็น Pure JSON เท่านั้น:
+{
+  "detected_text": "คำแปลหรือชื่อภาษาไทยมาตรฐานของคำที่ปรากฏในภาพ",
+  "lanna_text": "อักขระล้านนา Tai Tham Unicode ที่ถอดรหัสได้จากภาพ",
+  "reading": "[คำอ่านสำเนียงคำเมืองล้านนา]",
+  "meaning": "คำอธิบายความหมายและบริบทอย่างละเอียด",
+  "direction": "ภาษาล้านนา → ภาษาไทย"
+}
+''';
+
+    const models = ['gpt-4o-mini', 'gpt-4o'];
+
+    for (final model in models) {
+      try {
+        final url = Uri.parse('https://api.openai.com/v1/chat/completions');
+        final res = await http.post(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $apiKey',
+          },
+          body: jsonEncode({
+            'model': model,
+            'response_format': {'type': 'json_object'},
+            'temperature': 0.1,
+            'messages': [
+              {
+                'role': 'system',
+                'content': prompt,
+              },
+              {
+                'role': 'user',
+                'content': [
+                  {'type': 'text', 'text': 'อ่านและถอดรหัสข้อความอักษรล้านนาในภาพนี้อย่างแม่นยำ:'},
+                  {
+                    'type': 'image_url',
+                    'image_url': {
+                      'url': 'data:$mimeType;base64,$base64Img',
+                    }
+                  }
+                ]
+              }
+            ]
+          }),
+        ).timeout(const Duration(seconds: 15));
+
+        if (res.statusCode == 200) {
+          final data = jsonDecode(utf8.decode(res.bodyBytes));
+          final content = data['choices'][0]['message']['content'] as String;
+          final jsonMap = jsonDecode(content) as Map<String, dynamic>;
+
+          final detectedText = jsonMap['detected_text']?.toString().trim() ??
+              jsonMap['translated_text']?.toString().trim() ??
+              '';
+          final lannaText = jsonMap['lanna_text']?.toString().trim() ??
+              jsonMap['lanna_char']?.toString().trim();
+          final reading = jsonMap['reading']?.toString().trim();
+          final meaning = jsonMap['meaning']?.toString().trim();
+
+          return _matchStage2(
+            detectedText: detectedText,
+            lannaText: lannaText,
+            reading: reading,
+            meaning: meaning,
+            directionLabel: 'ภาษาล้านนา → ภาษาไทย (OpenAI GPT-4o)',
+          );
+        }
+      } catch (e) {
+        debugPrint('GPT Vision OCR error on $model: $e');
+      }
+    }
+    return null;
+  }
+
   /// อ่านและแปลอักษรล้านนาจากภาพถ่ายด้วย Stage 1 (Vision AI) + Stage 2 (Database Matcher)
   Future<_CameraOcrResult?> _requestGeminiVisionOcr(Uint8List imageBytes) async {
     final apiKey = await ApiConfig.getActiveGeminiApiKey();
@@ -671,6 +803,103 @@ class _CameraPageState extends State<CameraPage>
     return null;
   }
 
+  Future<void> _showAiSettingsDialog() async {
+    final currentGptKey = await ApiConfig.getActiveOpenAiApiKey() ?? '';
+    final gptController = TextEditingController(text: currentGptKey);
+
+    if (!mounted) return;
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: 20,
+            left: 20,
+            right: 20,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'ตั้งค่าโมเดล AI ในการอ่านภาพ (OCR)',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white70),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'ระบบรองรับทั้ง OpenAI ChatGPT (GPT-4o Vision) และ Google Gemini Vision พร้อมระบบจับคู่ฐานข้อมูลอักขรวิธีล้านนาความแม่นยำสูง',
+                style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'OpenAI API Key (สำหรับเรียกใช้ ChatGPT / GPT-4o):',
+                style: TextStyle(color: kPrimaryOrange, fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: gptController,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'sk-proj-... หรือปล่อยว่างเพื่อใช้ Hybrid AI',
+                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                  filled: true,
+                  fillColor: const Color(0xFF2A2A2A),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimaryOrange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () async {
+                    await ApiConfig.saveCustomOpenAiApiKey(gptController.text.trim());
+                    if (ctx.mounted) {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('บันทึกการตั้งค่าโมเดล AI เรียบร้อยแล้ว')),
+                      );
+                    }
+                  },
+                  child: const Text('บันทึกการตั้งค่า', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _clearImage() {
     setState(() {
       _image = null;
@@ -710,6 +939,16 @@ class _CameraPageState extends State<CameraPage>
                     child: _iconBtn(
                       _flashOn ? Icons.flash_on : Icons.flash_off_outlined,
                       onTap: () => setState(() => _flashOn = !_flashOn),
+                    ),
+                  ),
+
+                  // Floating AI Settings Button (Top Right next to close)
+                  Positioned(
+                    top: 16,
+                    right: hasImage ? 64 : 16,
+                    child: _iconBtn(
+                      Icons.tune,
+                      onTap: _showAiSettingsDialog,
                     ),
                   ),
 

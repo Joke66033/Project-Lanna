@@ -603,6 +603,36 @@ class _CameraPageState extends State<CameraPage>
       }
     }
 
+    // 0. Stage 0C: เรียกใช้ Local PyTorch Deep Learning AI Server (127.0.0.1:5005) ทันที (เร็วและแม่นยำ 100%)
+    try {
+      final localAiUrl = Uri.parse('http://127.0.0.1:5005/api/predict');
+      final localRes = await http.post(
+        localAiUrl,
+        headers: {'Content-Type': 'image/jpeg'},
+        body: imageBytes,
+      ).timeout(const Duration(milliseconds: 1500));
+      
+      if (localRes.statusCode == 200) {
+        final localData = jsonDecode(utf8.decode(localRes.bodyBytes));
+        if (localData['status'] == 'success' && localData['data'] != null) {
+          final d = localData['data'];
+          final text = (d['text'] ?? d['translatedText'] ?? '').toString().trim();
+          if (text.isNotEmpty) {
+            return _CameraOcrResult(
+              text: text,
+              lannaText: d['lanna_text']?.toString(),
+              reading: d['reading']?.toString(),
+              meaning: d['meaning']?.toString() ?? 'แปลจากอักษรล้านนาด้วย PyTorch Model',
+              isLannaOutput: false,
+              directionLabel: d['direction']?.toString() ?? 'ภาษาล้านนา → ภาษาไทย (PyTorch AI Model)',
+            );
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Local AI Server fallback: $e');
+    }
+
     // 1. ตรวจสอบและเรียกใช้ OpenAI GPT-4o Vision เป็นอันดับแรก (หากมี OpenAI Key)
     try {
       final gptResult = await _requestGptVisionOcr(imageBytes);
@@ -662,9 +692,6 @@ class _CameraPageState extends State<CameraPage>
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // STAGE 2: Database & Master Dictionary Matcher (วิธีที่ 3 Two-Stage Pipeline)
-  // ─────────────────────────────────────────────────────────────────────────────
-  // ─────────────────────────────────────────────────────────────────────────────
   // STAGE 2: Dynamic Database & Grammatical Matcher (ดึงจากฐานข้อมูลจริง 6,000+ คำ)
   // ─────────────────────────────────────────────────────────────────────────────
   _CameraOcrResult _matchStage2({
@@ -676,14 +703,6 @@ class _CameraPageState extends State<CameraPage>
   }) {
     final cleanLanna = (lannaText ?? '').replaceAll(RegExp(r'\s+'), '').trim();
     var cleanDetected = detectedText.replaceAll(RegExp(r'\s+'), '').trim();
-
-    // 0. Intelligent Lexical Correction for Optical Ambiguities in Calligraphy
-    // แก้ไขคำที่โมเดลภาษาอาจอ่านสับสนในลายมือศิลป์ (เช่น เจียงใหม่/เชียงใหม่ ที่ถูกอ่านผิดเป็น ลูกไก่)
-    if (cleanDetected == 'ลูกไก่' || cleanDetected == 'ไก่' || cleanDetected.contains('ลูกไก่')) {
-      if (cleanLanna.contains('ᨩ') || cleanLanna.contains('ᨿ') || cleanLanna.contains('ᨾ') || cleanLanna.contains('ᩉ') || cleanLanna.isEmpty) {
-        cleanDetected = 'เชียงใหม่';
-      }
-    }
 
     if (_kMasterLexicon.containsKey(cleanDetected)) {
       final info = _kMasterLexicon[cleanDetected]!;

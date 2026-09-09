@@ -53,14 +53,32 @@ if ($imageBytes === false || $imageBytes === '') {
     autoOcrRespond(null, 'ไม่สามารถอ่านไฟล์ภาพได้', 400);
 }
 
-$base64Image = base64_encode($imageBytes);
+// 0. Primary Priority: Locally Trained Lanna Vision Model (PyTorch Deep Learning)
+$predictScript = __DIR__ . '/../ai_engine/predict_vision.py';
+if (file_exists($predictScript)) {
+    $cmd = 'python ' . escapeshellarg($predictScript) . ' ' . escapeshellarg($file['tmp_name']);
+    $output = @shell_exec($cmd);
+    if ($output) {
+        $json = json_decode(trim($output), true);
+        if (is_array($json) && !empty($json['text']) && ($json['confidence'] ?? 0) >= 0.70) {
+            autoOcrRespond([
+                'text' => $json['text'],
+                'lanna_text' => $json['lanna_text'] ?? '',
+                'reading' => $json['reading'] ?? '',
+                'meaning' => $json['meaning'] ?? '',
+                'direction' => $json['direction'] ?? 'ภาษาล้านนา → ภาษาไทย (Trained AI Vision)',
+                'confidence' => $json['confidence'] ?? 0.99,
+            ]);
+        }
+    }
+}
 
-// 1. Primary: Gemini Vision AI
+// 1. Fallback: Gemini Vision AI
 $geminiKey = base64_decode('QVEuQWI4Uk42SVctZUVRdVdWMXdnZ0lZRFhWUUdWMHFneXFRd2MweHJoQ0llOFpwbElmaXc=');
 $geminiModels = [
+    'gemini-3.6-flash',
     'gemini-3.1-flash-lite',
     'gemini-3.5-flash-lite',
-    'gemini-3.6-flash',
     'gemini-3.1-flash-lite-preview',
     'gemini-flash-latest',
 ];

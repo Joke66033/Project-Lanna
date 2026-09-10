@@ -24,6 +24,10 @@ class CharacterStrokeService {
       if (data == null || data is! List) return [];
       final list = data.map((x) => CharacterStrokeModel.fromJson(x as Map<String, dynamic>)).toList();
       for (var item in list) {
+        final clean = item.charSymbol.trim().replaceAll(RegExp(r'[\u200B-\u200F\uFEFF]'), '');
+        if (clean.isNotEmpty) {
+          _cache[clean] = item;
+        }
         _cache[item.charSymbol] = item;
       }
       return list;

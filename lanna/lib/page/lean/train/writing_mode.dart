@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lanna/services/auth_provider.dart';
 import 'package:lanna/services/lanna_char_service.dart';
+import 'package:lanna/services/character_stroke_service.dart';
 import 'glyph_layout.dart';
 import 'writing_data.dart';
 import 'writing_canvas.dart';
@@ -28,6 +29,7 @@ class _WritingModePageState extends State<WritingModePage> {
   late final PageController _pageController;
   final GlobalKey<WritingCanvasState> _canvasKey =
       GlobalKey<WritingCanvasState>();
+  final CharacterStrokeService _strokeService = CharacterStrokeService();
 
   @override
   void initState() {
@@ -37,6 +39,16 @@ class _WritingModePageState extends State<WritingModePage> {
       viewportFraction: 0.35,
       initialPage: widget.initialIndex,
     );
+    _fetchCurrentStroke();
+  }
+
+  Future<void> _fetchCurrentStroke() async {
+    if (widget.items.isEmpty || _index >= widget.items.length) return;
+    final currentItem = widget.items[_index];
+    await _strokeService.getStrokeByChar(currentItem.char);
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -182,6 +194,7 @@ class _WritingModePageState extends State<WritingModePage> {
                             _index = i;
                           });
                           _canvasKey.currentState?.clear();
+                          _fetchCurrentStroke();
                         },
                         itemBuilder: (_, i) {
                           final active = i == _index;
@@ -417,6 +430,7 @@ class WritingCategoryLoaderPage extends StatefulWidget {
 
 class _WritingCategoryLoaderPageState extends State<WritingCategoryLoaderPage> {
   final LannaCharService _charService = LannaCharService();
+  final CharacterStrokeService _strokeService = CharacterStrokeService();
   List<WritingItem> _items = [];
   bool _isLoading = true;
 
@@ -428,7 +442,12 @@ class _WritingCategoryLoaderPageState extends State<WritingCategoryLoaderPage> {
 
   Future<void> _loadData() async {
     try {
-      final chars = await _charService.getAllCharacters(categoryCharId: widget.categoryCharIds);
+      final charsFuture = _charService.getAllCharacters(categoryCharId: widget.categoryCharIds);
+      final strokesFuture = _strokeService.getAllStrokes();
+
+      final results = await Future.wait([charsFuture, strokesFuture]);
+      final chars = results[0] as List<dynamic>;
+
       if (mounted) {
         setState(() {
           _items = chars.map((c) => WritingItem(

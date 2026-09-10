@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'glyph_layout.dart';
 import 'writing_ai_service.dart';
 import 'stroke_order_model.dart';
+import 'package:lanna/services/character_stroke_service.dart';
 
 class WritingCanvas extends StatefulWidget {
   final ValueChanged<List<Offset>> onChanged;
@@ -39,6 +40,29 @@ class WritingCanvasState extends State<WritingCanvas> {
   final List<Offset> _points = [];
   double _accuracy = 0.0;
   int _analysisVersion = 0;
+  final CharacterStrokeService _strokeService = CharacterStrokeService();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchStroke();
+  }
+
+  @override
+  void didUpdateWidget(covariant WritingCanvas oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.guideChar != widget.guideChar) {
+      _fetchStroke();
+    }
+  }
+
+  Future<void> _fetchStroke() async {
+    if (widget.guideChar.trim().isEmpty) return;
+    final model = await _strokeService.getStrokeByChar(widget.guideChar);
+    if (mounted && model != null) {
+      setState(() {});
+    }
+  }
 
   /// 🧹 ล้างกระดาน
   void clear() {

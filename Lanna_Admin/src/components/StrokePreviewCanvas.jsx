@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { toTilokFontString } from '../lib/thaiToLanna.js';
 
 /**
  * StrokePreviewCanvas
@@ -16,7 +17,7 @@ const STROKE_COLORS = [
   '#65a30d', // Lime
 ];
 
-export default function StrokePreviewCanvas({ strokeDataStr, charSymbol = '', size = 260 }) {
+export default function StrokePreviewCanvas({ strokeDataStr, charSymbol = '', fallbackThai = '', size = 260 }) {
   const { strokes, isValid, error } = useMemo(() => {
     if (!strokeDataStr || !strokeDataStr.trim()) {
       return { strokes: [], isValid: true, error: null };
@@ -26,15 +27,62 @@ export default function StrokePreviewCanvas({ strokeDataStr, charSymbol = '', si
       if (!Array.isArray(parsed)) {
         return { strokes: [], isValid: false, error: 'ข้อมูลต้องเป็น Array' };
       }
-      // If it's a single stroke array of points [ {x, y}, ... ], wrap it
-      if (parsed.length > 0 && !Array.isArray(parsed[0]) && typeof parsed[0] === 'object') {
-        parsed = [parsed];
+      
+      let rawStrokes = [];
+      // Case 1: [ { stroke_number: 1, points: [...] }, ... ]
+      if (parsed.length > 0 && typeof parsed[0] === 'object' && !Array.isArray(parsed[0]) && parsed[0].points) {
+        rawStrokes = parsed.map(s => Array.isArray(s.points) ? s.points : []);
       }
-      return { strokes: parsed, isValid: true, error: null };
+      // Case 2: [ [ {x, y}, ... ], ... ]
+      else if (parsed.length > 0 && Array.isArray(parsed[0])) {
+        rawStrokes = parsed;
+      }
+      // Case 3: [ {x, y}, {x, y} ] (single stroke)
+      else if (parsed.length > 0 && typeof parsed[0] === 'object' && !Array.isArray(parsed[0])) {
+        rawStrokes = [parsed];
+      }
+
+      // Check if coordinates are normalized 0..1 (all points <= 1.0)
+      let isNormalized = true;
+      let hasPoints = false;
+      for (const stroke of rawStrokes) {
+        if (!Array.isArray(stroke)) continue;
+        for (const pt of stroke) {
+          hasPoints = true;
+          const px = typeof pt.x === 'number' ? pt.x : (Array.isArray(pt) ? pt[0] : (pt.dx ?? 0));
+          const py = typeof pt.y === 'number' ? pt.y : (Array.isArray(pt) ? pt[1] : (pt.dy ?? 0));
+          if (px > 1.0 || py > 1.0) {
+            isNormalized = false;
+            break;
+          }
+        }
+        if (!isNormalized) break;
+      }
+
+      // Convert points to uniform {x, y} on 100x100 grid
+      const normalizedStrokes = rawStrokes.map(stroke => {
+        if (!Array.isArray(stroke)) return [];
+        return stroke.map(pt => {
+          let px = typeof pt.x === 'number' ? pt.x : (Array.isArray(pt) ? pt[0] : (pt.dx ?? 0));
+          let py = typeof pt.y === 'number' ? pt.y : (Array.isArray(pt) ? pt[1] : (pt.dy ?? 0));
+          if (isNormalized && hasPoints) {
+            px = px * 100;
+            py = py * 100;
+          }
+          return { x: px, y: py };
+        });
+      });
+
+      return { strokes: normalizedStrokes, isValid: true, error: null };
     } catch (err) {
       return { strokes: [], isValid: false, error: 'รูปแบบ JSON ไม่ถูกต้อง' };
     }
   }, [strokeDataStr]);
+
+  const tilokText = useMemo(() => {
+    if (!charSymbol) return '';
+    return toTilokFontString(charSymbol, fallbackThai);
+  }, [charSymbol, fallbackThai]);
 
   return (
     <div className="flex flex-col items-center justify-center p-3.5 bg-slate-50 border border-slate-200 rounded-2xl h-full">
@@ -46,15 +94,34 @@ export default function StrokePreviewCanvas({ strokeDataStr, charSymbol = '', si
       </div>
 
       <div 
-        className="relative bg-white rounded-xl shadow-inner border-2 border-slate-300 overflow-hidden select-none flex-shrink-0"
+        className="relative bg-white rounded-xl shadow-inner border-2 border-slate-300 overflow-hidden select-none flex-shrink-0 flex items-center justify-center"
         style={{ width: size, height: size }}
       >
-        {/* Grid Background */}
+        {/* Exact Lanna Character Background Template matching Table */}
+        {charSymbol && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
+            <span 
+              className="font-lanna select-none pointer-events-none"
+              style={{
+                fontFamily: "'LN-TILOK', 'LN-TILOK-6.10', 'LNTilok', sans-serif",
+                fontSize: `${size * 0.58}px`,
+                color: '#94a3b8',
+                opacity: 0.35,
+                lineHeight: 1,
+                transform: 'translateY(-4%)'
+              }}
+            >
+              {toTilokFontString(charSymbol, fallbackThai)}
+            </span>
+          </div>
+        )}
+
+        {/* Grid & Stroke Vectors */}
         <svg 
           width={size} 
           height={size} 
           viewBox="0 0 100 100" 
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full z-10"
         >
           {/* Subtle Grid Lines */}
           <line x1="0" y1="50" x2="100" y2="50" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="2,2" />
@@ -63,8 +130,6 @@ export default function StrokePreviewCanvas({ strokeDataStr, charSymbol = '', si
           <line x1="0" y1="75" x2="100" y2="75" stroke="#f1f5f9" strokeWidth="0.6" />
           <line x1="25" y1="0" x2="25" y2="100" stroke="#f1f5f9" strokeWidth="0.6" />
           <line x1="75" y1="0" x2="75" y2="100" stroke="#f1f5f9" strokeWidth="0.6" />
-          
-
 
           {/* Stroke Paths */}
           {isValid && strokes.map((stroke, strokeIdx) => {

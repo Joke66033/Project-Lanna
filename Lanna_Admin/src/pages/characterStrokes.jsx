@@ -567,7 +567,7 @@ export default function CharacterStrokesPage() {
                     <label style={{ color: '#000000' }} className="block mb-1 text-sm font-normal text-black">
                       ตัวอักขระล้านนา <span style={{ color: '#dc2626' }}>*</span>
                     </label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <input
                         type="text"
                         required
@@ -580,6 +580,12 @@ export default function CharacterStrokesPage() {
                         className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white shadow-sm font-lanna placeholder:text-gray-400"
                         placeholder="เช่น ᨠ"
                       />
+                      {/* Live Tilok Font Display Badge matching Table */}
+                      <div className="flex items-center justify-center px-4 py-2 bg-indigo-50/80 border border-indigo-200 rounded-xl min-w-[76px] min-h-[48px] shadow-sm select-none" title="ตัวอย่างฟอนต์ LN-TILOK">
+                        <LannaText fallbackThai={form.char_name} className="text-3xl text-indigo-950 leading-none">
+                          {form.char_symbol || "-"}
+                        </LannaText>
+                      </div>
                     </div>
                   </div>
 
@@ -688,6 +694,7 @@ export default function CharacterStrokesPage() {
                   <StrokePreviewCanvas
                     strokeDataStr={form.stroke_data}
                     charSymbol={form.char_symbol}
+                    fallbackThai={form.char_name}
                     size={280}
                   />
                 </div>

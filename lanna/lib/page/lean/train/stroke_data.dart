@@ -83,13 +83,9 @@ List<List<Offset>>? getConsonantStrokePaths(String char) {
     case 'ᨥ':
       return [
         [
-          const Offset(15.9, 38.7), const Offset(18.4, 35.8), const Offset(18.4, 42.2), const Offset(13.8, 42.8), const Offset(11.3, 37.8),
-          const Offset(12.2, 31.4), const Offset(15.9, 27.0), const Offset(21.0, 29.9), const Offset(27.6, 29.3), const Offset(33.3, 27.0), const Offset(35.9, 31.4),
-          const Offset(31.3, 42.7), const Offset(23.0, 52.5), const Offset(11.8, 61.3), const Offset(11.0, 70.1), const Offset(19.0, 73.0), const Offset(30.7, 72.4),
-          const Offset(38.9, 64.6), const Offset(43.6, 51.5), const Offset(48.2, 38.3), const Offset(53.2, 27.0), const Offset(58.3, 28.5), const Offset(60.9, 38.3),
-          const Offset(59.8, 52.9), const Offset(58.6, 66.1), const Offset(62.4, 73.0), const Offset(68.1, 72.4),
-          const Offset(71.2, 55.9), const Offset(75.2, 38.3), const Offset(80.4, 27.0), const Offset(85.5, 28.5), const Offset(88.1, 38.3),
-          const Offset(89.0, 52.9), const Offset(87.0, 66.1), const Offset(82.9, 72.7), const Offset(76.3, 71.2), const Offset(72.1, 61.7),
+          const Offset(28.0, 48.0), const Offset(32.0, 42.0), const Offset(42.0, 36.0), const Offset(54.0, 38.0),
+          const Offset(58.0, 50.0), const Offset(50.0, 60.0), const Offset(38.0, 64.0), const Offset(28.0, 58.0),
+          const Offset(30.0, 48.0), const Offset(44.0, 48.0), const Offset(56.0, 54.0), const Offset(64.0, 74.0),
         ],
       ];
     case 'ᨦ': // งะ (ง)
@@ -343,6 +339,73 @@ List<List<Offset>>? getConsonantStrokePaths(String char) {
 /// VOWEL STROKE COORDINATES
 List<List<Offset>>? getVowelStrokePaths(String char) {
   switch (char) {
+    // Independent Vowels (สระลอย / สระหลวง)
+    case 'ᩋ': // อะลอย (2 เส้น: หัววงใน + ตัววงนอก)
+      return [
+        [const Offset(43.0, 44.0), const Offset(39.0, 39.0), const Offset(43.0, 34.0), const Offset(49.0, 38.0), const Offset(47.0, 45.0)],
+        [const Offset(31.0, 39.0), const Offset(32.0, 52.0), const Offset(41.0, 61.0), const Offset(52.0, 61.0), const Offset(55.0, 51.0), const Offset(51.0, 39.0), const Offset(56.0, 31.0), const Offset(63.0, 34.0), const Offset(64.0, 63.0)],
+      ];
+    case 'ᩋᩣ': // อาลอย (3 เส้น: หัววงใน + ตัววงนอก + หางสระอา)
+      return [
+        [const Offset(25.0, 36.0), const Offset(20.0, 31.0), const Offset(24.0, 26.0), const Offset(30.0, 30.0), const Offset(28.0, 37.0)],
+        [const Offset(13.0, 39.0), const Offset(14.0, 52.0), const Offset(23.0, 61.0), const Offset(34.0, 61.0), const Offset(37.0, 51.0), const Offset(33.0, 39.0), const Offset(38.0, 31.0), const Offset(45.0, 34.0), const Offset(46.0, 63.0)],
+        [const Offset(58.0, 43.0), const Offset(59.0, 34.0), const Offset(67.0, 29.0), const Offset(77.0, 33.0), const Offset(81.0, 44.0), const Offset(78.0, 55.0), const Offset(85.0, 63.0)],
+      ];
+    case 'ᩋᩥ': // อิลอย (3 เส้น: หัววงใน + ตัววงนอก + สระอิบน)
+      return [
+        [const Offset(43.0, 54.0), const Offset(39.0, 49.0), const Offset(43.0, 44.0), const Offset(49.0, 48.0), const Offset(47.0, 55.0)],
+        [const Offset(31.0, 49.0), const Offset(32.0, 62.0), const Offset(41.0, 71.0), const Offset(52.0, 71.0), const Offset(55.0, 61.0), const Offset(51.0, 49.0), const Offset(56.0, 41.0), const Offset(63.0, 44.0), const Offset(64.0, 73.0)],
+        [const Offset(34.0, 34.0), const Offset(42.0, 23.0), const Offset(52.0, 20.0), const Offset(62.0, 25.0), const Offset(66.0, 34.0), const Offset(50.0, 33.0), const Offset(34.0, 34.0)],
+      ];
+    case 'ᩋᩦ': // อีลอย (4 เส้น)
+      return [
+        [const Offset(43.0, 54.0), const Offset(39.0, 49.0), const Offset(43.0, 44.0), const Offset(49.0, 48.0), const Offset(47.0, 55.0)],
+        [const Offset(31.0, 49.0), const Offset(32.0, 62.0), const Offset(41.0, 71.0), const Offset(52.0, 71.0), const Offset(55.0, 61.0), const Offset(51.0, 49.0), const Offset(56.0, 41.0), const Offset(63.0, 44.0), const Offset(64.0, 73.0)],
+        [const Offset(34.0, 34.0), const Offset(42.0, 23.0), const Offset(52.0, 20.0), const Offset(62.0, 25.0), const Offset(66.0, 34.0), const Offset(50.0, 33.0), const Offset(34.0, 34.0)],
+        [const Offset(52.0, 20.0), const Offset(52.0, 8.0)],
+      ];
+    case 'ᩋᩧ': // อึลอย (4 เส้น)
+      return [
+        [const Offset(43.0, 54.0), const Offset(39.0, 49.0), const Offset(43.0, 44.0), const Offset(49.0, 48.0), const Offset(47.0, 55.0)],
+        [const Offset(31.0, 49.0), const Offset(32.0, 62.0), const Offset(41.0, 71.0), const Offset(52.0, 71.0), const Offset(55.0, 61.0), const Offset(51.0, 49.0), const Offset(56.0, 41.0), const Offset(63.0, 44.0), const Offset(64.0, 73.0)],
+        [const Offset(34.0, 34.0), const Offset(42.0, 23.0), const Offset(52.0, 20.0), const Offset(62.0, 25.0), const Offset(66.0, 34.0), const Offset(50.0, 33.0), const Offset(34.0, 34.0)],
+        [const Offset(52.0, 20.0), const Offset(56.0, 15.0), const Offset(60.0, 20.0), const Offset(56.0, 25.0), const Offset(52.0, 20.0)],
+      ];
+    case 'ᩋᩨ': // อืลอย (5 เส้น)
+      return [
+        [const Offset(43.0, 54.0), const Offset(39.0, 49.0), const Offset(43.0, 44.0), const Offset(49.0, 48.0), const Offset(47.0, 55.0)],
+        [const Offset(31.0, 49.0), const Offset(32.0, 62.0), const Offset(41.0, 71.0), const Offset(52.0, 71.0), const Offset(55.0, 61.0), const Offset(51.0, 49.0), const Offset(56.0, 41.0), const Offset(63.0, 44.0), const Offset(64.0, 73.0)],
+        [const Offset(34.0, 34.0), const Offset(42.0, 23.0), const Offset(52.0, 20.0), const Offset(62.0, 25.0), const Offset(66.0, 34.0), const Offset(50.0, 33.0), const Offset(34.0, 34.0)],
+        [const Offset(46.0, 20.0), const Offset(46.0, 8.0)],
+        [const Offset(58.0, 20.0), const Offset(58.0, 8.0)],
+      ];
+    case 'ᩋᩩ': // อุลอย (3 เส้น)
+      return [
+        [const Offset(43.0, 44.0), const Offset(39.0, 39.0), const Offset(43.0, 34.0), const Offset(49.0, 38.0), const Offset(47.0, 45.0)],
+        [const Offset(31.0, 39.0), const Offset(32.0, 52.0), const Offset(41.0, 61.0), const Offset(52.0, 61.0), const Offset(55.0, 51.0), const Offset(51.0, 39.0), const Offset(56.0, 31.0), const Offset(63.0, 34.0), const Offset(64.0, 63.0)],
+        [const Offset(58.0, 61.0), const Offset(58.0, 74.0), const Offset(53.0, 84.0), const Offset(43.0, 88.0), const Offset(35.0, 81.0)],
+      ];
+    case 'ᩋᩪ': // อูลอย (4 เส้น)
+      return [
+        [const Offset(43.0, 44.0), const Offset(39.0, 39.0), const Offset(43.0, 34.0), const Offset(49.0, 38.0), const Offset(47.0, 45.0)],
+        [const Offset(31.0, 39.0), const Offset(32.0, 52.0), const Offset(41.0, 61.0), const Offset(52.0, 61.0), const Offset(55.0, 51.0), const Offset(51.0, 39.0), const Offset(56.0, 31.0), const Offset(63.0, 34.0), const Offset(64.0, 63.0)],
+        [const Offset(58.0, 61.0), const Offset(58.0, 74.0), const Offset(53.0, 84.0), const Offset(43.0, 88.0), const Offset(35.0, 81.0)],
+        [const Offset(58.0, 74.0), const Offset(70.0, 80.0), const Offset(84.0, 82.0)],
+      ];
+    case 'ᩮᩋ': // เอลอย (3 เส้น)
+      return [
+        [const Offset(24.0, 61.0), const Offset(18.0, 55.0), const Offset(12.0, 59.0), const Offset(16.0, 67.0), const Offset(24.0, 67.0), const Offset(32.0, 59.0), const Offset(32.0, 29.0), const Offset(26.0, 15.0), const Offset(14.0, 11.0)],
+        [const Offset(55.0, 44.0), const Offset(51.0, 39.0), const Offset(55.0, 34.0), const Offset(61.0, 38.0), const Offset(59.0, 45.0)],
+        [const Offset(43.0, 39.0), const Offset(44.0, 52.0), const Offset(53.0, 61.0), const Offset(64.0, 61.0), const Offset(67.0, 51.0), const Offset(63.0, 39.0), const Offset(68.0, 31.0), const Offset(75.0, 34.0), const Offset(76.0, 63.0)],
+      ];
+    case 'ᩰᩋ': // โอลอย (3 เส้น)
+      return [
+        [const Offset(24.0, 61.0), const Offset(18.0, 55.0), const Offset(12.0, 59.0), const Offset(16.0, 67.0), const Offset(24.0, 67.0), const Offset(32.0, 59.0), const Offset(32.0, 20.0), const Offset(22.0, 11.0), const Offset(12.0, 16.0), const Offset(18.0, 26.0), const Offset(28.0, 26.0)],
+        [const Offset(55.0, 44.0), const Offset(51.0, 39.0), const Offset(55.0, 34.0), const Offset(61.0, 38.0), const Offset(59.0, 45.0)],
+        [const Offset(43.0, 39.0), const Offset(44.0, 52.0), const Offset(53.0, 61.0), const Offset(64.0, 61.0), const Offset(67.0, 51.0), const Offset(63.0, 39.0), const Offset(68.0, 31.0), const Offset(75.0, 34.0), const Offset(76.0, 63.0)],
+      ];
+
+    // Dependent Vowels (สระจม / สระหน้อย)
     case 'ᩡ':
       return [
         [const Offset(32.0, 38.0), const Offset(38.0, 32.0), const Offset(46.0, 36.0), const Offset(42.0, 44.0), const Offset(34.0, 44.0), const Offset(26.0, 36.0), const Offset(28.0, 52.0), const Offset(38.0, 64.0), const Offset(52.0, 64.0), const Offset(60.0, 54.0)],

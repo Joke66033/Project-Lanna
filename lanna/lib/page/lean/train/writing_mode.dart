@@ -230,7 +230,7 @@ class _WritingModePageState extends State<WritingModePage> {
                               opacity: active ? 1 : 0.6,
                               duration: const Duration(milliseconds: 250),
                               child: CenteredWritingGlyph(
-                                character: widget.items[i].char,
+                                character: formatLannaDisplayGlyph(widget.items[i].char),
                                 fontFamily: 'LNTilok',
                                 color: active
                                     ? const Color(0xFF924E19)
@@ -264,7 +264,7 @@ class _WritingModePageState extends State<WritingModePage> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: item.char,
+                        text: formatLannaDisplayGlyph(item.char),
                         style: const TextStyle(
                           fontSize: 18,
                           fontFamily: 'LNTilok',

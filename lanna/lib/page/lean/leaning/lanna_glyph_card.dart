@@ -13,6 +13,13 @@ String formatLannaDisplayGlyph(String rawChar) {
   var text = rawChar.trim();
   if (text.isEmpty) return '';
 
+  // สลับการแสดงผลตัว ᨭ (ฏะ) และ ᨮ (ฐะ) ให้ตรงตามรูปร่างฟอนต์ LNTilok และวิธีเขียนจริง
+  if (text == '\u1A2D' || text == 'ᨭ') {
+    return '\u1A2E';
+  } else if (text == '\u1A2E' || text == 'ᨮ') {
+    return '\u1A2D';
+  }
+
   const subMap = {
     'ก': '\uF001', 'ข': '\uF002', 'ฃ': '\uF003', 'ค': '\uF004', 'ฅ': '\uF005', 'ฆ': '\uF006',
     'ง': '\uF007', 'จ': '\uF008', 'ฉ': '\uF009', 'ช': '\uF00A', 'ซ': '\uF00B', 'ฌ': '\uF00C',

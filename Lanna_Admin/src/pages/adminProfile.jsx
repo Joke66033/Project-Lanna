@@ -573,10 +573,11 @@ export default function AdminProfile() {
                     <input
                       type={showNewPassword ? "text" : "password"}
                       name="newPassword"
+                      autoComplete="new-password"
                       value={profile.newPassword || ""}
                       disabled={!isEditing}
                       onChange={handleChange}
-                      placeholder={isEditing ? "เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน" : "••••••••"}
+                      placeholder="เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน"
                       className={`w-full rounded-xl border pl-4 pr-10 py-3 focus:ring-2 focus:ring-orange-400 outline-none transition-colors ${
                         isEditing ? "bg-white border-gray-300" : "bg-gray-50 border-gray-200 text-gray-600"
                       }`}
@@ -628,10 +629,11 @@ export default function AdminProfile() {
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       name="confirmPassword"
+                      autoComplete="new-password"
                       value={profile.confirmPassword || ""}
                       disabled={!isEditing}
                       onChange={handleChange}
-                      placeholder={isEditing ? "เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน" : "••••••••"}
+                      placeholder="เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน"
                       className={`w-full rounded-xl border pl-4 pr-10 py-3 focus:ring-2 focus:ring-orange-400 outline-none transition-colors ${
                         isEditing ? "bg-white border-gray-300" : "bg-gray-50 border-gray-200 text-gray-600"
                       }`}
@@ -731,7 +733,11 @@ export default function AdminProfile() {
             ) : (
               <button
                 type="button"
-                onClick={() => setIsEditing(true)}
+                onClick={() => {
+                  setProfile((prev) => ({ ...prev, newPassword: "", confirmPassword: "" }));
+                  setPasswordError("");
+                  setIsEditing(true);
+                }}
                 className="w-full sm:w-auto px-10 py-3 rounded-xl bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 shadow-lg font-semibold transition text-center"
               >
                 แก้ไขข้อมูล

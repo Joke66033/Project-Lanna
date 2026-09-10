@@ -130,18 +130,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
             $projectRoot = dirname(__DIR__, 2);
             
-            // Check admin directory first if filename looks like admin or if file exists there
-            $adminFilePath = $projectRoot . '/Lanna_Admin/src/assets/image/profile/' . $filename;
-            $userFilePath = $projectRoot . '/lanna/assets/images/profile/' . $filename;
+            $subPaths = [
+                'Lanna_Admin/src/assets/image/profile/' . $filename,
+                'lanna/assets/images/profile/' . $filename,
+                'assets/images/profile/' . $filename,
+                'images/profile/' . $filename,
+                'profile/' . $filename,
+            ];
             
-            $adminFilePath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $adminFilePath);
-            $userFilePath = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $userFilePath);
+            $possibleRoots = [
+                $projectRoot,
+                dirname(__DIR__),
+                $_SERVER['DOCUMENT_ROOT'] ?? '',
+                rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/\\') . '/LANNA',
+            ];
             
             $filePath = '';
-            if (file_exists($adminFilePath) && !is_dir($adminFilePath)) {
-                $filePath = $adminFilePath;
-            } elseif (file_exists($userFilePath) && !is_dir($userFilePath)) {
-                $filePath = $userFilePath;
+            foreach ($possibleRoots as $root) {
+                if (empty($root)) continue;
+                foreach ($subPaths as $sub) {
+                    $candidate = rtrim($root, '/\\') . '/' . $sub;
+                    $candidate = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $candidate);
+                    if (is_file($candidate)) {
+                        $filePath = $candidate;
+                        break 2;
+                    }
+                }
             }
             
             if ($filePath !== '') {

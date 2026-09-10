@@ -4,13 +4,13 @@
  * 100% matched with Flutter mobile app & enhanced with comprehensive Northern Thai / Kam Mueang linguistics
  */
 
-import { parseLannaNotation, translateKamMueangOffline } from './thaiToLanna.js';
+import { parseLannaNotation, translateKamMueangOffline, SUB_WORDS } from './thaiToLanna.js';
 
 const _K = 'QVEuQWI4Uk42SVctZUVRdVdWMXdnZ0lZRFhWUUdWMHFneXFRd2MweHJoQ0llOFpwbElmaXc=';
 const API_KEY = typeof atob === 'function' ? atob(_K) : Buffer.from(_K, 'base64').toString('utf-8');
-const MODELS = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-flash-latest'];
+const MODELS = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.6-flash'];
 
-// ฐานข้อมูลคำศัพท์ล้านนา คำอ่านสำเนียงคำเมือง ความหมาย และหมวดหมู่
+// ฐานข้อมูลคำศัพท์ล้านนาสำรอง (Offline Fallback & Few-shot Knowledge Base)
 export const VOCAB_KNOWLEDGE_BASE = {
   // 1. คำทักทายและการสนทนา
   'สวัสดีตอนเช้า': { km: 'สวัสสดีตอนเจ้า', reading: 'สะ-หวัด-ดี-ตอน-เจ้า', notation: 'ส_วั\u00AAดีตอ_นเจ้_า', meaning: 'คำกล่าวทักทายในช่วงเวลาเช้า', category: 'คำทักทายและการสนทนา' },
@@ -524,11 +524,12 @@ ${categoryPromptList}
 }
 `;
 
-  // 1. ลองเรียก Gemini API
+  // 1. เรียก Google Gemini AI แบบ Live เพื่อแปลภาษาคำเมืองและจัดหมวดหมู่อย่างเป็นธรรมชาติ
   for (const model of MODELS) {
     try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -556,16 +557,19 @@ ${categoryPromptList}
           const kamMueang = (parsed.kam_mueang || cleanInput).replace(/[[\]]/g, '').trim();
           let reading = (parsed.phonetic || parsed.reading || kamMueang).replace(/[[\]]/g, '').trim();
           
-          // ถ้า reading ยังเป็นคำภาษาไทยเดิม ให้ใช้ Linguistic Engine แก้ไขเป็นคำอ่านภาษาล้านนา
-          const fallbackLinguistic = analyzeKamMueangFull(cleanInput, availableCategories);
-          if (reading === cleanInput && fallbackLinguistic.reading) {
-            reading = fallbackLinguistic.reading;
+          // นำคำเมืองหรือ notation ส่งต่อให้ Linguistic Engine แปลงเป็นตัวอักษรตั๋วเมือง
+          let notation = parsed.lanna_notation || kamMueang;
+          if (!notation.includes('_')) {
+            const sortedSubKeys = Object.keys(SUB_WORDS).sort((a, b) => b.length - a.length);
+            for (const k of sortedSubKeys) {
+              if (notation.includes(k)) {
+                notation = notation.replaceAll(k, SUB_WORDS[k]);
+              }
+            }
           }
-
-          const notation = parsed.lanna_notation || kamMueang;
-          const lannaWord = parseLannaNotation(notation, cleanInput);
-          const meaning = parsed.meaning && parsed.meaning.length > 3 ? parsed.meaning : fallbackLinguistic.meaning;
-          const category = parsed.category || fallbackLinguistic.category;
+          const lannaWord = parseLannaNotation(notation, kamMueang);
+          const meaning = parsed.meaning && parsed.meaning.length > 3 ? parsed.meaning : `คำศัพท์ภาษาล้านนา/คำเมือง (${kamMueang})`;
+          const category = parsed.category || 'คำศัพท์ทั่วไป';
 
           return {
             kam_mueang: kamMueang,
@@ -574,6 +578,7 @@ ${categoryPromptList}
             meaning: meaning,
             category: category,
             model: model,
+            is_ai: true,
           };
         }
       }

@@ -53,47 +53,45 @@ $projectRoot = dirname(__DIR__, 2);
 $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 $isSubdir = str_contains(strtolower($requestUri), '/lanna/');
 
-if ($type === 'user') {
-    $id = trim($_POST['user_id'] ?? $_POST['id'] ?? '');
+$typeDetected = ($type === 'user' || str_starts_with(strtoupper($id = trim($_POST['user_id'] ?? $_POST['admin_id'] ?? $_POST['id'] ?? '')), 'US')) ? 'user' : 'admin';
+$id = trim($_POST['admin_id'] ?? $_POST['user_id'] ?? $_POST['id'] ?? '');
+
+if ($typeDetected === 'user') {
     $table = 'users';
     $pkField = 'user_id';
-    $uploadDir = $projectRoot . '/lanna/assets/images/profile/';
+    $subPath = 'lanna/assets/images/profile';
     $apacheBaseUrl = $isSubdir ? "$baseUrl/LANNA/lanna/assets/images/profile" : "$baseUrl/lanna/assets/images/profile";
-} elseif ($type === 'admin') {
-    $id = trim($_POST['admin_id'] ?? $_POST['id'] ?? '');
+} else {
     $table = 'admin_user';
     $pkField = 'admin_id';
-    $uploadDir = $projectRoot . '/Lanna_Admin/src/assets/image/profile/';
+    $subPath = 'Lanna_Admin/src/assets/image/profile';
     $apacheBaseUrl = $isSubdir ? "$baseUrl/LANNA/Lanna_Admin/src/assets/image/profile" : "$baseUrl/Lanna_Admin/src/assets/image/profile";
-} else {
-    // Fallback: ตรวจจับจาก Prefix ของ ID
-    $id = trim($_POST['admin_id'] ?? $_POST['user_id'] ?? $_POST['id'] ?? '');
-    $isUser = str_starts_with(strtoupper($id), 'US');
-    if ($isUser) {
-        $table = 'users';
-        $pkField = 'user_id';
-        $uploadDir = $projectRoot . '/lanna/assets/images/profile/';
-        $apacheBaseUrl = $isSubdir ? "$baseUrl/LANNA/lanna/assets/images/profile" : "$baseUrl/lanna/assets/images/profile";
-    } else {
-        $table = 'admin_user';
-        $pkField = 'admin_id';
-        $uploadDir = $projectRoot . '/Lanna_Admin/src/assets/image/profile/';
-        $apacheBaseUrl = $isSubdir ? "$baseUrl/LANNA/Lanna_Admin/src/assets/image/profile" : "$baseUrl/Lanna_Admin/src/assets/image/profile";
-    }
 }
 
-// แปลง Path ตัวแยกโฟลเดอร์ตาม OS
-$uploadDir = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $uploadDir);
+$possibleRoots = [
+    $projectRoot,
+    dirname(__DIR__),
+    $_SERVER['DOCUMENT_ROOT'] ?? '',
+    rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/\\') . '/LANNA',
+];
+
+$uploadDir = '';
+foreach ($possibleRoots as $root) {
+    if (empty($root)) continue;
+    $cand = rtrim($root, '/\\') . '/' . $subPath;
+    $cand = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $cand);
+    if (is_dir($cand) || @mkdir($cand, 0777, true)) {
+        $uploadDir = rtrim($cand, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        break;
+    }
+}
+if ($uploadDir === '') {
+    $uploadDir = rtrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $projectRoot . '/' . $subPath), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    @mkdir($uploadDir, 0777, true);
+}
 
 if ($id === '') {
     respond(null, 'กรุณาระบุ admin_id หรือ user_id', 400);
-}
-
-// สร้างโฟลเดอร์สำหรับผู้ใช้ทั่วไปหากไม่มี
-if (!file_exists($uploadDir)) {
-    if (!@mkdir($uploadDir, 0777, true)) {
-        respond(null, 'เซิร์ฟเวอร์ไม่สามารถสร้างโฟลเดอร์เก็บไฟล์ได้ กรุณาตรวจสอบสิทธิ์', 500);
-    }
 }
 
 if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {

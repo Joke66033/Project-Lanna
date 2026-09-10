@@ -556,27 +556,18 @@ class _LocalStrokePainter extends CustomPainter {
   final int currentIndex;
   final double progress;
   final String char;
-  final bool animateAllStrokes;
 
   _LocalStrokePainter({
     required this.strokes,
     required this.currentIndex,
     required this.progress,
     required this.char,
-    this.animateAllStrokes = false,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     var activeStrokeIndex = currentIndex;
     var activeStrokeProgress = progress.clamp(0.0, 1.0);
-    if (animateAllStrokes && strokes.isNotEmpty) {
-      final sequenceProgress = progress.clamp(0.0, 1.0) * strokes.length;
-      activeStrokeIndex = sequenceProgress.floor().clamp(0, strokes.length - 1);
-      activeStrokeProgress = sequenceProgress >= strokes.length
-          ? 1
-          : sequenceProgress - activeStrokeIndex;
-    }
 
     // 0. Dotted grid background
     final paintDot = Paint()
@@ -724,6 +715,78 @@ class _LocalStrokePainter extends CustomPainter {
 }
 
 // ============================================================================
+// STATIC GLYPH STROKE PAINTER (วาดรูปอักขระลายเส้นตรงตามวิธีเขียนจริง)
+// ============================================================================
+class _StaticGlyphStrokePainter extends CustomPainter {
+  final List<List<Offset>> strokes;
+  final String char;
+  final Color color;
+
+  _StaticGlyphStrokePainter({
+    required this.strokes,
+    required this.char,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (strokes.isEmpty) return;
+
+    final characterRunes = char.runes.toList();
+    final isFloatingVowelOrMark =
+        characterRunes.length == 1 &&
+        characterRunes.first >= 0x1A65 &&
+        characterRunes.first <= 0x1A7C;
+
+    double minX = 100.0, minY = 100.0, maxX = 0.0, maxY = 0.0;
+    bool hasPoints = false;
+    for (final stroke in strokes) {
+      for (final pt in stroke) {
+        hasPoints = true;
+        if (pt.dx < minX) minX = pt.dx;
+        if (pt.dy < minY) minY = pt.dy;
+        if (pt.dx > maxX) maxX = pt.dx;
+        if (pt.dy > maxY) maxY = pt.dy;
+      }
+    }
+
+    final double charWidth = hasPoints ? math.max(20.0, maxX - minX) : 60.0;
+    final double charHeight = hasPoints ? math.max(20.0, maxY - minY) : 60.0;
+    final double charCenterX = hasPoints ? (minX + maxX) / 2.0 : 50.0;
+    final double charCenterY = hasPoints ? (minY + maxY) / 2.0 : 50.0;
+
+    final double targetSize = size.shortestSide * (isFloatingVowelOrMark ? 0.45 : 0.72);
+    final double scale = targetSize / math.max(charWidth, charHeight);
+
+    Offset strokeScale(Offset point) {
+      final double scaledX = (point.dx - charCenterX) * scale;
+      final double scaledY = (point.dy - charCenterY) * scale;
+      return Offset(
+        size.width / 2.0 + scaledX,
+        size.height / 2.0 + scaledY,
+      );
+    }
+
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 5.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+
+    for (final stroke in strokes) {
+      if (stroke.isEmpty) continue;
+      final path = buildStrokePath(stroke, strokeScale);
+      canvas.drawPath(path, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _StaticGlyphStrokePainter oldDelegate) =>
+      oldDelegate.strokes != strokes || oldDelegate.color != color || oldDelegate.char != char;
+}
+
+// ============================================================================
 // STROKE DETAIL BOTTOM SHEET (เหมือนในรูปที่ 2)
 // ============================================================================
 class _StrokeDetailSheet extends StatefulWidget {
@@ -838,15 +901,27 @@ class _StrokeDetailSheetState extends State<_StrokeDetailSheet>
           const SizedBox(height: 4),
 
           // Char display
-          Text(
-            widget.char,
-            style: const TextStyle(
-              fontSize: 32,
-              fontFamily: 'LNTilok',
-              color: Color(0xFF924E19),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          widget.strokes.isNotEmpty
+              ? SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: CustomPaint(
+                    painter: _StaticGlyphStrokePainter(
+                      strokes: widget.strokes,
+                      char: widget.char,
+                      color: const Color(0xFF924E19),
+                    ),
+                  ),
+                )
+              : Text(
+                  widget.char,
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontFamily: 'LNTilok',
+                    color: Color(0xFF924E19),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
           const SizedBox(height: 12),
 
           // Canvas 220x220

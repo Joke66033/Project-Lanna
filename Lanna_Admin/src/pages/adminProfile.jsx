@@ -77,10 +77,7 @@ export default function AdminProfile() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    let key = name;
-    if (name === "admin_new_pwd") key = "newPassword";
-    if (name === "admin_confirm_pwd") key = "confirmPassword";
-    setProfile(prev => ({ ...prev, [key]: value }));
+    setProfile({ ...profile, [name]: value });
     if (name === "name") {
       if (value.trim() !== "") {
         setNameError("");
@@ -565,11 +562,12 @@ export default function AdminProfile() {
             </div>
 
             {/* NEW PASSWORD & CONFIRM NEW PASSWORD (ONLY SHOWN IN EDIT MODE) */}
+            {/* NEW PASSWORD & CONFIRM NEW PASSWORD (ONLY SHOWN IN EDIT MODE) */}
             {isEditing && (
-              <>
-                {/* Anti-autofill traps for Chrome / Edge */}
-                <input type="text" style={{ display: "none" }} aria-hidden="true" tabIndex={-1} />
-                <input type="password" style={{ display: "none" }} aria-hidden="true" tabIndex={-1} />
+              <div className="space-y-6 pt-2 border-t border-gray-100">
+                {/* Dummy hidden inputs to absorb Chrome password manager autofill */}
+                <input type="text" name="fake_username_field" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
+                <input type="password" name="fake_password_field" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
 
                 {/* NEW PASSWORD */}
                 <div>
@@ -579,20 +577,16 @@ export default function AdminProfile() {
                   <div className="relative">
                     <input
                       type={showNewPassword ? "text" : "password"}
-                      name="admin_new_pwd"
-                      id="admin_new_pwd"
-                      autoComplete="off"
+                      name="newPassword"
+                      id="admin_profile_new_password"
+                      autoComplete="new-password"
                       data-lpignore="true"
                       data-form-type="other"
-                      readOnly
-                      onFocus={(e) => e.target.removeAttribute("readOnly")}
                       value={profile.newPassword || ""}
                       disabled={!isEditing}
                       onChange={handleChange}
                       placeholder="เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน"
-                      className={`w-full rounded-xl border pl-4 pr-10 py-3 focus:ring-2 focus:ring-orange-400 outline-none transition-colors ${
-                        isEditing ? "bg-white border-gray-300" : "bg-gray-50 border-gray-200 text-gray-600"
-                      }`}
+                      className="w-full rounded-xl border pl-4 pr-10 py-3 focus:ring-2 focus:ring-orange-400 outline-none transition-colors bg-white border-gray-300"
                     />
                     <button
                       type="button"
@@ -640,20 +634,16 @@ export default function AdminProfile() {
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
-                      name="admin_confirm_pwd"
-                      id="admin_confirm_pwd"
-                      autoComplete="off"
+                      name="confirmPassword"
+                      id="admin_profile_confirm_password"
+                      autoComplete="new-password"
                       data-lpignore="true"
                       data-form-type="other"
-                      readOnly
-                      onFocus={(e) => e.target.removeAttribute("readOnly")}
                       value={profile.confirmPassword || ""}
                       disabled={!isEditing}
                       onChange={handleChange}
                       placeholder="เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน"
-                      className={`w-full rounded-xl border pl-4 pr-10 py-3 focus:ring-2 focus:ring-orange-400 outline-none transition-colors ${
-                        isEditing ? "bg-white border-gray-300" : "bg-gray-50 border-gray-200 text-gray-600"
-                      }`}
+                      className="w-full rounded-xl border pl-4 pr-10 py-3 focus:ring-2 focus:ring-orange-400 outline-none transition-colors bg-white border-gray-300"
                     />
                     <button
                       type="button"
@@ -695,7 +685,7 @@ export default function AdminProfile() {
                     <p className="text-red-500 text-sm mt-1">{passwordError}</p>
                   )}
                 </div>
-              </>
+              </div>
             )}
           </div>
 

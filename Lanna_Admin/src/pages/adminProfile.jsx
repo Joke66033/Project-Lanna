@@ -576,16 +576,20 @@ export default function AdminProfile() {
                   </label>
                   <div className="relative">
                     <input
-                      type={showNewPassword ? "text" : "password"}
+                      type="text"
                       name="newPassword"
                       id="admin_profile_new_password"
-                      autoComplete="new-password"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck="false"
                       data-lpignore="true"
                       data-form-type="other"
                       value={profile.newPassword || ""}
                       disabled={!isEditing}
                       onChange={handleChange}
                       placeholder="เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน"
+                      style={{ WebkitTextSecurity: showNewPassword ? 'none' : 'disc' }}
                       className="w-full rounded-xl border pl-4 pr-10 py-3 focus:ring-2 focus:ring-orange-400 outline-none transition-colors bg-white border-gray-300"
                     />
                     <button
@@ -633,16 +637,20 @@ export default function AdminProfile() {
                   </label>
                   <div className="relative">
                     <input
-                      type={showConfirmPassword ? "text" : "password"}
+                      type="text"
                       name="confirmPassword"
                       id="admin_profile_confirm_password"
-                      autoComplete="new-password"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck="false"
                       data-lpignore="true"
                       data-form-type="other"
                       value={profile.confirmPassword || ""}
                       disabled={!isEditing}
                       onChange={handleChange}
                       placeholder="เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน"
+                      style={{ WebkitTextSecurity: showConfirmPassword ? 'none' : 'disc' }}
                       className="w-full rounded-xl border pl-4 pr-10 py-3 focus:ring-2 focus:ring-orange-400 outline-none transition-colors bg-white border-gray-300"
                     />
                     <button

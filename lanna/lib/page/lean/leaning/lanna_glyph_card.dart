@@ -20,6 +20,39 @@ String formatLannaDisplayGlyph(String rawChar) {
     return '\u1A2D';
   }
 
+  // รองรับตัว อย (ย่า/อย) พิเศษของฟอนต์ LNTilok
+  if (text == 'ᩀ' || text == 'อย' || text == '\u1A40') {
+    return '\u00A3';
+  }
+
+  const rawongBaseMap = {
+    'ᨠ': 'ก', 'ก': 'ก',
+    'ᨡ': 'ข', 'ข': 'ข',
+    'ᨣ': 'ค', 'ค': 'ค',
+    'ᨧ': 'จ', 'จ': 'จ',
+    'ᨪ': 'ซ', 'ซ': 'ซ',
+    'ᨯ': 'ด', 'ด': 'ด',
+    'ᨲ': 'ต', 'ต': 'ต',
+    'ᨴ': 'ท', 'ท': 'ท',
+    'ᨷ': 'บ', 'บ': 'บ',
+    'ᨸ': 'ป', 'ป': 'ป',
+    'ᨺ': 'ฝ', 'ฝ': 'ฝ',
+    'ᨻ': 'พ', 'พ': 'พ',
+    'ᨼ': 'ฟ', 'ฟ': 'ฟ',
+    'ᩆ': 'ศ', 'ศ': 'ศ',
+    'ᩈ': 'ส', 'ส': 'ส',
+    'ᩉ': 'ห', 'ห': 'ห',
+  };
+
+  // 0. ตรวจสอบกลุ่มพยัญชนะควบกล้ำ (ระวง - ร ควบ เช่น กร, ขร, คร, ตร, ทร, บร, พร, สร, หร)
+  if (text.contains('\u1A60\u1A41') || text.contains('\u1A60ร') || text.contains('\u1A55')) {
+    for (final entry in rawongBaseMap.entries) {
+      if (text.startsWith(entry.key)) {
+        return '${entry.value}รฯ';
+      }
+    }
+  }
+
   const subMap = {
     'ก': '\uF001', 'ข': '\uF002', 'ฃ': '\uF003', 'ค': '\uF004', 'ฅ': '\uF005', 'ฆ': '\uF006',
     'ง': '\uF007', 'จ': '\uF008', 'ฉ': '\uF009', 'ช': '\uF00A', 'ซ': '\uF00B', 'ฌ': '\uF00C',
@@ -44,13 +77,18 @@ String formatLannaDisplayGlyph(String rawChar) {
     '\u1A4C': '\uF02E',
   };
 
-  // 1. ถ้ามีเว้นวรรคคั่นระหว่างตัวอักษร เช่น "ᨲ ᨷ" หรือ "ᨲ  ᨷ"
+  // 1. ถ้ามีเว้นวรรคคั่นระหว่างตัวอักษร เช่น "ᨲ ᨷ" หรือ "ᩈ ᩁ"
   if (text.contains(' ')) {
     final parts = text.split(RegExp(r'\s+')).where((s) => s.isNotEmpty).toList();
     if (parts.length == 2) {
       final base = parts[0];
       var sub = parts[1];
       if (sub.startsWith('\u1A60')) sub = sub.substring(1);
+      if (sub == 'ᩁ' || sub == 'ร' || sub == '\u1A41' || sub == '\u1A55') {
+        if (rawongBaseMap.containsKey(base)) {
+          return '${rawongBaseMap[base]}รฯ';
+        }
+      }
       if (subMap.containsKey(sub)) {
         return '$base${subMap[sub]}';
       }

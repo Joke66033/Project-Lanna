@@ -30,17 +30,18 @@ String formatLannaDisplayGlyph(String rawChar) {
     'ล': '\uF025', 'ฦ': '\uF026', 'ว': '\uF027', 'ศ': '\uF028', 'ษ': '\uF029', 'ส': '\uF02A',
     'ห': '\uF02B', 'ฬ': '\uF02C', 'อ': '\uF02D', 'ฮ': '\uF02E',
     // Lanna Unicode equivalents:
-    '\u1A20': '\uF001', '\u1A21': '\uF002', '\u1A22': '\uF003', '\u1A23': '\uF004',
-    '\u1A24': '\uF005', '\u1A25': '\uF006', '\u1A26': '\uF007', '\u1A27': '\uF008',
+    '\u1A20': '\uF001', '\u1A21': '\uF002', '\u1A22': '\uF002', '\u1A23': '\uF004',
+    '\u1A24': '\uF004', '\u1A25': '\uF004', '\u1A26': '\uF007', '\u1A27': '\uF008',
     '\u1A28': '\uF009', '\u1A29': '\uF00A', '\u1A2A': '\uF00B', '\u1A2B': '\uF00C',
-    '\u1A2C': '\uF00D', '\u1A2D': '\uF00D', '\u1A2E': '\uF00E', '\u1A2F': '\uF00F',
-    '\u1A30': '\uF010', '\u1A31': '\uF013', '\u1A32': '\uF015', '\u1A33': '\uF016',
+    '\u1A2C': '\uF00D', '\u1A2D': '\uF00E', '\u1A2E': '\uF00F', '\u1A2F': '\uF014',
+    '\u1A30': '\uF012', '\u1A31': '\uF013', '\u1A32': '\uF015', '\u1A33': '\uF016',
     '\u1A34': '\uF017', '\u1A35': '\uF018', '\u1A36': '\uF019', '\u1A37': '\uF01A',
     '\u1A38': '\uF01B', '\u1A39': '\uF01C', '\u1A3A': '\uF01D', '\u1A3B': '\uF01E',
     '\u1A3C': '\uF01F', '\u1A3D': '\uF020', '\u1A3E': '\uF021', '\u1A3F': '\uF022',
-    '\u1A40': '\uF023', '\u1A41': '\uF024', '\u1A42': '\uF025', '\u1A43': '\uF026',
-    '\u1A45': '\uF027', '\u1A47': '\uF028', '\u1A48': '\uF029', '\u1A49': '\uF02A',
-    '\u1A4A': '\uF02B', '\u1A4B': '\uF02C', '\u1A4C': '\uF02D', '\u1A4D': '\uF02E',
+    '\u1A40': '\uF022', '\u1A41': '\uF023', '\u1A42': '\uF024', '\u1A43': '\uF025',
+    '\u1A44': '\uF026', '\u1A45': '\uF027', '\u1A46': '\uF028', '\u1A47': '\uF029',
+    '\u1A48': '\uF02A', '\u1A49': '\uF02B', '\u1A4A': '\uF02C', '\u1A4B': '\uF02D',
+    '\u1A4C': '\uF02E',
   };
 
   // 1. ถ้ามีเว้นวรรคคั่นระหว่างตัวอักษร เช่น "ᨲ ᨷ" หรือ "ᨲ  ᨷ"
@@ -57,15 +58,21 @@ String formatLannaDisplayGlyph(String rawChar) {
     }
   }
 
-  // 2. ถ้ามีเครื่องหมายทำตัวห้อย Sakot \u1A60 เช่น "ᨲ᩠ᨷ"
+  // 2. ถ้ามีเครื่องหมายทำตัวห้อย Sakot \u1A60 เช่น "ᨲ᩠ᨷ" หรือ "ᩉ᩠ᩃ"
   if (text.contains('\u1A60')) {
-    final idx = text.indexOf('\u1A60');
-    if (idx + 1 < text.length) {
-      final nextChar = text[idx + 1];
-      if (subMap.containsKey(nextChar)) {
-        return text.replaceRange(idx, idx + 2, subMap[nextChar]!);
+    final sb = StringBuffer();
+    for (int i = 0; i < text.length; i++) {
+      if (text[i] == '\u1A60' && i + 1 < text.length) {
+        final nextChar = text[i + 1];
+        if (subMap.containsKey(nextChar)) {
+          sb.write(subMap[nextChar]);
+          i++; // ข้าม nextChar
+          continue;
+        }
       }
+      sb.write(text[i]);
     }
+    return sb.toString();
   }
 
   return text;

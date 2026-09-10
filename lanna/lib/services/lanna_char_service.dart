@@ -93,7 +93,8 @@ class LannaCharService {
 
   static String? _mapCategoryCharIdToLearningCode(String categoryCharId, String name) {
     final id = categoryCharId.trim().toUpperCase();
-    if (id == 'CL0001' || id == 'CL0002' || id == 'CL0003' || name.contains('พยัญชนะ')) {
+    if (id == 'CL0001' || id == 'CL0002' || id == 'CL0003' || id == 'CL0008' || id == 'CL0009' ||
+        name.contains('พยัญชนะ') || name.contains('ห นำ') || name.contains('ควบกล้ำ') || name.contains('ระวง')) {
       return 'LC001';
     }
     if (id == 'CL0004' || id == 'CL0005' || name.contains('สระ')) {
@@ -102,10 +103,10 @@ class LannaCharService {
     if (id == 'CL0006' || name.contains('วรรณยุกต์')) {
       return 'LC003';
     }
-    if (id == 'CL0007' || name.contains('เลข')) {
+    if (id == 'CL0007' || id == 'CL0014' || name.contains('เลข')) {
       return 'LC004';
     }
-    if (id == 'CL0008' || id == 'CL0009' || id == 'CL0010' || name.contains('ตัวสะกด') || name.contains('ห นำ') || name.contains('ระวง')) {
+    if (id == 'CL0010' || name.contains('ตัวสะกด') || name.contains('ตัวห้อย')) {
       return 'LC005';
     }
     return null;

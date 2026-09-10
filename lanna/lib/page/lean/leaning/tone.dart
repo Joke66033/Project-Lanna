@@ -75,8 +75,23 @@ class _TonePageState extends State<TonePage> {
       _errorMsg = null;
     });
     try {
-      // 1. ดึงบทความอธิบายวรรณยุกต์ (CL0006)
-      final tArticles = await _articleService.getAllArticles(categoryCharId: 'CL0006');
+      // 1. ดึงหมวดหมู่ย่อยทั้งหมดที่สังกัด LC003 จาก API
+      var subCategories = await _charService.getCategoriesByLearningCode('LC003');
+      if (subCategories.isEmpty) {
+        final allCats = await _charService.getAllCategories();
+        subCategories = allCats.where((c) => 
+          (c.learningCategoryCode != null && c.learningCategoryCode!.trim().toUpperCase() == 'LC003') ||
+          c.categoryCharId.toUpperCase() == 'CL0006' ||
+          c.name.contains('วรรณยุกต์')
+        ).toList();
+      }
+
+      final List<String> catIds = subCategories.map((c) => c.categoryCharId).toList();
+      const String fallbackToneCatIds = 'CL0006';
+      final String effectiveCatIds = catIds.isNotEmpty ? catIds.join(',') : fallbackToneCatIds;
+
+      // 2. ดึงบทความอธิบายวรรณยุกต์
+      final tArticles = await _articleService.getAllArticles(categoryCharId: effectiveCatIds);
       if (tArticles.isNotEmpty && tArticles.first.content.trim().isNotEmpty) {
         _article = tArticles.first;
       } else {
@@ -88,16 +103,10 @@ class _TonePageState extends State<TonePage> {
         );
       }
 
-      // 2. ดึงวรรณยุกต์ทั้งหมดจาก API เฉพาะกลุ่ม CL0006
-      final apiTones = await _charService.getAllCharacters(categoryCharId: 'CL0006');
+      // 3. ดึงวรรณยุกต์ทั้งหมดจาก API
+      final apiTones = await _charService.getAllCharacters(categoryCharId: effectiveCatIds);
 
-      // ดึงข้อมูลหมวดหมู่เพื่อเอาชื่อแสดงเป็นแท็บย่อย
-      final categories = await _charService.getAllCategories();
-      final Map<String, String> catNames = {
-        for (var c in categories) c.categoryCharId: c.name
-      };
-
-      final List<LannaTone> listMain = [];
+      final Map<String, List<LannaTone>> dynamicMap = {};
 
       for (var c in apiTones) {
         final String rawThai = c.thaiEquivalent;
@@ -106,33 +115,46 @@ class _TonePageState extends State<TonePage> {
           parsedReading = rawThai.substring(rawThai.indexOf('(') + 1, rawThai.indexOf(')'));
         }
         
-        listMain.add(LannaTone(
+        final tone = LannaTone(
           char: c.lannaChar,
           reading: parsedReading,
           thai: rawThai,
           description: 'เครื่องหมายล้านนาตัว ${c.thaiEquivalent}',
+        );
+
+        final catId = c.categoryCharId;
+        dynamicMap.putIfAbsent(catId, () => []).add(tone);
+      }
+
+      final List<ToneGroup> groups = [];
+      for (var cat in subCategories) {
+        final list = dynamicMap[cat.categoryCharId] ?? [];
+        if (list.isNotEmpty) {
+          groups.add(ToneGroup(
+            name: cat.name,
+            categoryCharId: cat.categoryCharId,
+            tones: list,
+          ));
+        }
+      }
+
+      if (groups.isEmpty) {
+        groups.add(const ToneGroup(
+          name: 'วรรณยุกต์ล้านนา',
+          categoryCharId: 'CL0006',
+          tones: [
+            LannaTone(char: '᩵', reading: 'ไม้เหยาะ (ไม้เอก)', thai: '่ (ไม้เอก)', description: 'วรรณยุกต์เอกล้านนา'),
+            LannaTone(char: '᩶', reading: 'ไม้ขอช้าง (ไม้โท)', thai: '้ (ไม้โท)', description: 'วรรณยุกต์โทล้านนา'),
+            LannaTone(char: '᩷', reading: 'ไม้ตรี', thai: '๊ (ไม้ตรี)', description: 'วรรณยุกต์ตรีล้านนา'),
+            LannaTone(char: '᩸', reading: 'ไม้จัตวา', thai: '๋ (ไม้จัตวา)', description: 'วรรณยุกต์จัตวาล้านนา'),
+            LannaTone(char: '᩹', reading: 'ไม้ซัด', thai: '์ (การันต์/ไม้ซัด)', description: 'เครื่องหมายไม้ซัดล้านนา'),
+            LannaTone(char: '᩺', reading: 'ไม้ทัณฑฆาต (ไม้ฆ่า)', thai: '์ (การันต์)', description: 'เครื่องหมายฆ่าเสียงพยัญชนะ'),
+          ],
         ));
       }
 
-      if (listMain.isEmpty) {
-        listMain.addAll(const [
-          LannaTone(char: '᩵', reading: 'ไม้เหยาะ (ไม้เอก)', thai: '่ (ไม้เอก)', description: 'วรรณยุกต์เอกล้านนา'),
-          LannaTone(char: '᩶', reading: 'ไม้ขอช้าง (ไม้โท)', thai: '้ (ไม้โท)', description: 'วรรณยุกต์โทล้านนา'),
-          LannaTone(char: '᩷', reading: 'ไม้ตรี', thai: '๊ (ไม้ตรี)', description: 'วรรณยุกต์ตรีล้านนา'),
-          LannaTone(char: '᩸', reading: 'ไม้จัตวา', thai: '๋ (ไม้จัตวา)', description: 'วรรณยุกต์จัตวาล้านนา'),
-          LannaTone(char: '᩹', reading: 'ไม้ซัด', thai: '์ (การันต์/ไม้ซัด)', description: 'เครื่องหมายไม้ซัดล้านนา'),
-          LannaTone(char: '᩺', reading: 'ไม้ทัณฑฆาต (ไม้ฆ่า)', thai: '์ (การันต์)', description: 'เครื่องหมายฆ่าเสียงพยัญชนะ'),
-        ]);
-      }
-
       setState(() {
-        _groups = [
-          ToneGroup(
-            name: catNames['CL0006'] ?? 'วรรณยุกต์ล้านนา',
-            categoryCharId: 'CL0006',
-            tones: listMain,
-          ),
-        ].where((g) => g.tones.isNotEmpty).toList();
+        _groups = groups;
         _isLoading = false;
       });
     } catch (e) {

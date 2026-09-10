@@ -95,8 +95,24 @@ class _VowelPageState extends State<VowelPage> with SingleTickerProviderStateMix
       _errorMsg = null;
     });
     try {
-      // 1. ดึงบทความอธิบายสระทั้งหมด (CL0004 หรือ CL0005)
-      final apiArticles = await _articleService.getAllArticles(categoryCharId: 'CL0004,CL0005');
+      // 1. ดึงหมวดหมู่ย่อยทั้งหมดที่สังกัด LC002 จาก API
+      var subCategories = await _charService.getCategoriesByLearningCode('LC002');
+      if (subCategories.isEmpty) {
+        final allCats = await _charService.getAllCategories();
+        subCategories = allCats.where((c) => 
+          (c.learningCategoryCode != null && c.learningCategoryCode!.trim().toUpperCase() == 'LC002') ||
+          c.categoryCharId.toUpperCase() == 'CL0005' ||
+          c.categoryCharId.toUpperCase() == 'CL0004' ||
+          c.name.contains('สระ')
+        ).toList();
+      }
+
+      final List<String> catIds = subCategories.map((c) => c.categoryCharId).toList();
+      const String fallbackVowelCatIds = 'CL0005,CL0004';
+      final String effectiveCatIds = catIds.isNotEmpty ? catIds.join(',') : fallbackVowelCatIds;
+
+      // 2. ดึงบทความอธิบายสระทั้งหมด
+      final apiArticles = await _articleService.getAllArticles(categoryCharId: effectiveCatIds);
       _articlesMap.clear();
       for (var art in apiArticles) {
         if (art.categoryCharId != null && art.content.trim().isNotEmpty) {
@@ -116,17 +132,14 @@ class _VowelPageState extends State<VowelPage> with SingleTickerProviderStateMix
         categoryCharId: 'CL0004',
       ));
 
-      // 2. ดึงสระทั้งหมดจาก API เฉพาะกลุ่ม CL0004 และ CL0005
-      final apiVowels = await _charService.getAllCharacters(categoryCharId: 'CL0004,CL0005');
+      // 3. ดึงสระทั้งหมดจาก API
+      final apiVowels = await _charService.getAllCharacters(categoryCharId: effectiveCatIds);
 
-      // ดึงข้อมูลหมวดหมู่เพื่อเอาชื่อแสดงเป็นแท็บย่อย
-      final categories = await _charService.getAllCategories();
       final Map<String, String> catNames = {
-        for (var c in categories) c.categoryCharId: c.name
+        for (var c in subCategories) c.categoryCharId: c.name
       };
 
-      final List<LannaVowel> listJom = [];
-      final List<LannaVowel> listLoy = [];
+      final Map<String, List<LannaVowel>> dynamicMap = {};
 
       for (var c in apiVowels) {
         final String rawThai = c.thaiEquivalent;
@@ -142,25 +155,36 @@ class _VowelPageState extends State<VowelPage> with SingleTickerProviderStateMix
           description: 'สระล้านนาตัว ${c.thaiEquivalent}',
         );
 
-        if (c.categoryCharId == 'CL0005') {
-          listJom.add(vowel);
-        } else {
-          listLoy.add(vowel);
-        }
+        final catId = c.categoryCharId;
+        dynamicMap.putIfAbsent(catId, () => []).add(vowel);
       }
 
-      _vowelsMap['CL0005'] = listJom;
-      _vowelsMap['CL0004'] = listLoy;
+      _vowelsMap.clear();
+      _vowelsMap.addAll(dynamicMap);
+
+      // เรียงลำดับแท็บ: CL0005 (สระจม) มาก่อน แล้วตามด้วย CL0004 (สระลอย) และหมวดอื่นๆ
+      const canonicalOrder = ['CL0005', 'CL0004'];
+      final sortedKeys = dynamicMap.keys.toList()
+        ..sort((a, b) {
+          int indexA = canonicalOrder.indexOf(a);
+          int indexB = canonicalOrder.indexOf(b);
+          if (indexA == -1) indexA = 999;
+          if (indexB == -1) indexB = 999;
+          return indexA.compareTo(indexB);
+        });
 
       setState(() {
-        _groups = [
-          VowelGroup(name: catNames['CL0005'] ?? 'สระจม (ไม้)', categoryCharId: 'CL0005', vowels: listJom),
-          VowelGroup(name: catNames['CL0004'] ?? 'สระลอย (หลวง)', categoryCharId: 'CL0004', vowels: listLoy),
-        ].where((g) => g.vowels.isNotEmpty).toList();
+        _groups = sortedKeys.where((k) => dynamicMap[k]!.isNotEmpty).map((key) {
+          return VowelGroup(
+            name: catNames[key] ?? (key == 'CL0005' ? 'สระจม (ไม้)' : 'สระลอย (หลวง)'),
+            categoryCharId: key,
+            vowels: dynamicMap[key]!,
+          );
+        }).toList();
 
         _tabController?.removeListener(_handleTabChange);
         _tabController?.dispose();
-        _tabController = TabController(length: _groups.length, vsync: this);
+        _tabController = TabController(length: _groups.isNotEmpty ? _groups.length : 1, vsync: this);
         _tabController!.addListener(_handleTabChange);
         
         if (_groups.isNotEmpty) {

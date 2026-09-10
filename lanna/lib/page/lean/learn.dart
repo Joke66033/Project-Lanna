@@ -366,7 +366,7 @@ class LearnPageState extends State<LearnPage> {
                     title: category.title,
                     subtitle: category.description,
                     icon: icon,
-                    badgeText: count > 0 ? '$count ตัว' : 'บทเรียน',
+                    badgeText: count > 0 ? '$count ตัว' : (_getDefaultCount(category.categoryCode) > 0 ? '${_getDefaultCount(category.categoryCode)} ตัว' : 'บทเรียน'),
                     disabled: false,
                     category: category,
                   );
@@ -392,15 +392,15 @@ class LearnPageState extends State<LearnPage> {
   int _getDefaultCount(String code) {
     switch (code) {
       case 'LC001':
-        return 45;
+        return 57;
       case 'LC002':
-        return 25;
+        return 32;
       case 'LC003':
-        return 7;
+        return 5;
       case 'LC004':
         return 20;
       case 'LC005':
-        return 36;
+        return 11;
       default:
         return 0;
     }

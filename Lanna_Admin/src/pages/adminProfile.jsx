@@ -77,7 +77,10 @@ export default function AdminProfile() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile({ ...profile, [name]: value });
+    let key = name;
+    if (name === "admin_new_pwd") key = "newPassword";
+    if (name === "admin_confirm_pwd") key = "confirmPassword";
+    setProfile(prev => ({ ...prev, [key]: value }));
     if (name === "name") {
       if (value.trim() !== "") {
         setNameError("");
@@ -564,6 +567,10 @@ export default function AdminProfile() {
             {/* NEW PASSWORD & CONFIRM NEW PASSWORD (ONLY SHOWN IN EDIT MODE) */}
             {isEditing && (
               <>
+                {/* Anti-autofill traps for Chrome / Edge */}
+                <input type="text" style={{ display: "none" }} aria-hidden="true" tabIndex={-1} />
+                <input type="password" style={{ display: "none" }} aria-hidden="true" tabIndex={-1} />
+
                 {/* NEW PASSWORD */}
                 <div>
                   <label className="block mb-1 text-sm font-medium text-gray-700">
@@ -572,8 +579,13 @@ export default function AdminProfile() {
                   <div className="relative">
                     <input
                       type={showNewPassword ? "text" : "password"}
-                      name="newPassword"
-                      autoComplete="new-password"
+                      name="admin_new_pwd"
+                      id="admin_new_pwd"
+                      autoComplete="off"
+                      data-lpignore="true"
+                      data-form-type="other"
+                      readOnly
+                      onFocus={(e) => e.target.removeAttribute("readOnly")}
                       value={profile.newPassword || ""}
                       disabled={!isEditing}
                       onChange={handleChange}
@@ -628,8 +640,13 @@ export default function AdminProfile() {
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      autoComplete="new-password"
+                      name="admin_confirm_pwd"
+                      id="admin_confirm_pwd"
+                      autoComplete="off"
+                      data-lpignore="true"
+                      data-form-type="other"
+                      readOnly
+                      onFocus={(e) => e.target.removeAttribute("readOnly")}
                       value={profile.confirmPassword || ""}
                       disabled={!isEditing}
                       onChange={handleChange}

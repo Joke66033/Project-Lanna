@@ -8,6 +8,62 @@ int lannaGridColumnCount(BuildContext context) {
   return 2;
 }
 
+/// แปลงข้อความอักขระล้านนาให้จัดรูปตัวห้อยและสระตามฟอนต์ LNTilok อย่างถูกต้องสวยงาม
+String formatLannaDisplayGlyph(String rawChar) {
+  var text = rawChar.trim();
+  if (text.isEmpty) return '';
+
+  const subMap = {
+    'ก': '\uF001', 'ข': '\uF002', 'ฃ': '\uF003', 'ค': '\uF004', 'ฅ': '\uF005', 'ฆ': '\uF006',
+    'ง': '\uF007', 'จ': '\uF008', 'ฉ': '\uF009', 'ช': '\uF00A', 'ซ': '\uF00B', 'ฌ': '\uF00C',
+    'ญ': '\uF00D', 'ฎ': '\uF00E', 'ฏ': '\uF00F', 'ฐ': '\uF010', 'ฑ': '\uF011', 'ฒ': '\uF012',
+    'ณ': '\uF013', 'ด': '\uF014', 'ต': '\uF015', 'ถ': '\uF016', 'ท': '\uF017', 'ธ': '\uF018',
+    'น': '\uF019', 'บ': '\uF01A', 'ป': '\uF01B', 'ผ': '\uF01C', 'ฝ': '\uF01D', 'พ': '\uF01E',
+    'ฟ': '\uF01F', 'ภ': '\uF020', 'ม': '\uF021', 'ย': '\uF022', 'ร': '\uF023', 'ฤ': '\uF024',
+    'ล': '\uF025', 'ฦ': '\uF026', 'ว': '\uF027', 'ศ': '\uF028', 'ษ': '\uF029', 'ส': '\uF02A',
+    'ห': '\uF02B', 'ฬ': '\uF02C', 'อ': '\uF02D', 'ฮ': '\uF02E',
+    // Lanna Unicode equivalents:
+    '\u1A20': '\uF001', '\u1A21': '\uF002', '\u1A22': '\uF003', '\u1A23': '\uF004',
+    '\u1A24': '\uF005', '\u1A25': '\uF006', '\u1A26': '\uF007', '\u1A27': '\uF008',
+    '\u1A28': '\uF009', '\u1A29': '\uF00A', '\u1A2A': '\uF00B', '\u1A2B': '\uF00C',
+    '\u1A2C': '\uF00D', '\u1A2D': '\uF00D', '\u1A2E': '\uF00E', '\u1A2F': '\uF00F',
+    '\u1A30': '\uF010', '\u1A31': '\uF013', '\u1A32': '\uF015', '\u1A33': '\uF016',
+    '\u1A34': '\uF017', '\u1A35': '\uF018', '\u1A36': '\uF019', '\u1A37': '\uF01A',
+    '\u1A38': '\uF01B', '\u1A39': '\uF01C', '\u1A3A': '\uF01D', '\u1A3B': '\uF01E',
+    '\u1A3C': '\uF01F', '\u1A3D': '\uF020', '\u1A3E': '\uF021', '\u1A3F': '\uF022',
+    '\u1A40': '\uF023', '\u1A41': '\uF024', '\u1A42': '\uF025', '\u1A43': '\uF026',
+    '\u1A45': '\uF027', '\u1A47': '\uF028', '\u1A48': '\uF029', '\u1A49': '\uF02A',
+    '\u1A4A': '\uF02B', '\u1A4B': '\uF02C', '\u1A4C': '\uF02D', '\u1A4D': '\uF02E',
+  };
+
+  // 1. ถ้ามีเว้นวรรคคั่นระหว่างตัวอักษร เช่น "ᨲ ᨷ" หรือ "ᨲ  ᨷ"
+  if (text.contains(' ')) {
+    final parts = text.split(RegExp(r'\s+')).where((s) => s.isNotEmpty).toList();
+    if (parts.length == 2) {
+      final base = parts[0];
+      var sub = parts[1];
+      if (sub.startsWith('\u1A60')) sub = sub.substring(1);
+      if (subMap.containsKey(sub)) {
+        return '$base${subMap[sub]}';
+      }
+      return '$base\u1A60$sub';
+    }
+  }
+
+  // 2. ถ้ามีเครื่องหมายทำตัวห้อย Sakot \u1A60 เช่น "ᨲ᩠ᨷ"
+  if (text.contains('\u1A60')) {
+    final idx = text.indexOf('\u1A60');
+    if (idx + 1 < text.length) {
+      final nextChar = text[idx + 1];
+      if (subMap.containsKey(nextChar)) {
+        return text.replaceRange(idx, idx + 2, subMap[nextChar]!);
+      }
+    }
+  }
+
+  return text;
+}
+
 /// การ์ดรายการแบบเรียบง่าย แสดงเฉพาะอักขระล้านนากึ่งกลาง
 class LannaGlyphCard extends StatelessWidget {
   final String glyph;
@@ -44,7 +100,7 @@ class LannaGlyphCard extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  glyph,
+                  formatLannaDisplayGlyph(glyph),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 44,
